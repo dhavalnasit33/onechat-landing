@@ -105,14 +105,14 @@ export default function WhoItsFor() {
             <span className="text-brand-purple">people like you</span>
           </h2>
 
-          <p className="mt-4 font-sans text-sm sm:text-base text-brand-slate max-w-[600px] leading-relaxed">
+          {/* <p className="mt-4 font-sans text-sm sm:text-base text-brand-slate max-w-[600px] leading-relaxed">
             <span className="hidden sm:inline">
               Whether you create, build, market, or sell online — OneChat AI gives you every AI tool you need to do it better, faster, and smarter.
             </span>
             <span className="sm:hidden">
               Whether you create, build, market, or sell online — OneChat AI gives you every AI tool you need.
             </span>
-          </p>
+          </p> */}
         </div>
 
         {/* Audience Grid */}

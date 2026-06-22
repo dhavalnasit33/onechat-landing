@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface HeroProps {
   onOpenAuth: () => void;
@@ -26,6 +26,7 @@ const rotatingWords = [
 export default function Hero({ onOpenAuth }: HeroProps) {
   const [wordIndex, setWordIndex] = useState(0);
   const [fadeState, setFadeState] = useState("fade-in");
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const wordTimer = setInterval(() => {
@@ -38,6 +39,16 @@ export default function Hero({ onOpenAuth }: HeroProps) {
 
     return () => clearInterval(wordTimer);
   }, []);
+
+  const handleVideoClick = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  };
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[#FDF8FF] via-[#F0EDFF] to-[#E8F4FF] pt-32 pb-24 md:pt-40 md:pb-36 px-4">
@@ -63,9 +74,9 @@ export default function Hero({ onOpenAuth }: HeroProps) {
         </h1>
 
         {/* Subtitle */}
-        <p className="mt-8 font-sans text-base sm:text-lg md:text-xl text-[#0E1120]/70 max-w-[650px] mx-auto leading-relaxed">
+        {/* <p className="mt-8 font-sans text-base sm:text-lg md:text-xl text-[#0E1120]/70 max-w-[650px] mx-auto leading-relaxed">
           From idea to income — hundreds of AI tools for every step of building your online business.
-        </p>
+        </p> */}
 
         {/* CTA Button */}
         <div className="mt-10 flex flex-col items-center justify-center gap-4">
@@ -85,12 +96,19 @@ export default function Hero({ onOpenAuth }: HeroProps) {
           <div className="relative w-full max-w-[1200px] mx-auto rounded-2xl md:rounded-3xl bg-brand-purple p-1 sm:p-2 md:p-3 shadow-[0_20px_50px_rgba(108,86,229,0.25)] border border-brand-purple/20">
             <div className="overflow-hidden rounded-xl md:rounded-2xl aspect-[16/10] bg-brand-dark">
               <video
+                ref={videoRef}
+                onClick={handleVideoClick}
                 src="/assets/landing-page/see-it-in-actions.mp4"
+                autoPlay
+                muted
                 controls
                 loop
                 playsInline
                 preload="metadata"
-                className="w-full h-full object-cover"
+                controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
+                disablePictureInPicture
+                disableRemotePlayback
+                className="w-full h-full object-cover cursor-pointer"
               />
             </div>
           </div>

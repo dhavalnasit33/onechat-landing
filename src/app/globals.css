@@ -53,3 +53,18 @@ body {
   font-family: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui;
 }
 
+/* Hide specific video player controls */
+video::-webkit-media-controls-volume-control-container,
+video::-webkit-media-controls-mute-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-fullscreen-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-overflow-button {
+  display: none !important;
+}
+
+
