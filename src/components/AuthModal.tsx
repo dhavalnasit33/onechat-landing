@@ -1,5 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { auth, googleProvider } from "../lib/firebase";
+import {
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+} from "firebase/auth";
 import apiService from "../lib/apiService";
 
 interface AuthModalProps {
@@ -70,68 +76,78 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   }, [isOpen]);
 
-  // Load Google Identity Services script on mount
-  useEffect(() => {
-    if (typeof window !== "undefined" && !document.getElementById("google-gsi-script")) {
-      const script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client";
-      script.id = "google-gsi-script";
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-    }
-  }, []);
-
-  // Initialize and render Google Sign-In button
+  // Check for Google Redirect Result on load
   useEffect(() => {
     if (!isOpen) return;
 
-    let isMounted = true;
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result && result.user) {
+          setLoading(true);
+          try {
+            const idToken = await result.user.getIdToken();
+            await handleBackendGoogleLogin(idToken);
+          } catch (err: any) {
+            setErrorMsg(err.message || "Google Authentication failed.");
+            setLoading(false);
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("Google Redirect Result Error:", err);
+        setErrorMsg("Failed to recover login session from Google.");
+      });
+  }, [isOpen]);
 
-    const initializeGoogleSignIn = () => {
-      if (!isMounted) return;
-      const google = (window as any).google;
-      if (google && google.accounts && google.accounts.id) {
-        google.accounts.id.initialize({
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "361874907943-e4k2cponbo6g12rpu4ssi9f4iq6uguk2.apps.googleusercontent.com",
-          callback: async (response: any) => {
-            if (!isMounted) return;
-            const idToken = response.credential;
-            setLoading(true);
-            setErrorMsg(null);
-            try {
-              await handleBackendGoogleLogin(idToken);
-            } catch (err: any) {
-              if (isMounted) {
-                setErrorMsg(err.message || "Google Sign-In failed.");
+  // Render Google Identity Services Button dynamically
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let timeoutId: NodeJS.Timeout;
+
+    const renderGoogleBtn = () => {
+      const g = (window as any).google;
+      if (typeof window !== "undefined" && g && g.accounts) {
+        try {
+          g.accounts.id.initialize({
+            client_id:
+              "361874907943-e4k2cponbo6g12rpu4ssi9f4iq6uguk2.apps.googleusercontent.com",
+            callback: async (response: any) => {
+              setLoading(true);
+              setErrorMsg(null);
+              try {
+                const idToken = response.credential;
+                await handleBackendGoogleLogin(idToken);
+              } catch (err: any) {
+                setErrorMsg(err.message || "Google Authentication failed.");
                 setLoading(false);
               }
-            }
-          },
-          ux_mode: "popup",
-        });
-
-        const buttonParent = document.getElementById("google-signin-btn-container");
-        if (buttonParent && isMounted) {
-          google.accounts.id.renderButton(buttonParent, {
-            theme: "outline",
-            size: "large",
-            shape: "rectangular",
-            text: "continue_with",
-            width: 350,
+            },
+            ux_mode: "popup",
           });
+
+          const parent = document.getElementById("google-signin-button");
+          if (parent) {
+            g.accounts.id.renderButton(parent, {
+              theme: "outline",
+              size: "large",
+              shape: "pill",
+              width: parent.clientWidth || 356,
+            });
+          }
+        } catch (e) {
+          console.error("Error rendering GSI button:", e);
         }
       } else {
-        setTimeout(initializeGoogleSignIn, 100);
+        timeoutId = setTimeout(renderGoogleBtn, 300);
       }
     };
 
-    // Small delay to ensure the modal DOM is rendered
-    const timer = setTimeout(initializeGoogleSignIn, 50);
+    // Delay slightly to ensure DOM element is mounted
+    timeoutId = setTimeout(renderGoogleBtn, 100);
 
     return () => {
-      isMounted = false;
-      clearTimeout(timer);
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, [isOpen]);
 
@@ -225,31 +241,26 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       );
 
       const currentDomain = window.location.hostname;
+      const cookieStr = `FBSESSION=${fb_session_token}; path=/; max-age=2592000; secure; samesite=lax`;
 
-      // 👇 Dynamically check for HTTPS so local IP testing works on Safari
-      const isSecure = window.location.protocol === "https:";
-      const secureFlag = isSecure ? "; secure" : "";
-      const cookieStr = `FBSESSION=${fb_session_token}; path=/; max-age=2592000; samesite=lax${secureFlag}`;
-
-      // 1. Set exactly on the current host first (Bypasses Safari Private restrictions)
-      document.cookie = cookieStr;
-
-      // 2. Try the root domain if it's a live site
       if (
-        !currentDomain.includes("localhost") &&
-        !currentDomain.includes("127.0.0.1")
+        currentDomain.includes("localhost") ||
+        currentDomain.includes("127.0.0.1")
       ) {
+        document.cookie = cookieStr;
+      } else {
+        // Dynamically extract the root domain (e.g., "inspiretechnosolution.com" or "onechatai.ai")
         const hostParts = currentDomain.split(".");
         const rootDomain =
           hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
+
+        // Apply the dynamic domain to the cookie
         document.cookie = `${cookieStr}; domain=.${rootDomain}`;
       }
     }
 
-    // 👇 Give Safari Private Mode 300ms to save the cookie before routing away
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 300);
+    // Redirect to app (Nginx will route to Flutter now that FBSESSION is set)
+    window.location.href = "/";
   };
 
   const handleBackendGoogleLogin = async (idToken: string) => {
@@ -414,22 +425,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         )}
 
         {/* Google Authentication Button */}
-        <div className="w-full flex items-center justify-center min-h-[44px]">
+        <div className="w-full h-[50px] flex items-center justify-center">
           <div
-            id="google-signin-btn-container"
+            id="google-signin-button"
             className="w-full flex justify-center"
-            style={{ display: loading ? "none" : "flex" }}
           ></div>
-          {loading && (
-            <div className="flex items-center justify-center gap-3 bg-white border border-[#d6d6d6] rounded-[6px] text-black font-semibold text-[15px] w-full h-[44px]">
-              <svg className="animate-spin h-5 w-5 text-black" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-              Signing in...
-            </div>
-          )}
         </div>
+
         {/* Divider */}
         <div className="relative flex items-center w-full py-1">
           <div className="flex-grow border-t border-slate-200"></div>
