@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0E1120;
+}
+
+@theme {
+  --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui;
+  --font-poppins: var(--font-poppins), ui-serif, Georgia;
+  
+  --color-brand-purple: #6C56E5;
+  --color-brand-purple-light: #9B7FFF;
+  --color-brand-dark: #0E1120;
+  --color-brand-slate: #64748B;
+  --color-brand-border: #E8E4F0;
+  --color-brand-bg-light: #FAFAFF;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-33.3333%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-33.3333%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@utility animate-marquee-reverse {
+  animation: marquee-reverse 40s linear infinite;
+}
+
+@utility pause-marquee {
+  animation-play-state: paused;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui;
+}
+
