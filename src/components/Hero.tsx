@@ -55,21 +55,23 @@ export default function Hero({ onOpenAuth }: HeroProps) {
       {/* Background decorations */}
       <div className="absolute top-1/4 left-1/10 w-96 h-96 bg-brand-purple/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-1/10 w-96 h-96 bg-brand-purple-light/5 rounded-full blur-3xl pointer-events-none" />
-
       <div className="max-w-7xl mx-auto text-center relative z-10">
         {/* Headline */}
-        <h1 className="font-poppins text-3xl sm:text-4xl md:text-6xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[950px] mx-auto">
-          The Ultimate AI Super App for{" "}
-          <div className="h-[48px] sm:h-[60px] md:h-[80px] overflow-hidden flex items-center justify-center mt-1 sm:mt-2">
-            <span
-              className={`inline-block text-brand-purple transition-all duration-400 transform text-center font-extrabold tracking-tight ${
-                fadeState === "fade-in"
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 -translate-y-6"
-              }`}
-            >
-              {rotatingWords[wordIndex]}
-            </span>
+        <h1 className="font-poppins text-[21px] min-[375px]:text-[26px] min-[425px]:text-3xl sm:text-4xl md:text-6xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[950px] mx-auto">
+          The Ultimate AI Super App<span className="hidden sm:inline"> for</span>
+          <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-3 mt-1 sm:mt-2">
+            <span className="inline sm:hidden text-brand-dark font-extrabold">for</span>
+            <div className="h-[32px] min-[375px]:h-[38px] min-[425px]:h-[44px] sm:h-[60px] md:h-[80px] overflow-hidden flex items-center justify-center">
+              <span
+                className={`inline-block text-brand-purple transition-all duration-400 transform text-center font-extrabold tracking-tight whitespace-nowrap ${
+                  fadeState === "fade-in"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-6"
+                }`}
+              >
+                {rotatingWords[wordIndex]}
+              </span>
+            </div>
           </div>
         </h1>
 

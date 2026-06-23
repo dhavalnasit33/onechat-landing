@@ -120,7 +120,11 @@ export default function WhoItsFor() {
           {audienceData.map((data, index) => (
             <div
               key={index}
-              className="flex flex-col items-center p-5 md:p-9 rounded-2xl bg-white border border-brand-border shadow-sm transition-all duration-300 transform hover:-translate-y-1 hover:border-brand-purple hover:shadow-[0_10px_30px_rgba(108,86,229,0.1)] cursor-default select-none text-center"
+              className={`flex flex-col items-center p-5 md:p-9 rounded-2xl bg-white border border-brand-border shadow-sm transition-all duration-300 transform hover:-translate-y-1 hover:border-brand-purple hover:shadow-[0_10px_30px_rgba(108,86,229,0.1)] cursor-default select-none text-center ${
+                index === audienceData.length - 1
+                  ? "col-span-2 md:col-span-1 w-full max-w-[calc(50%-6px)] md:max-w-none justify-self-center"
+                  : ""
+              }`}
             >
               <span className="text-3xl sm:text-4xl md:text-5xl select-none leading-none">
                 {data.emoji}
