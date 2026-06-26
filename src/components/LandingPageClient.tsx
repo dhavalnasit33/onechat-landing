@@ -16,6 +16,38 @@ export default function LandingPageClient() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const cid = params.get("rdt_cid");
+      if (cid) {
+        try {
+          const currentDomain = window.location.hostname;
+          const isSecure = window.location.protocol === "https:";
+          const secureFlag = isSecure ? "; secure" : "";
+          const cookieStr = `rdt_cid=${encodeURIComponent(cid)}; path=/; max-age=${60 * 60 * 24 * 90}; samesite=lax${secureFlag}`;
+
+          // 1. Set on the current host first
+          document.cookie = cookieStr;
+
+          // 2. Try the root domain if it's a live site
+          if (
+            !currentDomain.includes("localhost") &&
+            !currentDomain.includes("127.0.0.1")
+          ) {
+            const hostParts = currentDomain.split(".");
+            const rootDomain =
+              hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
+            document.cookie = `${cookieStr}; domain=.${rootDomain}`;
+          }
+          console.log("Captured rdt_cid cookie successfully:", cid);
+        } catch (e) {
+          console.error("Error saving rdt_cid cookie:", e);
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
       const fbSessionToken = localStorage.getItem("flutter.fb_session_token");
       const isLoggedIn = localStorage.getItem("flutter.is_logged_in");
       if (isLoggedIn && fbSessionToken) {

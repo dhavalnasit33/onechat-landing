@@ -28,11 +28,13 @@ export const metadata: Metadata = {
     apple: "/icons/Icon-192.png",
   },
   other: {
-    "google-signin-client_id": process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "361874907943-e4k2cponbo6g12rpu4ssi9f4iq6uguk2.apps.googleusercontent.com",
+    "google-signin-client_id":
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      "361874907943-e4k2cponbo6g12rpu4ssi9f4iq6uguk2.apps.googleusercontent.com",
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black",
     "apple-mobile-web-app-title": "OneChat AI",
-    "robots": "index,follow",
+    robots: "index,follow",
   },
 };
 
@@ -42,7 +44,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "GTM-574KPV7S";
-  const mixpanelToken = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || "03d4baa225de32ea61053b3b47c8eed2";
+  const mixpanelToken =
+    process.env.NEXT_PUBLIC_MIXPANEL_TOKEN ||
+    "03d4baa225de32ea61053b3b47c8eed2";
   const hotjarId = process.env.NEXT_PUBLIC_HOTJAR_ID || "6510949";
 
   return (
@@ -96,6 +100,19 @@ export default function RootLayout({
             })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
           `}
         </Script>
+
+        {/* Reddit Pixel */}
+        <Script id="reddit-pixel" strategy="afterInteractive">
+          {`
+            !function(w,d){if(!w.rdt){var p=w.rdt=function(){
+            p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};
+            p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js";
+            t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s);
+            rdt('init','a2_j88r0c6qsh9b');
+            rdt('track','PageVisit');
+            }}(window,document);
+          `}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col bg-white text-[#0E1120] font-sans">
         {/* Google Tag Manager (noscript) */}
@@ -112,5 +129,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

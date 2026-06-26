@@ -263,6 +263,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     window.location.href = "/";
   };
 
+  const getCookie = (name: string) => {
+    if (typeof document === "undefined") return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return decodeURIComponent(parts.pop()?.split(";").shift() || "");
+    return null;
+  };
+
   const handleBackendGoogleLogin = async (idToken: string) => {
     try {
       // Determine client region dynamically
@@ -277,9 +285,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         console.warn("Could not determine user region:", e);
       }
 
+      const rdtCid = getCookie("_rdt_cid") || getCookie("rdt_cid");
       const response = await apiService<UserResponse>("/auth/google", {
         method: "POST",
-        body: { idToken, ...(region ? { region } : {}) },
+        body: { 
+          idToken, 
+          ...(region ? { region } : {}),
+          ...(rdtCid ? { rdt_cid: rdtCid } : {})
+        },
       });
 
       if (response && response.token) {
@@ -322,10 +335,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       } else {
         // Register Flow (Firstname and lastname defaulted to name split of email)
         const namePart = email.split("@")[0];
-        const response = await apiService<{
+        const rdtCid = getCookie("_rdt_cid") || getCookie("rdt_cid");
+        const response = await apiService<UserResponse & {
           success: boolean;
           message: string;
-          data?: UserResponse;
         }>("/auth/register", {
           method: "POST",
           body: {
@@ -334,11 +347,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             email: email.trim(),
             password: password.trim(),
             roles: ["User"],
+            ...(rdtCid ? { rdt_cid: rdtCid } : {})
           },
         });
 
-        if (response.success && response.data && response.data.token) {
-          saveAuthSession(response.data);
+        if (response.success && response.token) {
+          saveAuthSession(response);
         } else {
           throw new Error(response.message || "Registration failed.");
         }
