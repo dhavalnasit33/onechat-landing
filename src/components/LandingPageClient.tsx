@@ -17,32 +17,61 @@ export default function LandingPageClient() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      const cid = params.get("rdt_cid");
-      if (cid) {
+      const currentDomain = window.location.hostname;
+      const isSecure = window.location.protocol === "https:";
+      const secureFlag = isSecure ? "; secure" : "";
+      const cookieOpts = `path=/; max-age=${60 * 60 * 24 * 90}; samesite=lax${secureFlag}`;
+
+      // Helper to set a cookie on host and root domain
+      const setDomainCookie = (name: string, value: string) => {
+        const cookieStr = `${name}=${encodeURIComponent(value)}; ${cookieOpts}`;
+        document.cookie = cookieStr; // host-only
+        if (!currentDomain.includes("localhost") && !currentDomain.includes("127.0.0.1")) {
+          const hostParts = currentDomain.split(".");
+          const rootDomain = hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
+          document.cookie = `${cookieStr}; domain=.${rootDomain}`;
+        }
+      };
+
+      // Capture Reddit Click ID (rdt_cid)
+      const rdtCid = params.get("rdt_cid");
+      if (rdtCid) {
         try {
-          const currentDomain = window.location.hostname;
-          const isSecure = window.location.protocol === "https:";
-          const secureFlag = isSecure ? "; secure" : "";
-          const cookieStr = `rdt_cid=${encodeURIComponent(cid)}; path=/; max-age=${60 * 60 * 24 * 90}; samesite=lax${secureFlag}`;
-
-          // 1. Set on the current host first
-          document.cookie = cookieStr;
-
-          // 2. Try the root domain if it's a live site
-          if (
-            !currentDomain.includes("localhost") &&
-            !currentDomain.includes("127.0.0.1")
-          ) {
-            const hostParts = currentDomain.split(".");
-            const rootDomain =
-              hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
-            document.cookie = `${cookieStr}; domain=.${rootDomain}`;
-          }
-          console.log("Captured rdt_cid cookie successfully:", cid);
+          setDomainCookie("oc_rdt_cid", rdtCid);
+          setDomainCookie("rdt_cid", rdtCid); // Fallback old name
+          console.log("Captured rdt_cid cookie successfully:", rdtCid);
         } catch (e) {
           console.error("Error saving rdt_cid cookie:", e);
         }
       }
+
+      // Capture Meta Click ID (fbclid)
+      const fbclid = params.get("fbclid");
+      if (fbclid) {
+        try {
+          const fbc = `fb.1.${Date.now()}.${fbclid}`;
+          setDomainCookie("oc_fbc", fbc);
+          console.log("Captured oc_fbc cookie successfully:", fbc);
+        } catch (e) {
+          console.error("Error saving oc_fbc cookie:", e);
+        }
+      }
+
+      // Capture Google Click IDs (gclid, gbraid, wbraid)
+      const captureGoogleParam = (paramName: string, cookieName: string) => {
+        const value = params.get(paramName);
+        if (value) {
+          try {
+            setDomainCookie(cookieName, value);
+            console.log(`Captured ${paramName} cookie successfully:`, value);
+          } catch (e) {
+            console.error(`Error saving ${cookieName} cookie:`, e);
+          }
+        }
+      };
+      captureGoogleParam("gclid", "oc_gclid");
+      captureGoogleParam("gbraid", "oc_gbraid");
+      captureGoogleParam("wbraid", "oc_wbraid");
     }
   }, []);
 
