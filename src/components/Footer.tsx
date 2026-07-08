@@ -28,7 +28,7 @@ export default function Footer() {
             href="/affiliate"
             className="text-[13px] text-white/40 hover:text-white transition-colors font-light hover:font-medium"
           >
-            Affiliates
+            Our Affiliates
           </a>
           <a
             href="/privacy-policy"

@@ -32,8 +32,12 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (id: string) => {
+  const handleNavClick = (id: string) => {
     setMobileMenuOpen(false);
+    if (id === "our-affiliates") {
+      window.location.href = "/affiliate";
+      return;
+    }
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
@@ -45,12 +49,15 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
     { label: "Features", id: "features" },
     { label: "Why OneChat AI", id: "why-us" },
     { label: "FAQ", id: "faq" },
+    { label: "Our Affiliates", id: "our-affiliates" },
   ];
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/95 backdrop-blur-md shadow-md py-3" : "bg-transparent py-5"
+        scrolled
+          ? "bg-white/95 backdrop-blur-md shadow-md py-3"
+          : "bg-transparent py-5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,9 +82,11 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
+                onClick={() => handleNavClick(item.id)}
                 className={`text-[14px] font-semibold transition-colors hover:text-brand-purple cursor-pointer ${
-                  activeSection === item.id ? "text-brand-purple" : "text-[#64748B]"
+                  activeSection === item.id
+                    ? "text-brand-purple"
+                    : "text-[#64748B]"
                 }`}
               >
                 {item.label}
@@ -102,12 +111,32 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
               className="inline-flex items-center justify-center p-2 rounded-md text-[#0E1120] hover:text-brand-purple focus:outline-none cursor-pointer"
             >
               {mobileMenuOpen ? (
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               ) : (
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16m-7 6h7"
+                  />
                 </svg>
               )}
             </button>
@@ -121,9 +150,11 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => scrollToSection(item.id)}
+              onClick={() => handleNavClick(item.id)}
               className={`block w-full text-left px-3 py-2 rounded-md text-base font-semibold cursor-pointer ${
-                activeSection === item.id ? "text-brand-purple bg-brand-bg-light" : "text-brand-slate hover:bg-slate-50"
+                activeSection === item.id
+                  ? "text-brand-purple bg-brand-bg-light"
+                  : "text-brand-slate hover:bg-slate-50"
               }`}
             >
               {item.label}
