@@ -177,14 +177,13 @@ export default function FeaturesList({ onOpenAuth }: FeaturesListProps) {
             <div className="w-8 h-[2px] bg-brand-purple rounded" />
           </div>
 
-          <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[850px]">
-            Everything you can do with{" "}
+          <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[900px]">
+            Everything You Need is On{" "}
             <span className="text-brand-purple">OneChat AI</span>
           </h2>
 
           <p className="mt-4 font-sans text-sm sm:text-base text-brand-slate max-w-[600px] leading-relaxed">
-            Hundreds of AI tools organised around the things that matter most —
-            from making money online to running your entire business.
+            Hundreds of AI tools around Chat, Writing, Marketing, Research, Design, Ecommerce, and much more, all in one place.
           </p>
         </div>
 

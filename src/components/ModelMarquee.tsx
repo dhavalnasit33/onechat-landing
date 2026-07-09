@@ -83,11 +83,11 @@ export default function ModelMarquee() {
       <div className="max-w-7xl mx-auto px-4 text-center">
         {/* Section Title */}
         <h2 className="font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight">
-          250 Million People.{" "}
-          <span className="text-brand-purple">Too Many Tools</span>
+          Hundreds of Tools and {" "}
+          <span className="text-brand-purple">AI Models</span>
         </h2>
         <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-brand-dark/80 max-w-[850px] mx-auto leading-relaxed">
-          Every day, more than 250 million people use multiple generative AI tools — switching between ChatGPT, Claude, Gemini, and dozens more. OneChat AI brings every major AI model, and 300+ tools into one place.
+          OneChat AI is your all-in-one AI super app. Get access to every major AI model, and 300+ tools, all in one place.
         </p>
       </div>
 

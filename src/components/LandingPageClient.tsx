@@ -5,6 +5,8 @@ import Hero from "./Hero";
 import ModelMarquee from "./ModelMarquee";
 import WhoItsFor from "./WhoItsFor";
 import FeaturesList from "./FeaturesList";
+import OneQuestionSection from "./OneQuestionSection";
+import VideoSliderSection from "./VideoSliderSection";
 import AdvantageMarquee from "./AdvantageMarquee";
 import FAQAccordion from "./FAQAccordion";
 import Footer from "./Footer";
@@ -141,6 +143,8 @@ export default function LandingPageClient() {
         <Hero onOpenAuth={() => setAuthOpen(true)} />
         <ModelMarquee />
         <WhoItsFor />
+        <OneQuestionSection onOpenAuth={() => setAuthOpen(true)} />
+        <VideoSliderSection />
         <FeaturesList onOpenAuth={() => setAuthOpen(true)} />
         <AdvantageMarquee onOpenAuth={() => setAuthOpen(true)} />
         <FAQAccordion onOpenAuth={() => setAuthOpen(true)} />
