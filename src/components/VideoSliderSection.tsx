@@ -12,7 +12,7 @@ const CDN_BASE_URL = `${process.env.NEXT_PUBLIC_CDN_BASE_URL}/uploads/landing-pa
 
 const videoData: VideoItem[] = [
   {
-    title: "The white dragon",
+    title: "The white dragon warrior",
     prompt:
       "The white dragon warrior stands still, eyes full of determination and strength. The camera slowly moves closer or circles around the warrior, highlighting the powerful presence and heroic spirit of the character.",
     videoPath: `${CDN_BASE_URL}/the-white-dragon-warrior-stands-still.mp4`,
@@ -211,6 +211,7 @@ function VideoCard({ item }: { item: VideoItem }) {
 
 export default function VideoSliderSection() {
   const [isPaused, setIsPaused] = useState(false);
+  // Triplicate the data to match the marquee continuous loop requirement
   const triplicatedData = [...videoData, ...videoData, ...videoData];
 
   return (
@@ -220,20 +221,28 @@ export default function VideoSliderSection() {
     >
       <div className="max-w-7xl mx-auto px-4 text-center">
         <div className="flex flex-col items-center">
-          <h2 className="mt-5 font-poppins text-xl sm:text-2xl md:text-4xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[700px]">
-            Access Every Leading AI Video Model,{" "}
-            <span className="text-brand-purple">All in One Place</span>
+          <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[950px]">
+            Generate Any <span className="text-brand-purple"> AI Video</span> You Can Imagine{" "}
           </h2>
+          <p className="mt-4 font-sans text-sm sm:text-base text-brand-slate max-w-[600px] leading-relaxed">
+            Use text, images, and video to bring your ideas to life with every leading AI video model—all in one place.
+          </p>
         </div>
       </div>
 
-      <div
-        className="mt-12 md:mt-16 overflow-hidden relative w-full flex items-center py-4 cursor-pointer"
-        onClick={() => setIsPaused(!isPaused)}
+      {/* Scrolling Cards Marquee */}
+      <div 
+        // Changed: Added lg:cursor-default so it doesn't look clickable on desktop
+        className="mt-12 md:mt-16 overflow-hidden relative w-full flex items-center py-4 cursor-pointer  "
+        onClick={() => {
+          // Changed: Only toggle state on mobile/tablet (width < 1024px)
+          if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+            setIsPaused(!isPaused);
+          }
+        }}
       >
-        <div
-          className={`flex animate-marquee hover:pause-marquee ${isPaused ? "pause-marquee" : ""}`}
-        >
+        {/* Changed: Added lg:hover:pause-marquee to prevent sticky hover states on mobile taps */}
+        <div className={`flex animate-marquee lg:hover:pause-marquee ${isPaused ? "pause-marquee" : ""}`}>
           {triplicatedData.map((item, idx) => (
             <VideoCard key={idx} item={item} />
           ))}

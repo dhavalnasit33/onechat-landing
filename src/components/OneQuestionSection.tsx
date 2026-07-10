@@ -7,11 +7,11 @@ interface OneQuestionSectionProps {
 
 export default function OneQuestionSection({ onOpenAuth }: OneQuestionSectionProps) {
   return (
-    <section className="w-full py-16 md:py-24 bg-white px-4 border-t border-brand-border/20">
-      <div className="max-w-7xl px-4 mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+    <section className="w-full py-16 md:py-24 bg-white  border-t border-brand-border/20">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-12">
         {/* Left Side - Image with Rounded Corners */}
-        <div className="w-full lg:w-1/2 flex justify-center">
-          <div className="relative w-full max-w-[650px] overflow-hidden rounded-2xl shadow-md border border-brand-border/40">
+        <div className="w-full lg:w-2/3 flex justify-center">
+          <div className="relative w-full max-w-[800px] overflow-hidden rounded-2xl shadow-md border border-brand-border/40">
             <img
               src="/assets/landing-page/new-section-image.png"
               alt="One Question. Every AI Model."
@@ -21,7 +21,7 @@ export default function OneQuestionSection({ onOpenAuth }: OneQuestionSectionPro
         </div>
 
         {/* Right Side - Content */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-center items-center text-center max-w-[550px] mx-auto">
+        <div className="w-full lg:w-1/3 flex flex-col justify-center items-center text-center max-w-[600px] mx-auto">
           <h2 className="font-poppins text-2xl sm:text-3xl lg:text-4xl font-bold text-brand-dark tracking-tight leading-tight">
             One Question. Every AI Model.
           </h2>

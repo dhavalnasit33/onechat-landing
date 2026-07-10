@@ -168,7 +168,7 @@ export default function FeaturesList({ onOpenAuth }: FeaturesListProps) {
     <section id="features" className="w-full py-20 md:py-32 bg-white px-4">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="text-center flex flex-col items-center">
+        <div className="text-center pt-6 sm:pt-12 md:pt-16 lg:pt-40 pb-12 sm:pb-16 md:pb-24 lg:pb-64 flex flex-col items-center">
           <div className="flex items-center gap-3">
             <div className="w-8 h-[2px] bg-brand-purple rounded" />
             <span className="text-[11px] font-bold text-brand-purple tracking-[1.54px] uppercase font-sans">
