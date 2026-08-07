@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 interface HeroProps {
   onOpenAuth: () => void;
@@ -51,16 +52,31 @@ export default function Hero({ onOpenAuth }: HeroProps) {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#FDF8FF] via-[#F0EDFF] to-[#E8F4FF] pt-32 pb-24 md:pt-40 md:pb-36 px-4">
+    <section className="relative overflow-hidden bg-[#0E1120] pt-32 pb-24 md:pt-40 md:pb-36 px-4">
+      {/* Generated Background Gradient Image */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <Image
+          src="/assets/landing-page/hero-gradient-bg.png"
+          alt="Hero Background Gradient"
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
+
       {/* Background decorations */}
-      <div className="absolute top-1/4 left-1/10 w-96 h-96 bg-brand-purple/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-1/10 w-96 h-96 bg-brand-purple-light/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/10 w-96 h-96 bg-brand-purple/5 rounded-full blur-3xl pointer-events-none z-0" />
+      <div className="absolute bottom-10 right-1/10 w-96 h-96 bg-brand-purple-light/5 rounded-full blur-3xl pointer-events-none z-0" />
+
       <div className="max-w-7xl mx-auto text-center relative z-10">
         {/* Headline */}
-        <h1 className="font-poppins text-[21px] min-[375px]:text-[26px] min-[425px]:text-3xl sm:text-4xl md:text-6xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[950px] mx-auto">
-          The Ultimate AI Super App<span className="hidden sm:inline"> for</span>
+        <h1 className="font-poppins text-[21px] min-[375px]:text-[26px] min-[425px]:text-3xl sm:text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-[950px] mx-auto">
+          The Ultimate AI Super App
+          <span className="hidden sm:inline"> for</span>
           <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-3 mt-1 sm:mt-2">
-            <span className="inline sm:hidden text-brand-dark font-extrabold">for</span>
+            <span className="inline sm:hidden text-white font-extrabold">
+              for
+            </span>
             <div className="h-[32px] min-[375px]:h-[38px] min-[425px]:h-[44px] sm:h-[60px] md:h-[80px] overflow-hidden flex items-center justify-center">
               <span
                 className={`inline-block text-brand-purple transition-all duration-400 transform text-center font-extrabold tracking-tight whitespace-nowrap ${
@@ -88,7 +104,7 @@ export default function Hero({ onOpenAuth }: HeroProps) {
           >
             Start Your 7-Day Free Trial
           </button>
-          <p className="font-sans text-[13px] sm:text-[14px] text-brand-dark/50 font-medium mt-2">
+          <p className="font-sans text-[13px] sm:text-[14px] text-white/70 font-medium mt-2">
             Hundreds of AI tools • Dozens of AI models • One Platform
           </p>
         </div>

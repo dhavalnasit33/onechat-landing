@@ -52,8 +52,8 @@ export default function ModelMarquee() {
         <div
           className={`relative rounded-full shadow-md bg-white border border-brand-border overflow-hidden transition-all duration-300 group-hover:shadow-xl ${
             model.isLarge
-              ? "w-[52px] h-[52px] md:w-[76px] md:h-[76px]"
-              : "w-[40px] h-[40px] md:w-[58px] md:h-[58px]"
+              ? "w-[82px] h-[82px] md:w-[106px] md:h-[106px]"
+              : "w-[72px] h-[72px] md:w-[98px] md:h-[98px]"
           }`}
         >
           <img

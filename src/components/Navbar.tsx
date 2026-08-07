@@ -72,7 +72,11 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
               alt="OneChat AI Logo"
               className="h-8 w-8 object-contain"
             />
-            <span className="ml-2.5 font-poppins text-lg md:text-xl font-extrabold text-[#0E1120] tracking-tight">
+            <span
+              className={`ml-2.5 font-poppins text-lg md:text-xl font-extrabold tracking-tight transition-colors ${
+                scrolled ? "text-[#0E1120]" : "text-white"
+              }`}
+            >
               OneChat AI
             </span>
           </div>
@@ -86,7 +90,9 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
                 className={`text-[14px] font-semibold transition-colors hover:text-brand-purple cursor-pointer ${
                   activeSection === item.id
                     ? "text-brand-purple"
-                    : "text-[#64748B]"
+                    : scrolled
+                      ? "text-[#64748B]"
+                      : "text-white/80"
                 }`}
               >
                 {item.label}
@@ -108,7 +114,9 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-[#0E1120] hover:text-brand-purple focus:outline-none cursor-pointer"
+              className={`inline-flex items-center justify-center p-2 rounded-md hover:text-brand-purple focus:outline-none cursor-pointer transition-colors ${
+                scrolled ? "text-[#0E1120]" : "text-white"
+              }`}
             >
               {mobileMenuOpen ? (
                 <svg
