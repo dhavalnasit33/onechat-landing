@@ -56,7 +56,7 @@ export default function Hero({ onOpenAuth }: HeroProps) {
       {/* Generated Background Gradient Image */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
-          src="/assets/landing-page/hero-gradient-bg.png"
+          src="/assets/landing-page/hero-gradient-bg-v3.png"
           alt="Hero Background Gradient"
           fill
           priority
@@ -111,8 +111,8 @@ export default function Hero({ onOpenAuth }: HeroProps) {
 
         {/* Video Card */}
         <div className="mt-16 md:mt-24 px-2 sm:px-6">
-          <div className="relative w-full max-w-[1200px] mx-auto rounded-2xl md:rounded-3xl bg-brand-purple p-1 sm:p-2 md:p-3 shadow-[0_20px_50px_rgba(108,86,229,0.25)] border border-brand-purple/20">
-            <div className="overflow-hidden rounded-xl md:rounded-2xl aspect-[16/10] bg-brand-dark">
+          <div className="relative w-full max-w-[1200px] mx-auto shadow-[0_20px_50px_rgba(108,86,229,0.25)] rounded-2xl md:rounded-3xl">
+            <div className="overflow-hidden rounded-2xl md:rounded-3xl aspect-[16/10] bg-brand-dark">
               <video
                 ref={videoRef}
                 onClick={handleVideoClick}
@@ -123,7 +123,7 @@ export default function Hero({ onOpenAuth }: HeroProps) {
                 loop
                 playsInline
                 preload="metadata"
-                controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
+                controlsList="nodownload noremoteplayback noplaybackrate"
                 disablePictureInPicture
                 disableRemotePlayback
                 className="w-full h-full object-cover cursor-pointer"

@@ -59,9 +59,9 @@ video::-webkit-media-controls-mute-button {
   display: none !important;
 }
 
-video::-webkit-media-controls-fullscreen-button {
+/* video::-webkit-media-controls-fullscreen-button {
   display: none !important;
-}
+} */
 
 video::-webkit-media-controls-overflow-button {
   display: none !important;
