@@ -80,7 +80,7 @@ export default function AdvantageMarquee({ onOpenAuth }: AdvantageMarqueeProps) 
 
   return (
     <section id="why-us" className="w-full py-20 md:py-32 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 text-center">
+      <div className="max-w-[1440px] mx-auto px-4 text-center">
         {/* Section Header */}
         <div className="flex flex-col items-center">
           <div className="flex items-center gap-3">

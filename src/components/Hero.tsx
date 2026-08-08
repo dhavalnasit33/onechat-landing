@@ -68,10 +68,10 @@ export default function Hero({ onOpenAuth }: HeroProps) {
       <div className="absolute top-1/4 left-1/10 w-96 h-96 bg-brand-purple/5 rounded-full blur-3xl pointer-events-none z-0" />
       <div className="absolute bottom-10 right-1/10 w-96 h-96 bg-brand-purple-light/5 rounded-full blur-3xl pointer-events-none z-0" />
 
-      <div className="max-w-7xl mx-auto text-center relative z-10">
+      <div className="max-w-[1440px] mx-auto text-center relative z-10">
         {/* Headline */}
-        <h1 className="font-poppins text-[21px] min-[375px]:text-[26px] min-[425px]:text-3xl sm:text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-[950px] mx-auto">
-          The Ultimate AI Super App
+        <h1 className="font-poppins text-[21px] min-[375px]:text-[26px] min-[425px]:text-3xl sm:text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-5xl mx-auto">
+          The #1 All-in-One AI Super App
           <span className="hidden sm:inline"> for</span>
           <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-3 mt-1 sm:mt-2">
             <span className="inline sm:hidden text-white font-extrabold">

@@ -80,7 +80,7 @@ export default function ModelMarquee() {
 
   return (
     <section className="w-full py-16 md:py-24 bg-gradient-to-b from-[#E8F4FF] via-[#F0EDFF] via-[#FAFAFF] to-white">
-      <div className="max-w-7xl mx-auto px-4 text-center">
+      <div className="max-w-[1440px] mx-auto px-4 text-center">
         {/* Section Title */}
         <h2 className="font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight">
           Hundreds of Tools and {" "}

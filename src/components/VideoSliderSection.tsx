@@ -219,7 +219,7 @@ export default function VideoSliderSection() {
       id="video-showcase"
       className="w-full py-16 md:py-24 bg-white overflow-hidden border-t border-brand-border/20"
     >
-      <div className="max-w-7xl mx-auto px-4 text-center">
+      <div className="max-w-[1440px] mx-auto px-4 text-center">
         <div className="flex flex-col items-center">
           <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[950px]">
             Generate Any <span className="text-brand-purple"> AI Video</span> You Can Imagine{" "}

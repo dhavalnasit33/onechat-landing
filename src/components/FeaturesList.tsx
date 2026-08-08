@@ -166,7 +166,7 @@ const featuresData: Feature[] = [
 export default function FeaturesList({ onOpenAuth }: FeaturesListProps) {
   return (
     <section id="features" className="w-full py-20 md:py-32 bg-white px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-[1440px] mx-auto">
         {/* Section Header */}
         <div className="text-center pt-6 sm:pt-12 md:pt-16 lg:pt-40 pb-12 sm:pb-16 md:pb-24 lg:pb-64 flex flex-col items-center">
           <div className="flex items-center gap-3">

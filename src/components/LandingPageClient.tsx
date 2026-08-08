@@ -11,6 +11,7 @@ import AdvantageMarquee from "./AdvantageMarquee";
 import FAQAccordion from "./FAQAccordion";
 import Footer from "./Footer";
 import AuthModal from "./AuthModal";
+import AmazingFeatures from "./AmazingFeatures";
 
 export default function LandingPageClient() {
   const [authOpen, setAuthOpen] = useState(false);
@@ -142,10 +143,11 @@ export default function LandingPageClient() {
       <main className="flex-1 w-full flex flex-col">
         <Hero onOpenAuth={() => setAuthOpen(true)} />
         <ModelMarquee />
-        <WhoItsFor />
+         <AmazingFeatures onOpenAuth={() => setAuthOpen(true)} />
         <OneQuestionSection onOpenAuth={() => setAuthOpen(true)} />
         <VideoSliderSection />
         <FeaturesList onOpenAuth={() => setAuthOpen(true)} />
+        <WhoItsFor />
         <AdvantageMarquee onOpenAuth={() => setAuthOpen(true)} />
         <FAQAccordion onOpenAuth={() => setAuthOpen(true)} />
       </main>

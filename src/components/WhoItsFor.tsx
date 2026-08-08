@@ -88,7 +88,7 @@ const audienceData: Audience[] = [
 export default function WhoItsFor() {
   return (
     <section id="who-its-for" className="w-full py-20 md:py-32 bg-white px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-[1440px] mx-auto">
         {/* Section Header */}
         <div className="text-center flex flex-col items-center">
           <div className="flex items-center gap-3">

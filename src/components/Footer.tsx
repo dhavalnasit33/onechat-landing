@@ -4,7 +4,7 @@ import React from "react";
 export default function Footer() {
   return (
     <footer className="bg-brand-dark text-white py-12 px-6 sm:px-12 md:px-20 mt-auto">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Left: Logo & Copyright */}
         <div className="flex flex-col items-center md:items-start gap-3">
           <div className="flex items-center">
