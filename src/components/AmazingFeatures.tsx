@@ -204,6 +204,10 @@ export default function AmazingFeatures({ onOpenAuth }: AmazingFeaturesProps) {
                 <img
                   src={feature.icon}
                   alt={feature.title}
+                  width={64}
+                  height={64}
+                  loading="lazy"
+                  decoding="async"
                   className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 object-contain"
                   onError={(e) => {
                     e.currentTarget.style.display = "none";

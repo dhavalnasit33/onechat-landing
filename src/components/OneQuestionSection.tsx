@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 
 interface OneQuestionSectionProps {
   onOpenAuth: () => void;
@@ -15,9 +16,11 @@ export default function OneQuestionSection({
           {/* Left Side - Image with Rounded Corners */}
           <div className="w-full lg:w-2/3 flex justify-center">
             <div className="relative w-full   overflow-hidden rounded-2xl shadow-md border border-brand-border/40">
-              <img
+              <Image
                 src="/assets/landing-page/new-section-image.png"
                 alt="One Question. Every AI Model."
+                width={1100}
+                height={688}
                 className="w-full h-auto object-cover"
               />
             </div>

@@ -27,6 +27,7 @@ const rotatingWords = [
 export default function Hero({ onOpenAuth }: HeroProps) {
   const [wordIndex, setWordIndex] = useState(0);
   const [fadeState, setFadeState] = useState("fade-in");
+  const [videoSrc, setVideoSrc] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -38,7 +39,15 @@ export default function Hero({ onOpenAuth }: HeroProps) {
       }, 400); // duration of fade-out
     }, 2500);
 
-    return () => clearInterval(wordTimer);
+    // Defer video loading to prioritize critical assets
+    const videoTimer = setTimeout(() => {
+      setVideoSrc("/assets/landing-page/see-it-in-actions.mp4");
+    }, 1000);
+
+    return () => {
+      clearInterval(wordTimer);
+      clearTimeout(videoTimer);
+    };
   }, []);
 
   const handleVideoClick = () => {
@@ -116,7 +125,7 @@ export default function Hero({ onOpenAuth }: HeroProps) {
               <video
                 ref={videoRef}
                 onClick={handleVideoClick}
-                src="/assets/landing-page/see-it-in-actions.mp4"
+                src={videoSrc || undefined}
                 autoPlay
                 muted
                 controls

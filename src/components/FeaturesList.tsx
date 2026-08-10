@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 interface Feature {
   section: number;
@@ -13,6 +14,56 @@ interface Feature {
 
 interface FeaturesListProps {
   onOpenAuth: () => void;
+}
+
+function FeatureVideo({ videoPath }: { videoPath: string }) {
+  const [isInView, setIsInView] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            videoRef.current
+              ?.play()
+              .catch((err) => console.log("Autoplay blocked:", err));
+          } else {
+            videoRef.current?.pause();
+          }
+        });
+      },
+      {
+        rootMargin: "300px",
+        threshold: 0.1,
+      }
+    );
+
+    const currentVideoRef = videoRef.current;
+    if (currentVideoRef) {
+      observer.observe(currentVideoRef);
+    }
+
+    return () => {
+      if (currentVideoRef) {
+        observer.unobserve(currentVideoRef);
+      }
+    };
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      src={isInView ? videoPath : ""}
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="metadata"
+      className="w-full h-full object-cover"
+    />
+  );
 }
 
 const featuresData: Feature[] = [
@@ -210,21 +261,15 @@ export default function FeaturesList({ onOpenAuth }: FeaturesListProps) {
                   <div className="relative z-10 w-full max-w-[550px] lg:max-w-none rounded-2xl bg-brand-purple p-1.5 sm:p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.15)] border border-brand-purple/20">
                     <div className="overflow-hidden rounded-xl aspect-[16/10] bg-brand-dark flex items-center justify-center">
                       {feature.imagePath ? (
-                        <img
+                        <Image
                           src={feature.imagePath}
                           alt={feature.title}
+                          width={550}
+                          height={344}
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <video
-                          src={feature.videoPath}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          preload="metadata"
-                          className="w-full h-full object-cover"
-                        />
+                        feature.videoPath && <FeatureVideo videoPath={feature.videoPath} />
                       )}
                     </div>
                   </div>

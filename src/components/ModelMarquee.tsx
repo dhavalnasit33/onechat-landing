@@ -86,6 +86,8 @@ export default function ModelMarquee() {
             alt={model.name}
             loading="lazy"
             decoding="async"
+            width={98}
+            height={98}
             className="w-full h-full object-cover"
             onError={(e) => {
               // Fallback if image fails to load
