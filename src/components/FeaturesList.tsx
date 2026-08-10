@@ -108,34 +108,34 @@ const featuresData: Feature[] = [
     videoPath: "/assets/landing-page/design-media-section-11.mp4",
     gradientClass: "from-[#FDF2F8] to-[#F0D4EC]",
   },
-  {
-    section: 9,
-    title: "Marketing",
-    description:
-      "Plan, create, and launch marketing that actually works — without the agency budget or the wait.",
-    bullets: [
-      "Content marketing — plan, write, and publish content that attracts customers",
-      "Social media — create posts, captions, and full campaigns across every platform",
-      "Ad copy — generate headlines, landing pages, and ads that convert",
-      "Marketing ideas — get fresh campaign concepts and angles on demand",
-    ],
-    videoPath: "/assets/landing-page/marketing-section-9.mp4",
-    gradientClass: "from-[#FFF3E8] to-[#FAEEDA]",
-  },
-  {
-    section: 10,
-    title: "Ecommerce & Shopify",
-    description:
-      "Everything you need to sell online — from product listings to full marketing campaigns, built for ecommerce sellers at every level.",
-    bullets: [
-      "Product descriptions — write compelling copy for any product in seconds",
-      "Marketplace listings — optimise titles, descriptions, and keywords for Shopify, Amazon, Etsy, and more",
-      "Ecommerce ads & emails — create Facebook, Google, and email campaigns that drive sales",
-      "Digital products — create, market, and sell ecommerce ebooks, courses, templates, and presets",
-    ],
-    videoPath: "/assets/landing-page/ecommerce-shopify-section-8.mp4",
-    gradientClass: "from-[#E1F5EE] to-[#D4F5E4]",
-  },
+  // {
+  //   section: 9,
+  //   title: "Marketing",
+  //   description:
+  //     "Plan, create, and launch marketing that actually works — without the agency budget or the wait.",
+  //   bullets: [
+  //     "Content marketing — plan, write, and publish content that attracts customers",
+  //     "Social media — create posts, captions, and full campaigns across every platform",
+  //     "Ad copy — generate headlines, landing pages, and ads that convert",
+  //     "Marketing ideas — get fresh campaign concepts and angles on demand",
+  //   ],
+  //   videoPath: "/assets/landing-page/marketing-section-9.mp4",
+  //   gradientClass: "from-[#FFF3E8] to-[#FAEEDA]",
+  // },
+  // {
+  //   section: 10,
+  //   title: "Ecommerce & Shopify",
+  //   description:
+  //     "Everything you need to sell online — from product listings to full marketing campaigns, built for ecommerce sellers at every level.",
+  //   bullets: [
+  //     "Product descriptions — write compelling copy for any product in seconds",
+  //     "Marketplace listings — optimise titles, descriptions, and keywords for Shopify, Amazon, Etsy, and more",
+  //     "Ecommerce ads & emails — create Facebook, Google, and email campaigns that drive sales",
+  //     "Digital products — create, market, and sell ecommerce ebooks, courses, templates, and presets",
+  //   ],
+  //   videoPath: "/assets/landing-page/ecommerce-shopify-section-8.mp4",
+  //   gradientClass: "from-[#E1F5EE] to-[#D4F5E4]",
+  // },
   // {
   //   section: 11,
   //   title: "Build Online Income",
@@ -148,24 +148,24 @@ const featuresData: Feature[] = [
   //   videoPath: "/assets/landing-page/build-online-income-section-4.mp4",
   //   gradientClass: "from-[#E8FFE8] to-[#D4F5E8]",
   // },
-  {
-    section: 14,
-    title: "Documents & PDFs",
-    description:
-      "Work smarter with any document — upload, ask questions, summarise, and take action without leaving your workspace.",
-    bullets: [
-      "Chat with any document — ask questions and get answers directly from PDFs and files",
-      "Edit, fill, and sign PDFs — handle paperwork without installing extra software",
-      "Summarise anything — extract key points from long documents in seconds",
-    ],
-    videoPath: "/assets/landing-page/documents-pdf-section-12.mp4",
-    gradientClass: "from-[#EFF6FF] to-[#D4E8FF]",
-  },
+  // {
+  //   section: 14,
+  //   title: "Documents & PDFs",
+  //   description:
+  //     "Work smarter with any document — upload, ask questions, summarise, and take action without leaving your workspace.",
+  //   bullets: [
+  //     "Chat with any document — ask questions and get answers directly from PDFs and files",
+  //     "Edit, fill, and sign PDFs — handle paperwork without installing extra software",
+  //     "Summarise anything — extract key points from long documents in seconds",
+  //   ],
+  //   videoPath: "/assets/landing-page/documents-pdf-section-12.mp4",
+  //   gradientClass: "from-[#EFF6FF] to-[#D4E8FF]",
+  // },
 ];
 
 export default function FeaturesList({ onOpenAuth }: FeaturesListProps) {
   return (
-    <section id="features" className="w-full py-20 md:py-32 bg-white px-4">
+    <section id="demos" className="w-full py-20 md:py-32 bg-white px-4">
       <div className="max-w-[1440px] mx-auto">
         {/* Section Header */}
         <div className="text-center pt-6 sm:pt-12 md:pt-16 lg:pt-40 pb-12 sm:pb-16 md:pb-24 lg:pb-64 flex flex-col items-center">

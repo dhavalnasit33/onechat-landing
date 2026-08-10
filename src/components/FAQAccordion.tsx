@@ -9,31 +9,31 @@ interface FAQItem {
 const faqData: FAQItem[] = [
   {
     q: "What exactly is OneChat AI?",
-    a: "OneChat AI is an AI super app giving you access to 100+ AI tools, 14 AI models, image generation, video creation, cloud storage, and a full workspace — all under one subscription. Replace Jasper, ChatGPT Plus, Canva, Grammarly, and Runway with one platform from $9.99/mo.",
+    a: "OneChat AI is an all-in-one AI super app that brings leading AI models and hundreds of tools together in one platform. You can chat, research, write, create images and videos, design content, build websites and emails, manage projects, store files, work with PDFs, and much more.",
   },
   {
-    q: "How is it different from ChatGPT or Claude?",
-    a: "ChatGPT and Claude are AI models. OneChat AI is a platform that includes those models plus 12 others, plus 100+ purpose-built tools for writing, marketing, images, video, and more. One platform on top of all the AI models.",
+    q: "How is OneChat AI different from other AI platforms?",
+    a: "Instead of giving you access to only one AI model or one type of tool, OneChat AI brings leading AI models and a wide range of creation, research, design, productivity, and business tools together. You can do more without switching between different platforms, accounts, and subscriptions.",
   },
   {
-    q: "Do I need any technical skills?",
-    a: "None at all. OneChat AI is built for everyday people — entrepreneurs, creators, freelancers, and business owners. If you can type a sentence, you can use every tool on the platform.",
+    q: "Do I need separate accounts or subscriptions for each AI model?",
+    a: "No. You can access all supported AI models directly through your OneChat AI account—without creating or managing separate accounts and subscriptions for every provider.",
   },
   {
-    q: "What if I already pay for ChatGPT Plus?",
-    a: "OneChat AI includes ChatGPT and 13 other models — so you can cancel your separate ChatGPT Plus subscription. Most users save $100–$300/mo by consolidating into OneChat AI.",
+    q: "What can I create with OneChat AI?",
+    a: "You can create written content, images, videos, social media posts, marketing campaigns, websites, emails, resumes, cover letters, brochures, flyers, posters, business documents, and much more—all from one platform.",
   },
   {
     q: "Is there a free trial?",
-    a: "Yes. Every new user gets a free trial to explore OneChat AI before being charged. You can cancel any time before it ends.",
+    a: "Yes. OneChat AI offers a 7-day free trial that allows you to explore and test most of the platform’s features before choosing a paid plan. Usage limits may apply to certain models and resource-intensive features.",
   },
-  {
-    q: "Is my data private and secure?",
-    a: "Yes. We take your privacy seriously. We never sell your personal data or use your conversations to train AI models. Your prompts and outputs are processed by the AI models you choose to use (such as OpenAI, Anthropic, Google) and are handled according to their respective policies, but we do not retain or share your content for any training purposes. We use industry-standard security practices to protect your account information.",
-  },
+  // {
+  //   q: "Is my data private and secure?",
+  //   a: "Yes. We take your privacy seriously. We never sell your personal data or use your conversations to train AI models. Your prompts and outputs are processed by the AI models you choose to use (such as OpenAI, Anthropic, Google) and are handled according to their respective policies, but we do not retain or share your content for any training purposes. We use industry-standard security practices to protect your account information.",
+  // },
   {
     q: "How do I contact OneChat AI?",
-    a: "You can reach us at support@onechatai.ai for any questions, feedback, billing issues, or technical support. We aim to respond to all inquiries within 1–2 business days.",
+    a: "You can contact us at support@onechatai.ai with questions, feedback, billing concerns, or technical issues. We aim to respond within 1–2 business days.",
   },
 ];
 

@@ -14,13 +14,13 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
 
-      const sections = ["who-its-for", "features", "why-us", "faq"];
+      const sections = ["features", "demos", "who-its-for", "why-us", "faq"];
       let current = "home";
       for (const section of sections) {
         const el = document.getElementById(section);
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.top <= 150) {
+          if (rect.top <= 250 && rect.bottom >= 100) {
             current = section;
           }
         }
@@ -38,6 +38,7 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
       window.location.href = "/affiliate";
       return;
     }
+    setActiveSection(id);
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
@@ -45,8 +46,9 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
   };
 
   const navItems = [
-    { label: "Who it's for", id: "who-its-for" },
     { label: "Features", id: "features" },
+    { label: "Demos", id: "demos" },
+    { label: "Who it's for", id: "who-its-for" },
     { label: "Why OneChat AI", id: "why-us" },
     { label: "FAQ", id: "faq" },
     { label: "Our Affiliates", id: "our-affiliates" },
@@ -82,12 +84,12 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
           </div>
 
           {/* Desktop Nav items */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-3 lg:space-x-6 xl:space-x-8">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`text-[14px] font-semibold transition-colors hover:text-brand-purple cursor-pointer ${
+                className={`text-[13px] lg:text-[14px] font-semibold transition-colors hover:text-brand-purple cursor-pointer whitespace-nowrap ${
                   activeSection === item.id
                     ? "text-brand-purple"
                     : scrolled
@@ -104,7 +106,7 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
           <div className="hidden md:block">
             <button
               onClick={onOpenAuth}
-              className="px-6 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_4px_15px_rgba(108,86,229,0.32)] transition-all hover:scale-105 cursor-pointer"
+              className="px-4 lg:px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_4px_15px_rgba(108,86,229,0.32)] transition-all hover:scale-105 cursor-pointer whitespace-nowrap"
             >
               Start Your 7-Day Free Trial
             </button>
@@ -154,21 +156,21 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-brand-border px-4 pt-2 pb-6 space-y-3 shadow-lg">
+        <div className="md:hidden bg-white/95 backdrop-blur-md border-b border-brand-border px-4 pt-2 pb-6 space-y-2 shadow-lg max-h-[calc(100vh-5rem)] overflow-y-auto">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
-              className={`block w-full text-left px-3 py-2 rounded-md text-base font-semibold cursor-pointer ${
+              className={`block w-full text-left px-3 py-2.5 rounded-md text-base font-semibold cursor-pointer transition-colors ${
                 activeSection === item.id
-                  ? "text-brand-purple bg-brand-bg-light"
-                  : "text-brand-slate hover:bg-slate-50"
+                  ? "text-brand-purple bg-brand-purple/10"
+                  : "text-[#0E1120] hover:bg-slate-50"
               }`}
             >
               {item.label}
             </button>
           ))}
-          <div className="pt-2 px-3">
+          <div className="pt-2 px-1">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

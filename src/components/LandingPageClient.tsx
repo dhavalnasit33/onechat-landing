@@ -1,17 +1,19 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Navbar from "./Navbar";
 import Hero from "./Hero";
 import ModelMarquee from "./ModelMarquee";
-import WhoItsFor from "./WhoItsFor";
-import FeaturesList from "./FeaturesList";
-import OneQuestionSection from "./OneQuestionSection";
-import VideoSliderSection from "./VideoSliderSection";
-import AdvantageMarquee from "./AdvantageMarquee";
-import FAQAccordion from "./FAQAccordion";
-import Footer from "./Footer";
-import AuthModal from "./AuthModal";
 import AmazingFeatures from "./AmazingFeatures";
+import OneQuestionSection from "./OneQuestionSection";
+
+const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
+const FeaturesList = dynamic(() => import("./FeaturesList"));
+const WhoItsFor = dynamic(() => import("./WhoItsFor"));
+const AdvantageMarquee = dynamic(() => import("./AdvantageMarquee"));
+const FAQAccordion = dynamic(() => import("./FAQAccordion"));
+const Footer = dynamic(() => import("./Footer"));
+const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 
 export default function LandingPageClient() {
   const [authOpen, setAuthOpen] = useState(false);
@@ -143,7 +145,7 @@ export default function LandingPageClient() {
       <main className="flex-1 w-full flex flex-col">
         <Hero onOpenAuth={() => setAuthOpen(true)} />
         <ModelMarquee />
-         <AmazingFeatures onOpenAuth={() => setAuthOpen(true)} />
+        <AmazingFeatures onOpenAuth={() => setAuthOpen(true)} />
         <OneQuestionSection onOpenAuth={() => setAuthOpen(true)} />
         <VideoSliderSection />
         <FeaturesList onOpenAuth={() => setAuthOpen(true)} />

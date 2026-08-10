@@ -106,7 +106,7 @@ const featuresData: Feature[] = [
     icon: "/assets/landing-page/resume-builder.png",
   },
   {
-    title: "Cover Letter Builder",
+    title: "Cover Letter Generator",
     desc: "Create a polished, personalized cover letter for any job or opportunity.",
     cta: "Create a Cover Letter",
     icon: "/assets/landing-page/cover-letter-builder.png",
@@ -117,12 +117,12 @@ const featuresData: Feature[] = [
     cta: "Start Designing",
     icon: "/assets/landing-page/flyers-posters.png",
   },
-  {
-    title: "Brochure Builder",
-    desc: "Create professional brochures for your business, products, services, and marketing campaigns.",
-    cta: "Create a Brochure",
-    icon: "/assets/landing-page/brochure-builder.png",
-  },
+  // {
+  //   title: "Brochure Builder",
+  //   desc: "Create professional brochures for your business, products, services, and marketing campaigns.",
+  //   cta: "Create a Brochure",
+  //   icon: "/assets/landing-page/brochure-builder.png",
+  // },
   {
     title: "Chat With PDFs",
     desc: "Upload any PDF to summarize it, ask questions, and find information instantly.",
@@ -167,7 +167,7 @@ interface AmazingFeaturesProps {
 
 export default function AmazingFeatures({ onOpenAuth }: AmazingFeaturesProps) {
   return (
-    <section id="amazing-features" className="w-full py-20 md:py-32 bg-white px-4">
+    <section id="features" className="w-full py-20 md:py-32 bg-white px-4">
       <div className="max-w-[1440px] mx-auto">
         {/* Section Header */}
         <div className="text-center flex flex-col items-center">
@@ -180,8 +180,7 @@ export default function AmazingFeatures({ onOpenAuth }: AmazingFeaturesProps) {
           </div> */}
 
           <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[850px]">
- 
-           Amazing{" "}
+            OneChat AI{" "}
             <span className="text-brand-purple">Features</span>
           </h2>
 {/* 
@@ -192,20 +191,20 @@ export default function AmazingFeatures({ onOpenAuth }: AmazingFeaturesProps) {
 
        {/* Feature Cards Grid */}
         {/* Switched back to flex and justify-center to perfectly center the last orphaned card */}
-        <div className="mt-16 flex flex-wrap justify-center gap-10 md:gap-12 lg:gap-14">
+        {/* Feature Cards Grid - 2 cards per row on mobile, 3 cards per row on desktop */}
+        <div className="mt-10 sm:mt-16 flex flex-wrap justify-center gap-3 sm:gap-6 md:gap-8 lg:gap-12">
           {featuresData.map((feature, idx) => (
             <div
               key={idx}
               onClick={onOpenAuth}
-              // Added calculated widths for the exact gaps, and justify-center to center the content vertically
-              className="group cursor-pointer w-full sm:w-[calc(50%-20px)] md:w-[calc(50%-24px)] lg:w-[calc(33.333%-38px)] min-h-[300px] flex flex-col items-center justify-center text-center p-6 md:p-7 rounded-2xl bg-white border border-brand-border shadow-sm transition-all duration-300 ease-out hover:-translate-y-1.5 hover:-rotate-3 hover:border-brand-purple hover:shadow-[0_20px_40px_rgba(108,86,229,0.16)] hover:z-10"
+              className="group cursor-pointer w-full min-[355px]:w-[calc(50%-6px)] sm:w-[calc(50%-12px)] md:w-[calc(50%-16px)] lg:w-[calc(33.333%-32px)] min-h-[220px] sm:min-h-[280px] md:min-h-[300px] flex flex-col items-center justify-center text-center p-3.5 sm:p-6 md:p-7 rounded-xl sm:rounded-2xl bg-white border border-brand-border shadow-sm transition-all duration-300 ease-out hover:-translate-y-1.5 hover:-rotate-3 hover:border-brand-purple hover:shadow-[0_20px_40px_rgba(108,86,229,0.16)] hover:z-10"
             >
               {/* Icon */}
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-[#EEEDFE] flex items-center justify-center overflow-hidden shrink-0 transition-colors duration-300 group-hover:bg-brand-purple/15">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-lg sm:rounded-xl bg-[#EEEDFE] flex items-center justify-center overflow-hidden shrink-0 transition-colors duration-300 group-hover:bg-brand-purple/15">
                 <img
                   src={feature.icon}
                   alt={feature.title}
-                  className="w-8 h-8 md:w-12 md:h-12 object-contain"
+                  className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 object-contain"
                   onError={(e) => {
                     e.currentTarget.style.display = "none";
                   }}
@@ -213,23 +212,22 @@ export default function AmazingFeatures({ onOpenAuth }: AmazingFeaturesProps) {
               </div>
 
               {/* Title */}
-              <h3 className="mt-5 font-poppins text-base md:text-lg font-bold text-brand-dark tracking-tight leading-snug">
+              <h3 className="mt-3 sm:mt-5 font-poppins text-xs sm:text-base md:text-lg font-bold text-brand-dark tracking-tight leading-snug">
                 {feature.title}
               </h3>
 
               {/* Description */}
-              {/* Removed the 'flex-1' class from here so it stops pushing the link away */}
-              <p className="mt-2.5 font-sans text-sm md:text-base text-brand-slate leading-relaxed font-medium">
+              <p className="mt-1.5 sm:mt-2.5 font-sans text-[11px] sm:text-sm md:text-base text-brand-slate leading-normal sm:leading-relaxed font-medium">
                 {feature.desc}
               </p>
 
               {/* CTA */}
               <div
-                className="mt-5 inline-flex items-center justify-center gap-1.5 text-sm md:text-base font-bold text-brand-purple transition-all duration-300 group-hover:gap-2.5"
+                className="mt-3 sm:mt-5 inline-flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-sm md:text-base font-bold text-brand-purple transition-all duration-300 group-hover:gap-2"
               >
                 {feature.cta}
                 <svg
-                  className="w-4 h-4"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

@@ -86,13 +86,13 @@ export default function AdvantageMarquee({ onOpenAuth }: AdvantageMarqueeProps) 
           <div className="flex items-center gap-3">
             <div className="w-8 h-[2px] bg-brand-purple rounded" />
             <span className="text-[11px] font-bold text-brand-purple tracking-[1.54px] uppercase font-sans">
-              YOUR UNFAIR ADVANTAGE
+              The OneChat AI Advantage
             </span>
             <div className="w-8 h-[2px] bg-brand-purple rounded" />
           </div>
 
-          <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[850px]">
-            Built to give you an edge online
+          <h2 className="mt-5 font-poppins text-2xl  sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[850px]">
+            Built to Give You an Edge Online
           </h2>
 
           <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-brand-slate max-w-[800px] leading-relaxed font-medium">

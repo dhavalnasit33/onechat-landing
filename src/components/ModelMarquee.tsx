@@ -8,40 +8,65 @@ interface AIModel {
 }
 
 const row1Models: AIModel[] = [
-  { name: "ChatGPT", asset: "/assets/landing-page/section-2-chatgpt.png", isLarge: true },
-  { name: "Flux", asset: "/assets/landing-page/section-2-flux.png", isLarge: false },
-  { name: "Gemini", asset: "/assets/landing-page/section-2-gemini.png", isLarge: true },
-  { name: "GLM", asset: "/assets/landing-page/section-2-glm.png", isLarge: false },
+  { name: "ChatGPT", asset: "/assets/landing-page/section-2-chatgpt.png", isLarge: false }, //isLarge: true
+  { name: "Claude", asset: "/assets/landing-page/section-2-claude.png", isLarge: false },//isLarge: true
+  { name: "Gemini", asset: "/assets/landing-page/section-2-gemini.png", isLarge: false },//isLarge: true
+  { name: "DeepSeek", asset: "/assets/landing-page/section-2-deepSeek.png", isLarge: false },//isLarge: true
+  { name: "Canva", asset: "/assets/landing-page/section-2-canva.png", isLarge: false },
+  { name: "Notion", asset: "/assets/landing-page/section-2-notion.png", isLarge: false },
+  { name: "Grammarly", asset: "/assets/landing-page/section-2-grammarly.png", isLarge: false },
+  { name: "Copilot", asset: "/assets/landing-page/section-2-microsoft-copilot.png", isLarge: false },
+  { name: "Photoshop", asset: "/assets/landing-page/section-2-adobe-photoshop.png", isLarge: false },
   { name: "Grok", asset: "/assets/landing-page/section-2-grok.png", isLarge: false },
-  { name: "DeepSeek", asset: "/assets/landing-page/section-2-deepSeek.png", isLarge: true },
   { name: "Ideogram", asset: "/assets/landing-page/section-2-ideogram.png", isLarge: false },
-  { name: "Kimi", asset: "/assets/landing-page/section-2-kimi.png", isLarge: false },
+  { name: "Jasper AI", asset: "/assets/landing-page/section-2-jasper-ai.png", isLarge: false },
+  { name: "Flux", asset: "/assets/landing-page/section-2-flux.png", isLarge: false },
+  { name: "Remove.bg", asset: "/assets/landing-page/section-2-remove-bg.png", isLarge: false },
+  { name: "Asana", asset: "/assets/landing-page/section-2-asana.png", isLarge: false },
 ];
 
 const row2Models: AIModel[] = [
-  { name: "Kling", asset: "/assets/landing-page/section-2-kling.png", isLarge: false },
+  { name: "Perplexity", asset: "/assets/landing-page/section-2-perplexity.png", isLarge: false }, //isLarge: true
+  { name: "Leonardo AI", asset: "/assets/landing-page/section-2-leonardo-ai.png", isLarge: false },
   { name: "Meta AI", asset: "/assets/landing-page/section-2-meta-ai.png", isLarge: false },
-  { name: "Claude", asset: "/assets/landing-page/section-2-claude.png", isLarge: true },
-  { name: "Mimo", asset: "/assets/landing-page/section-2-mimo.png", isLarge: false },
-  { name: "Minimax", asset: "/assets/landing-page/section-2-minimax.png", isLarge: false },
+  { name: "Stable Diffusion", asset: "/assets/landing-page/section-2-stable-diffusion.png", isLarge: false }, // isLarge: true
+  { name: "Google Drive", asset: "/assets/landing-page/section-2-google-drive.png", isLarge: false },
+  { name: "Google Docs", asset: "/assets/landing-page/section-2-google-docs.png", isLarge: false },
+  { name: "Dropbox", asset: "/assets/landing-page/section-2-dropbox.png", isLarge: false },
+  { name: "QuillBot", asset: "/assets/landing-page/section-2-quillbot.png", isLarge: false },
+  { name: "Copy.ai", asset: "/assets/landing-page/section-2-copy-ai.png", isLarge: false },
+  { name: "ClickUp", asset: "/assets/landing-page/section-2-clickup.png", isLarge: false },
+  { name: "Nano Banana", asset: "/assets/landing-page/section-2-nano-banana.png", isLarge: false }, //isLarge: true
+  { name: "Kling", asset: "/assets/landing-page/section-2-kling.png", isLarge: false },
   { name: "Mistral", asset: "/assets/landing-page/section-2-mistral.png", isLarge: false },
-  { name: "Nano Banana", asset: "/assets/landing-page/section-2-nano-banana.png", isLarge: true },
-  { name: "Nvidia", asset: "/assets/landing-page/section-2-nvidia.png", isLarge: false },
-  { name: "Perplexity", asset: "/assets/landing-page/section-2-perplexity.png", isLarge: true },
-  { name: "Pika", asset: "/assets/landing-page/section-2-pika.png", isLarge: false },
-  { name: "Qwen", asset: "/assets/landing-page/section-2-qwen.png", isLarge: false },
-  { name: "Recraft", asset: "/assets/landing-page/section-2-recraft.png", isLarge: false },
-  { name: "Stable Diffusion", asset: "/assets/landing-page/section-2-stable-diffusion.png", isLarge: true },
-  { name: "Runway", asset: "/assets/landing-page/section-2-runway.png", isLarge: false },
-  { name: "SeeDream", asset: "/assets/landing-page/section-2-seedream.png", isLarge: false },
+  { name: "Mailchimp", asset: "/assets/landing-page/section-2-mailchimp.png", isLarge: false },
+  { name: "Wix", asset: "/assets/landing-page/section-2-wix.png", isLarge: false },
+];
+
+const row3Models: AIModel[] = [
+  { name: "WordPress", asset: "/assets/landing-page/section-2-wordpresss.png", isLarge: false },
+  { name: "Squarespace", asset: "/assets/landing-page/section-2-squarespace.png", isLarge: false },
+  { name: "Wordtune", asset: "/assets/landing-page/section-2-wordtune.png", isLarge: false },
+  { name: "Sider AI", asset: "/assets/landing-page/section-2-sider-ai.png", isLarge: false },
+  { name: "Poe AI", asset: "/assets/landing-page/section-2-poe-ai.png", isLarge: false },
+  { name: "Monica AI", asset: "/assets/landing-page/section-2-monica-ai.png", isLarge: false },
+  { name: "Monday.com", asset: "/assets/landing-page/section-2-monday.com.png", isLarge: false },
+  { name: "Merlin AI", asset: "/assets/landing-page/section-2-merlin-ai.png", isLarge: false },
+  { name: "iCloud", asset: "/assets/landing-page/section-2-icloud-drive.png", isLarge: false },
+  { name: "iLovePDF", asset: "/assets/landing-page/section-2-i-love-pdf.png", isLarge: false },
+  { name: "ChatPDF", asset: "/assets/landing-page/section-2-chatpdf.png", isLarge: false },
+  { name: "Veo", asset: "/assets/landing-page/section-2-veo.png", isLarge: false }, //isLarge: true
   { name: "Sora", asset: "/assets/landing-page/section-2-sora.png", isLarge: false },
-  { name: "Veo", asset: "/assets/landing-page/section-2-veo.png", isLarge: true },
+  { name: "Runway", asset: "/assets/landing-page/section-2-runway.png", isLarge: false },
+  { name: "Pika", asset: "/assets/landing-page/section-2-pika.png", isLarge: false },
+  { name: "Recraft", asset: "/assets/landing-page/section-2-recraft.png", isLarge: false },
 ];
 
 export default function ModelMarquee() {
   // Triplicate the lists to make the scrolling seamless
   const triplicatedRow1 = [...row1Models, ...row1Models, ...row1Models];
   const triplicatedRow2 = [...row2Models, ...row2Models, ...row2Models];
+  const triplicatedRow3 = [...row3Models, ...row3Models, ...row3Models];
 
   const renderModelItem = (model: AIModel, idx: number) => {
     return (
@@ -52,13 +77,15 @@ export default function ModelMarquee() {
         <div
           className={`relative rounded-full shadow-md bg-white border border-brand-border overflow-hidden transition-all duration-300 group-hover:shadow-xl ${
             model.isLarge
-              ? "w-[82px] h-[82px] md:w-[106px] md:h-[106px]"
+              ? "w-[82px] h-[82px] md:w-[106px] md:h-[120px]"
               : "w-[72px] h-[72px] md:w-[98px] md:h-[98px]"
           }`}
         >
           <img
             src={model.asset}
             alt={model.name}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
             onError={(e) => {
               // Fallback if image fails to load
@@ -83,12 +110,12 @@ export default function ModelMarquee() {
       <div className="max-w-[1440px] mx-auto px-4 text-center">
         {/* Section Title */}
         <h2 className="font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight">
-          Hundreds of Tools and {" "}
-          <span className="text-brand-purple">AI Models</span>
+          Replace up to 100 Apps and {" "}
+          <span className="text-brand-purple">AI Tools</span>
         </h2>
-        <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-brand-dark/80 max-w-[850px] mx-auto leading-relaxed">
+        {/* <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-brand-dark/80 max-w-[850px] mx-auto leading-relaxed">
           OneChat AI is your all-in-one AI super app. Get access to every major AI model, and 300+ tools, all in one place.
-        </p>
+        </p> */}
       </div>
 
       {/* Marquee Rows Container */}
@@ -104,6 +131,13 @@ export default function ModelMarquee() {
         <div className="relative w-full flex items-center overflow-hidden py-4">
           <div className="flex animate-marquee-reverse hover:pause-marquee hover:cursor-pointer">
             {triplicatedRow2.map((model, idx) => renderModelItem(model, idx))}
+          </div>
+        </div>
+
+        {/* Row 3: Left scrolling */}
+        <div className="relative w-full flex items-center overflow-hidden py-4">
+          <div className="flex animate-marquee hover:pause-marquee hover:cursor-pointer">
+            {triplicatedRow3.map((model, idx) => renderModelItem(model, idx))}
           </div>
         </div>
       </div>

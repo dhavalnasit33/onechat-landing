@@ -100,9 +100,8 @@ export default function WhoItsFor() {
           </div>
 
           <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[850px]">
-            <span className="hidden sm:inline">The Ultimate AI Super App for </span>
-            <span className="sm:hidden">Built for </span>
-            <span className="text-brand-purple">people like you</span>
+            <span className=" inline">One AI Super App. {" "}</span>
+            <span className="text-brand-purple">Built for the Way You Work.</span>
           </h2>
 
           {/* <p className="mt-4 font-sans text-sm sm:text-base text-brand-slate max-w-[600px] leading-relaxed">
