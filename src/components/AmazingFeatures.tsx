@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 
 interface Feature {
@@ -180,16 +179,15 @@ export default function AmazingFeatures({ onOpenAuth }: AmazingFeaturesProps) {
           </div> */}
 
           <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[850px]">
-            OneChat AI{" "}
-            <span className="text-brand-purple">Features</span>
+            OneChat AI <span className="text-brand-purple">Features</span>
           </h2>
-{/* 
+          {/* 
           <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-brand-slate max-w-[750px] leading-relaxed">
             From chat and research to writing, design, and documents — explore the toolkit that powers your entire workflow.
           </p> */}
         </div>
 
-       {/* Feature Cards Grid */}
+        {/* Feature Cards Grid */}
         {/* Switched back to flex and justify-center to perfectly center the last orphaned card */}
         {/* Feature Cards Grid - 2 cards per row on mobile, 3 cards per row on desktop */}
         <div className="mt-10 sm:mt-16 flex flex-wrap justify-center gap-3 sm:gap-6 md:gap-8 lg:gap-12">
@@ -226,9 +224,7 @@ export default function AmazingFeatures({ onOpenAuth }: AmazingFeaturesProps) {
               </p>
 
               {/* CTA */}
-              <div
-                className="mt-3 sm:mt-5 inline-flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-sm md:text-base font-bold text-brand-purple transition-all duration-300 group-hover:gap-2"
-              >
+              <div className="mt-3 sm:mt-5 inline-flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-sm md:text-base font-bold text-brand-purple transition-all duration-300 group-hover:gap-2">
                 {feature.cta}
                 <svg
                   className="w-3.5 h-3.5 sm:w-4 sm:h-4"

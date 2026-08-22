@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 
 interface AIModel {
@@ -8,58 +7,242 @@ interface AIModel {
 }
 
 const row1Models: AIModel[] = [
-  { name: "ChatGPT", asset: "/assets/landing-page/section-2-chatgpt.png", isLarge: false }, //isLarge: true
-  { name: "Claude", asset: "/assets/landing-page/section-2-claude.png", isLarge: false },//isLarge: true
-  { name: "Gemini", asset: "/assets/landing-page/section-2-gemini.png", isLarge: false },//isLarge: true
-  { name: "DeepSeek", asset: "/assets/landing-page/section-2-deepSeek.png", isLarge: false },//isLarge: true
-  { name: "Canva", asset: "/assets/landing-page/section-2-canva.png", isLarge: false },
-  { name: "Notion", asset: "/assets/landing-page/section-2-notion.png", isLarge: false },
-  { name: "Grammarly", asset: "/assets/landing-page/section-2-grammarly.png", isLarge: false },
-  { name: "Copilot", asset: "/assets/landing-page/section-2-microsoft-copilot.png", isLarge: false },
-  { name: "Photoshop", asset: "/assets/landing-page/section-2-adobe-photoshop.png", isLarge: false },
-  { name: "Grok", asset: "/assets/landing-page/section-2-grok.png", isLarge: false },
-  { name: "Ideogram", asset: "/assets/landing-page/section-2-ideogram.png", isLarge: false },
-  { name: "Jasper AI", asset: "/assets/landing-page/section-2-jasper-ai.png", isLarge: false },
-  { name: "Flux", asset: "/assets/landing-page/section-2-flux.png", isLarge: false },
-  { name: "Remove.bg", asset: "/assets/landing-page/section-2-remove-bg.png", isLarge: false },
-  { name: "Asana", asset: "/assets/landing-page/section-2-asana.png", isLarge: false },
+  {
+    name: "ChatGPT",
+    asset: "/assets/landing-page/section-2-chatgpt.png",
+    isLarge: false,
+  }, //isLarge: true
+  {
+    name: "Claude",
+    asset: "/assets/landing-page/section-2-claude.png",
+    isLarge: false,
+  }, //isLarge: true
+  {
+    name: "Gemini",
+    asset: "/assets/landing-page/section-2-gemini.png",
+    isLarge: false,
+  }, //isLarge: true
+  {
+    name: "DeepSeek",
+    asset: "/assets/landing-page/section-2-deepSeek.png",
+    isLarge: false,
+  }, //isLarge: true
+  {
+    name: "Canva",
+    asset: "/assets/landing-page/section-2-canva.png",
+    isLarge: false,
+  },
+  {
+    name: "Notion",
+    asset: "/assets/landing-page/section-2-notion.png",
+    isLarge: false,
+  },
+  {
+    name: "Grammarly",
+    asset: "/assets/landing-page/section-2-grammarly.png",
+    isLarge: false,
+  },
+  {
+    name: "Copilot",
+    asset: "/assets/landing-page/section-2-microsoft-copilot.png",
+    isLarge: false,
+  },
+  {
+    name: "Photoshop",
+    asset: "/assets/landing-page/section-2-adobe-photoshop.png",
+    isLarge: false,
+  },
+  {
+    name: "Grok",
+    asset: "/assets/landing-page/section-2-grok.png",
+    isLarge: false,
+  },
+  {
+    name: "Ideogram",
+    asset: "/assets/landing-page/section-2-ideogram.png",
+    isLarge: false,
+  },
+  {
+    name: "Jasper AI",
+    asset: "/assets/landing-page/section-2-jasper-ai.png",
+    isLarge: false,
+  },
+  {
+    name: "Flux",
+    asset: "/assets/landing-page/section-2-flux.png",
+    isLarge: false,
+  },
+  {
+    name: "Remove.bg",
+    asset: "/assets/landing-page/section-2-remove-bg.png",
+    isLarge: false,
+  },
+  {
+    name: "Asana",
+    asset: "/assets/landing-page/section-2-asana.png",
+    isLarge: false,
+  },
 ];
 
 const row2Models: AIModel[] = [
-  { name: "Perplexity", asset: "/assets/landing-page/section-2-perplexity.png", isLarge: false }, //isLarge: true
-  { name: "Leonardo AI", asset: "/assets/landing-page/section-2-leonardo-ai.png", isLarge: false },
-  { name: "Meta AI", asset: "/assets/landing-page/section-2-meta-ai.png", isLarge: false },
-  { name: "Stable Diffusion", asset: "/assets/landing-page/section-2-stable-diffusion.png", isLarge: false }, // isLarge: true
-  { name: "Google Drive", asset: "/assets/landing-page/section-2-google-drive.png", isLarge: false },
-  { name: "Google Docs", asset: "/assets/landing-page/section-2-google-docs.png", isLarge: false },
-  { name: "Dropbox", asset: "/assets/landing-page/section-2-dropbox.png", isLarge: false },
-  { name: "QuillBot", asset: "/assets/landing-page/section-2-quillbot.png", isLarge: false },
-  { name: "Copy.ai", asset: "/assets/landing-page/section-2-copy-ai.png", isLarge: false },
-  { name: "ClickUp", asset: "/assets/landing-page/section-2-clickup.png", isLarge: false },
-  { name: "Nano Banana", asset: "/assets/landing-page/section-2-nano-banana.png", isLarge: false }, //isLarge: true
-  { name: "Kling", asset: "/assets/landing-page/section-2-kling.png", isLarge: false },
-  { name: "Mistral", asset: "/assets/landing-page/section-2-mistral.png", isLarge: false },
-  { name: "Mailchimp", asset: "/assets/landing-page/section-2-mailchimp.png", isLarge: false },
-  { name: "Wix", asset: "/assets/landing-page/section-2-wix.png", isLarge: false },
+  {
+    name: "Perplexity",
+    asset: "/assets/landing-page/section-2-perplexity.png",
+    isLarge: false,
+  }, //isLarge: true
+  {
+    name: "Leonardo AI",
+    asset: "/assets/landing-page/section-2-leonardo-ai.png",
+    isLarge: false,
+  },
+  {
+    name: "Meta AI",
+    asset: "/assets/landing-page/section-2-meta-ai.png",
+    isLarge: false,
+  },
+  {
+    name: "Stable Diffusion",
+    asset: "/assets/landing-page/section-2-stable-diffusion.png",
+    isLarge: false,
+  }, // isLarge: true
+  {
+    name: "Google Drive",
+    asset: "/assets/landing-page/section-2-google-drive.png",
+    isLarge: false,
+  },
+  {
+    name: "Google Docs",
+    asset: "/assets/landing-page/section-2-google-docs.png",
+    isLarge: false,
+  },
+  {
+    name: "Dropbox",
+    asset: "/assets/landing-page/section-2-dropbox.png",
+    isLarge: false,
+  },
+  {
+    name: "QuillBot",
+    asset: "/assets/landing-page/section-2-quillbot.png",
+    isLarge: false,
+  },
+  {
+    name: "Copy.ai",
+    asset: "/assets/landing-page/section-2-copy-ai.png",
+    isLarge: false,
+  },
+  {
+    name: "ClickUp",
+    asset: "/assets/landing-page/section-2-clickup.png",
+    isLarge: false,
+  },
+  {
+    name: "Nano Banana",
+    asset: "/assets/landing-page/section-2-nano-banana.png",
+    isLarge: false,
+  }, //isLarge: true
+  {
+    name: "Kling",
+    asset: "/assets/landing-page/section-2-kling.png",
+    isLarge: false,
+  },
+  {
+    name: "Mistral",
+    asset: "/assets/landing-page/section-2-mistral.png",
+    isLarge: false,
+  },
+  {
+    name: "Mailchimp",
+    asset: "/assets/landing-page/section-2-mailchimp.png",
+    isLarge: false,
+  },
+  {
+    name: "Wix",
+    asset: "/assets/landing-page/section-2-wix.png",
+    isLarge: false,
+  },
 ];
 
 const row3Models: AIModel[] = [
-  { name: "WordPress", asset: "/assets/landing-page/section-2-wordpresss.png", isLarge: false },
-  { name: "Squarespace", asset: "/assets/landing-page/section-2-squarespace.png", isLarge: false },
-  { name: "Wordtune", asset: "/assets/landing-page/section-2-wordtune.png", isLarge: false },
-  { name: "Sider AI", asset: "/assets/landing-page/section-2-sider-ai.png", isLarge: false },
-  { name: "Poe AI", asset: "/assets/landing-page/section-2-poe-ai.png", isLarge: false },
-  { name: "Monica AI", asset: "/assets/landing-page/section-2-monica-ai.png", isLarge: false },
-  { name: "Monday.com", asset: "/assets/landing-page/section-2-monday.com.png", isLarge: false },
-  { name: "Merlin AI", asset: "/assets/landing-page/section-2-merlin-ai.png", isLarge: false },
-  { name: "iCloud", asset: "/assets/landing-page/section-2-icloud-drive.png", isLarge: false },
-  { name: "iLovePDF", asset: "/assets/landing-page/section-2-i-love-pdf.png", isLarge: false },
-  { name: "ChatPDF", asset: "/assets/landing-page/section-2-chatpdf.png", isLarge: false },
-  { name: "Veo", asset: "/assets/landing-page/section-2-veo.png", isLarge: false }, //isLarge: true
-  { name: "Sora", asset: "/assets/landing-page/section-2-sora.png", isLarge: false },
-  { name: "Runway", asset: "/assets/landing-page/section-2-runway.png", isLarge: false },
-  { name: "Pika", asset: "/assets/landing-page/section-2-pika.png", isLarge: false },
-  { name: "Recraft", asset: "/assets/landing-page/section-2-recraft.png", isLarge: false },
+  {
+    name: "WordPress",
+    asset: "/assets/landing-page/section-2-wordpresss.png",
+    isLarge: false,
+  },
+  {
+    name: "Squarespace",
+    asset: "/assets/landing-page/section-2-squarespace.png",
+    isLarge: false,
+  },
+  {
+    name: "Wordtune",
+    asset: "/assets/landing-page/section-2-wordtune.png",
+    isLarge: false,
+  },
+  {
+    name: "Sider AI",
+    asset: "/assets/landing-page/section-2-sider-ai.png",
+    isLarge: false,
+  },
+  {
+    name: "Poe AI",
+    asset: "/assets/landing-page/section-2-poe-ai.png",
+    isLarge: false,
+  },
+  {
+    name: "Monica AI",
+    asset: "/assets/landing-page/section-2-monica-ai.png",
+    isLarge: false,
+  },
+  {
+    name: "Monday.com",
+    asset: "/assets/landing-page/section-2-monday.com.png",
+    isLarge: false,
+  },
+  {
+    name: "Merlin AI",
+    asset: "/assets/landing-page/section-2-merlin-ai.png",
+    isLarge: false,
+  },
+  {
+    name: "iCloud",
+    asset: "/assets/landing-page/section-2-icloud-drive.png",
+    isLarge: false,
+  },
+  {
+    name: "iLovePDF",
+    asset: "/assets/landing-page/section-2-i-love-pdf.png",
+    isLarge: false,
+  },
+  {
+    name: "ChatPDF",
+    asset: "/assets/landing-page/section-2-chatpdf.png",
+    isLarge: false,
+  },
+  {
+    name: "Veo",
+    asset: "/assets/landing-page/section-2-veo.png",
+    isLarge: false,
+  }, //isLarge: true
+  {
+    name: "Sora",
+    asset: "/assets/landing-page/section-2-sora.png",
+    isLarge: false,
+  },
+  {
+    name: "Runway",
+    asset: "/assets/landing-page/section-2-runway.png",
+    isLarge: false,
+  },
+  {
+    name: "Pika",
+    asset: "/assets/landing-page/section-2-pika.png",
+    isLarge: false,
+  },
+  {
+    name: "Recraft",
+    asset: "/assets/landing-page/section-2-recraft.png",
+    isLarge: false,
+  },
 ];
 
 export default function ModelMarquee() {
@@ -112,7 +295,7 @@ export default function ModelMarquee() {
       <div className="max-w-[1440px] mx-auto px-4 text-center">
         {/* Section Title */}
         <h2 className="font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight">
-          Replace up to 100 Apps and {" "}
+          Replace up to 100 Apps and{" "}
           <span className="text-brand-purple">AI Tools</span>
         </h2>
         {/* <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-brand-dark/80 max-w-[850px] mx-auto leading-relaxed">
