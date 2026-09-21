@@ -108,10 +108,12 @@ export default function Hero({ onOpenAuth }: HeroProps) {
         {/* CTA Button */}
         <div className="mt-10 flex flex-col items-center justify-center gap-4">
           <button
-            onClick={onOpenAuth}
+            onClick={() => {
+              window.location.href = "/generate-ai-videos";
+            }}
             className="px-10 py-5 rounded-full text-base sm:text-lg font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_8px_32px_rgba(108,86,229,0.32)] transition-all hover:scale-105 hover:shadow-[0_12px_40px_rgba(108,86,229,0.4)] cursor-pointer"
           >
-            Start Your 7-Day Free Trial
+            Explore OneChat AI
           </button>
           <p className="font-sans text-[13px] sm:text-[14px] text-white/70 font-medium mt-2">
             Hundreds of AI tools • Dozens of AI models • One Platform

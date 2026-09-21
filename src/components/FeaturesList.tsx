@@ -323,10 +323,12 @@ export default function FeaturesList({ onOpenAuth }: FeaturesListProps) {
                   {/* Button */}
                   <div className="mt-10 w-full flex justify-start">
                     <button
-                      onClick={onOpenAuth}
+                      onClick={() => {
+                        window.location.href = "/generate-ai-videos";
+                      }}
                       className="px-8 py-3.5 rounded-full text-[15px] font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_4px_15px_rgba(108,86,229,0.32)] transition-all hover:scale-105 cursor-pointer"
                     >
-                      Start Your 7-Day Free Trial
+                      Explore OneChat AI
                     </button>
                   </div>
                 </div>
