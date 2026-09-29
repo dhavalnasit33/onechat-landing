@@ -424,11 +424,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <h2 className="font-sans text-[26px] font-bold text-black tracking-tight leading-tight">
             {isLoginTab ? "Welcome Back" : "Create Your Account"}
           </h2>
-          <p className="mt-1.5 font-sans text-[14px] text-[#bdbdbd] leading-relaxed">
+          {/* <p className="mt-1.5 font-sans text-[14px] text-[#bdbdbd] leading-relaxed">
             {isLoginTab
               ? "Please sign in to your account to continue."
               : "Please create your login details so you can easily access your account in the future."}
-          </p>
+          </p> */}
         </div>
 
         {/* Error Message */}
