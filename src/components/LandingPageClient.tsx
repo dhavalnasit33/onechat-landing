@@ -4,17 +4,17 @@ import dynamic from "next/dynamic";
 import Navbar from "./Navbar";
 import Hero from "./Hero";
 import ModelMarquee from "./ModelMarquee";
-import AmazingFeatures from "./AmazingFeatures";
-import OneQuestionSection from "./OneQuestionSection";
+// import AmazingFeatures from "./AmazingFeatures";
+// import OneQuestionSection from "./OneQuestionSection";
 import Wanttocreate from "./Wanttocreate";
 import CreateZeroSkillSection from "./Createzeroskillsection";
 
 
 
-const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
-const FeaturesList = dynamic(() => import("./FeaturesList"));
-const WhoItsFor = dynamic(() => import("./WhoItsFor"));
-const AdvantageMarquee = dynamic(() => import("./AdvantageMarquee"));
+// const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
+// const FeaturesList = dynamic(() => import("./FeaturesList"));
+// const WhoItsFor = dynamic(() => import("./WhoItsFor"));
+// const AdvantageMarquee = dynamic(() => import("./AdvantageMarquee"));
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
 const Footer = dynamic(() => import("./Footer"));
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
@@ -151,12 +151,12 @@ export default function LandingPageClient() {
         <CreateZeroSkillSection onOpenAuth={() => setAuthOpen(true)} />
         <ModelMarquee />
         <Wanttocreate onOpenAuth={() => setAuthOpen(true)} />
-        <AmazingFeatures onOpenAuth={() => setAuthOpen(true)} />
-        <OneQuestionSection onOpenAuth={() => setAuthOpen(true)} />
-        <VideoSliderSection />
-        <FeaturesList onOpenAuth={() => setAuthOpen(true)} />
-        <WhoItsFor />
-        <AdvantageMarquee onOpenAuth={() => setAuthOpen(true)} />
+        {/* <AmazingFeatures onOpenAuth={() => setAuthOpen(true)} /> */}
+        {/* <OneQuestionSection onOpenAuth={() => setAuthOpen(true)} /> */}
+        {/* <VideoSliderSection /> */}
+        {/* <FeaturesList onOpenAuth={() => setAuthOpen(true)} /> */}
+        {/* <WhoItsFor /> */}
+        {/* <AdvantageMarquee onOpenAuth={() => setAuthOpen(true)} /> */}
         <FAQAccordion onOpenAuth={() => setAuthOpen(true)} />
       </main>
       <Footer />
