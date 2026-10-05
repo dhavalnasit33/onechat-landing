@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Navbar from "./Navbar";
@@ -11,8 +11,7 @@ import CreateZeroSkillSection from "./Createzeroskillsection";
 import Oneplace from "./Oneplace";
 import Allthebest from "./Allthebest";
 import Hastheskillsection from "./Hastheskillsection";
-
-
+import TemplatesShowcase from "./TemplatesShowcase";
 
 // const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
 // const FeaturesList = dynamic(() => import("./FeaturesList"));
@@ -163,6 +162,7 @@ export default function LandingPageClient() {
         {/* <FeaturesList onOpenAuth={() => setAuthOpen(true)} /> */}
         {/* <WhoItsFor /> */}
         {/* <AdvantageMarquee onOpenAuth={() => setAuthOpen(true)} /> */}
+           <TemplatesShowcase onOpenAuth={() => setAuthOpen(true)} />
         <FAQAccordion onOpenAuth={() => setAuthOpen(true)} />
       </main>
       <Footer />
