@@ -113,7 +113,7 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
               }}
               className="px-6 lg:px-8 py-3.5 rounded-full text-sm lg:text-base font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_4px_15px_rgba(108,86,229,0.32)] transition-all hover:scale-105 cursor-pointer whitespace-nowrap"
             >
-              Get Started
+             Start 7-Day Free Trial
             </button>
           </div>
 
@@ -183,7 +183,7 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
               }}
               className="w-full text-center px-6 py-4 rounded-full text-base font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_4px_15px_rgba(108,86,229,0.32)] cursor-pointer"
             >
-              Get Started
+             Start 7-Day Free Trial
             </button>
           </div>
         </div>

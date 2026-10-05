@@ -113,7 +113,7 @@ export default function Hero({ onOpenAuth }: HeroProps) {
             }}
             className="px-14 py-7 rounded-full text-xl sm:text-2xl font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_8px_32px_rgba(108,86,229,0.32)] transition-all hover:scale-105 hover:shadow-[0_12px_40px_rgba(108,86,229,0.4)] cursor-pointer"
           >
-            Get Started
+            Start 7-Day Free Trial
           </button>
           <p className="font-sans text-[13px] sm:text-[14px] text-white/70 font-medium mt-2">
             Hundreds of AI tools • Dozens of AI models • One Platform

@@ -130,7 +130,7 @@ export default function FAQAccordion({ onOpenAuth }: FAQAccordionProps) {
             }}
             className="px-14 py-7 rounded-full text-xl sm:text-2xl font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_8px_32px_rgba(108,86,229,0.32)] transition-all hover:scale-105 cursor-pointer"
           >
-            Get Started
+            Start 7-Day Free Trial
           </button>
         </div>
       </div>
