@@ -39,7 +39,7 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
       return;
     }
     if (id === "our-affiliates") {
-      window.open("https://onechatai.ai/affiliate", "_blank");
+      window.location.href = "/affiliate";
       return;
     }
     if (id === "faq") {
@@ -61,8 +61,8 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-          ? "bg-[#070913]/95 backdrop-blur-md border-b border-white/10 shadow-lg py-3"
-          : "bg-transparent py-5"
+        ? "bg-[#070913]/95 backdrop-blur-md border-b border-white/10 shadow-lg py-3"
+        : "bg-transparent py-5"
         }`}
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,8 +94,8 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
                 className={`text-[13px] lg:text-[14px] font-semibold transition-colors hover:text-white cursor-pointer whitespace-nowrap ${activeSection === item.id
-                    ? "text-[#00A3FF]"
-                    : "text-slate-300"
+                  ? "text-[#00A3FF]"
+                  : "text-slate-300"
                   }`}
               >
                 {item.label}
@@ -168,8 +168,8 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
               key={item.id}
               onClick={() => handleNavClick(item.id)}
               className={`block w-full text-left px-3 py-2.5 rounded-lg text-base font-semibold cursor-pointer transition-colors ${activeSection === item.id
-                  ? "text-[#00A3FF] bg-white/5"
-                  : "text-slate-200 hover:bg-white/5"
+                ? "text-[#00A3FF] bg-white/5"
+                : "text-slate-200 hover:bg-white/5"
                 }`}
             >
               {item.label}

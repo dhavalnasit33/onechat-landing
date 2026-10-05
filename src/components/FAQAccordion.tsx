@@ -49,45 +49,51 @@ export default function FAQAccordion({ onOpenAuth }: FAQAccordionProps) {
   };
 
   return (
-    <section id="faq" className="w-full py-20 md:py-32 bg-white px-4">
+    <section id="faq" className="w-full py-20 md:py-32 bg-[#050711] px-4">
+      {" "}
+      {/* Dark Background */}
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <div className="text-center flex flex-col items-center">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-[2px] bg-brand-purple rounded" />
-            <span className="text-[11px] font-bold text-brand-purple tracking-[1.54px] uppercase font-sans">
+            <div className="w-8 h-[2px] bg-[#6C56E5] rounded" />
+            <span className="text-[11px] font-bold text-[#6C56E5] tracking-[1.54px] uppercase font-sans">
               FAQ
             </span>
-            <div className="w-8 h-[2px] bg-brand-purple rounded" />
+            <div className="w-8 h-[2px] bg-[#6C56E5] rounded" />
           </div>
-
-          <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight">
-            Questions? We've got answers.
+          <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+            Questions? {" "}
+            <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">
+              We've got answers.
+            </span>
           </h2>
 
-          <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-brand-slate font-medium">
+          <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-[#94A3B8] font-medium">
             Everything you need to know about OneChat AI before getting started.
           </p>
         </div>
 
         {/* FAQ Accordion List */}
-        <div className="mt-16 border-t border-brand-border/60">
+        <div className="mt-16 border-t border-white/10">
+          {" "}
+          {/* Dark border */}
           {faqData.map((faq, index) => {
             const isExpanded = expandedIndex === index;
 
             return (
               <div
                 key={index}
-                className="border-b border-brand-border/60 overflow-hidden transition-all duration-300 bg-white"
+                className="border-b border-white/10 overflow-hidden transition-all duration-300 bg-transparent"
               >
                 {/* Header Row */}
                 <button
                   onClick={() => toggleExpand(index)}
-                  className="w-full flex items-center justify-between py-6 px-4 md:px-6 text-left cursor-pointer hover:bg-brand-bg-light/30 transition-colors focus:outline-none"
+                  className="w-full flex items-center justify-between py-6 px-4 md:px-6 text-left cursor-pointer hover:bg-white/5 transition-colors focus:outline-none"
                 >
                   <span
                     className={`font-poppins text-[15px] sm:text-base md:text-[17px] font-semibold transition-colors duration-200 ${
-                      isExpanded ? "text-brand-purple" : "text-brand-dark"
+                      isExpanded ? "text-[#8B5CF6]" : "text-white"
                     }`}
                   >
                     {faq.q}
@@ -97,12 +103,22 @@ export default function FAQAccordion({ onOpenAuth }: FAQAccordionProps) {
                   <div
                     className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-300 ${
                       isExpanded
-                        ? "bg-brand-purple border-brand-purple text-white rotate-45"
-                        : "bg-[#F8F7FF] border-[#EEEDFE] text-brand-purple"
+                        ? "bg-[#6C56E5] border-[#6C56E5] text-white rotate-45"
+                        : "bg-[#0F1426] border-white/10 text-[#94A3B8]"
                     }`}
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M12 4v16m8-8H4"
+                      />
                     </svg>
                   </div>
                 </button>
@@ -110,10 +126,12 @@ export default function FAQAccordion({ onOpenAuth }: FAQAccordionProps) {
                 {/* Animated Answer Body */}
                 <div
                   className={`transition-all duration-300 ease-in-out ${
-                    isExpanded ? "max-h-[300px] opacity-100 py-4 pb-8" : "max-h-0 opacity-0 pointer-events-none"
+                    isExpanded
+                      ? "max-h-[300px] opacity-100 py-4 pb-8"
+                      : "max-h-0 opacity-0 pointer-events-none"
                   }`}
                 >
-                  <p className="px-4 md:px-6 font-sans text-sm sm:text-base text-brand-slate font-light leading-relaxed">
+                  <p className="px-4 md:px-6 font-sans text-sm sm:text-base text-[#CBD5E1] font-light leading-relaxed">
                     {faq.a}
                   </p>
                 </div>
@@ -126,9 +144,10 @@ export default function FAQAccordion({ onOpenAuth }: FAQAccordionProps) {
         <div className="mt-16 text-center">
           <button
             onClick={() => {
-              window.location.href = "/generate-ai-videos";
+              if (onOpenAuth) onOpenAuth();
+              else window.location.href = "/generate-ai-videos";
             }}
-            className="px-14 py-7 rounded-full text-xl sm:text-2xl font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_8px_32px_rgba(108,86,229,0.32)] transition-all hover:scale-105 cursor-pointer"
+            className="px-14 py-5 rounded-2xl text-lg sm:text-xl font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_8px_32px_rgba(0,163,255,0.35)] transition-all hover:scale-105 cursor-pointer"
           >
             Start 7-Day Free Trial
           </button>

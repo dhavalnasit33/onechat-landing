@@ -8,6 +8,9 @@ import ModelMarquee from "./ModelMarquee";
 // import OneQuestionSection from "./OneQuestionSection";
 import Wanttocreate from "./Wanttocreate";
 import CreateZeroSkillSection from "./Createzeroskillsection";
+import Oneplace from "./Oneplace";
+import Allthebest from "./Allthebest";
+import Hastheskillsection from "./Hastheskillsection";
 
 
 
@@ -151,6 +154,9 @@ export default function LandingPageClient() {
         <CreateZeroSkillSection onOpenAuth={() => setAuthOpen(true)} />
         <ModelMarquee />
         <Wanttocreate onOpenAuth={() => setAuthOpen(true)} />
+        <Oneplace onOpenAuth={() => setAuthOpen(true)} />
+        <Allthebest onOpenAuth={() => setAuthOpen(true)} />
+        <Hastheskillsection onOpenAuth={() => setAuthOpen(true)} />
         {/* <AmazingFeatures onOpenAuth={() => setAuthOpen(true)} /> */}
         {/* <OneQuestionSection onOpenAuth={() => setAuthOpen(true)} /> */}
         {/* <VideoSliderSection /> */}
