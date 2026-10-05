@@ -67,14 +67,14 @@ const bottomModels = [
 export interface TopNavTab {
     id: string;
     label: string;
-    icon?: string; // Emoji string (e.g. "🖼️") or Image/Icon Path (e.g. "/assets/icons/...")
+    icon?: string; 
     isActive?: boolean;
 }
 
 export interface SidebarNavTab {
     id: string;
     label: string;
-    icon?: string; // Emoji string (e.g. "⚡") or Image/Icon Path (e.g. "/assets/icons/...")
+    icon?: string; 
     isActive?: boolean;
 }
 
@@ -207,10 +207,8 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
 
                 if (isCancelled) break;
 
-                // Step 3: Hold complete responses for reading (~2.5s)
                 await new Promise((r) => setTimeout(r, 2500));
 
-                // Step 4: Soft fade/reset before repeating (~0.5s)
                 if (isCancelled) break;
                 await new Promise((r) => setTimeout(r, 500));
             }
@@ -237,7 +235,6 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
             {/* Main Enclosing Frame (Outer Dashboard Box) */}
             <div className="relative max-w-[1380px] mx-auto rounded-3xl bg-[#0E0E24] border border-indigo-500/25 p-4 sm:p-7 md:p-9 lg:p-10 shadow-[0_0_80px_rgba(59,130,246,0.18)] backdrop-blur-2xl">
 
-                {/* Section Title & Subtitle inside the main box */}
                 <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
                     <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-[44px] font-extrabold text-white tracking-tight leading-tight">
                         One Place.{" "}
@@ -250,35 +247,7 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
                         Hundreds of tools, the best AI models, and ready-to-use templates — all in one platform.
                     </p>
                 </div>
-
-                {/* Top Demo Navigation Bar (Visual Only) */}
-                {/* <div className="w-full bg-[#0C1126]/90 border border-white/10 rounded-2xl p-1.5 sm:p-2 mb-6 sm:mb-8 shadow-inner">
-                    <div className="flex items-center justify-between gap-1.5 sm:gap-2 min-w-max">
-                        {defaultTopNavTabs.map((tab) => {
-                            if (tab.isActive) {
-                                return (
-                                    <div
-                                        key={tab.id}
-                                        className="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-[#5B4FE1] via-[#7B59EC] to-[#A855F7] text-white font-bold text-xs sm:text-sm shadow-[0_0_20px_rgba(123,89,236,0.45)] cursor-default select-none"
-                                    >
-                                        {renderIcon(tab.icon, tab.label)}
-                                        <span>{tab.label}</span>
-                                    </div>
-                                );
-                            }
-
-                            return (
-                                <div
-                                    key={tab.id}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-300 text-xs sm:text-sm font-medium hover:text-white transition-colors cursor-default select-none"
-                                >
-                                    {renderIcon(tab.icon, tab.label)}
-                                    <span>{tab.label}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div> */}
+              
                 <div className="w-full bg-[#0C1126]/90 border border-white/10 rounded-2xl p-1.5 sm:p-2 mb-6 sm:mb-8 shadow-inner">
 
                     {/* First Row */}
@@ -306,10 +275,8 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
                                 </div>
                             );
                         })}
-                    {/* </div> */}
 
                     {/* Second Row */}
-                    {/* <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2"> */}
                         {defaultTopNavTabs.slice(5).map((tab) => (
                             <div
                                 key={tab.id}
@@ -325,11 +292,7 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
 
                 {/* Center Main Split Area: Left Demo Frame + Right Explanation */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-
-                    {/* Left: Product UI Interactive Demo Container (8 cols on desktop) */}
                     <div className="lg:col-span-8 rounded-2xl bg-[#090E26] border border-white/15 p-3.5 sm:p-5 flex flex-col md:flex-row gap-4 relative overflow-hidden shadow-2xl">
-
-                        {/* Left Sidebar inside Demo (Visual only) */}
                         <div className="hidden md:flex flex-col w-36 shrink-0 border-r border-white/10 pr-3 justify-between">
                             <div>
                                 <div className="flex items-center gap-1 px-1.5 py-1 mb-3.5">
@@ -368,7 +331,6 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
                         {/* Compare Content Area */}
                         <div className="flex-1 flex flex-col justify-between">
                             <div>
-                                {/* Header */}
                                 <div className="mb-3">
                                     <h3 className="font-poppins font-bold text-base sm:text-lg text-white">Compare AI</h3>
                                     <p className="text-xs text-slate-400">Get multiple perspectives on any question.</p>
@@ -454,7 +416,6 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
                     {/* Right: Explanation & Feature Bullets Panel (4 cols on desktop) */}
                     <div className="lg:col-span-4 flex flex-col justify-between p-2 sm:p-4">
                         <div>
-                            {/* Heading */}
                             <h3 className="font-poppins text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
                                 Don&apos;t Ask{" "}
                                 <span className="text-[#00A3FF]">One AI.</span> <br />
@@ -505,7 +466,6 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
                         Leading AI Models, All in One Platform
                     </div>
 
-                    {/* <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 sm:gap-2.5 items-center"> */}
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 sm:gap-2.5 items-center">
                         {bottomModels.map((model, idx) => (
                             <div

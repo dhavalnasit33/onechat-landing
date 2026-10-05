@@ -79,7 +79,7 @@ export default function Wanttocreate({ onOpenAuth }: WanttocreateProps) {
               want to create?
             </span>
           </h2>
-          <p className="mt-3 sm:mt-4 font-sans text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-3 sm:mt-4 font-sans text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto whitespace-nowrap">
             Turn your ideas into amazing content with ready-to-use templates and powerful AI tools.
           </p>
         </div>

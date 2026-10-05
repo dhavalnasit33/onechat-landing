@@ -179,7 +179,7 @@ export default function Allthebest({ onOpenAuth }: AllthebestProps) {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-[600px] bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(99,102,241,0.12),transparent)] pointer-events-none" />
 
             {/* 1. Left Bottom Flowing Wave Overlay */}
-            <div className="absolute top-1/2 -left-16 sm:-left-8 w-[600px] sm:w-[850px] md:w-[1050px] max-w-none pointer-events-none z-0 mix-blend-screen opacity-95 select-none">
+            <div className="absolute top-1/2 -left-16 sm:-left-8 w-[600px] sm:w-[850px] md:w-[1050px] max-w-none pointer-events-none z-0 mix-blend-screen opacity-70 md:opacity-80 select-none">
                 <img
                     src="/assets/landing-page/allthebest/left_side_wav.png"
                     alt="Left Wave Glow"
@@ -188,13 +188,13 @@ export default function Allthebest({ onOpenAuth }: AllthebestProps) {
             </div>
 
             <div className="relative max-w-[1400px] mx-auto z-10">
-             
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 xl:gap-8 items-center">
 
                     {/* ================= COLUMN 1 (Left - 4 cols): Headline, CTA, 4 Badges ================= */}
                     <div className="lg:col-span-4 flex flex-col justify-center text-left relative z-10">
-                        {/* Eyebrow */}
-                        <div className="inline-flex items-center gap-2 mb-2 sm:mb-3">
+
+                        <div className="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-[#6C56E5]/15 border border-[#6C56E5]/30 mb-3.5">
                             <span className="font-mono text-xs sm:text-sm font-bold tracking-widest text-[#E879F9] uppercase">
                                 LEADING AI MODELS
                             </span>
@@ -230,9 +230,9 @@ export default function Allthebest({ onOpenAuth }: AllthebestProps) {
                         <div className="flex flex-row mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 gap-3 sm:gap-4">
                             {defaultFeatures.map((feat) => (
                                 <div key={feat.id} className="flex flex-col items-center sm:items-center gap-1.5 text-center sm:text-left">
-                                  
+
                                     <span className="bg-[#061742] rounded-full p-2">{feat.icon}</span>
-                                   
+
                                     <span className="text-[11px] sm:text-xs font-semibold text-slate-300 whitespace-nowrap">
                                         {feat.label}
                                     </span>
@@ -279,48 +279,9 @@ export default function Allthebest({ onOpenAuth }: AllthebestProps) {
 
                     </div>
 
-                    {/* ================= COLUMN 3 (Right - 3 cols): Angled Floating Showcase Cards ================= */}
-                    {/* <div className="lg:col-span-3 relative z-10 flex flex-col items-center justify-center gap-3 sm:gap-3.5 py-4 sm:py-6">
-                        <div className="absolute top-1/2 -translate-y-1/2 right-0 sm:-right-4 w-[320px] sm:w-[420px] lg:w-[460px] h-[550px] sm:h-[680px] pointer-events-none z-0 mix-blend-screen opacity-95 select-none flex items-center justify-center">
-                            <img
-                                src="/assets/landing-page/allthebest/right_side_wav.png"
-                                alt="Right Wave Glow"
-                                className="w-full h-full object-contain"
-                            />
-                        </div>
-
-                        <div className="absolute inset-0 bg-gradient-to-t from-purple-600/20 via-blue-600/10 to-transparent blur-2xl pointer-events-none" />
-
-                        {defaultShowcaseCards.map((card, idx) => (
-                            <div
-                                key={card.id || idx}
-                                className={`relative z-10 w-full max-w-[230px] sm:max-w-[250px] lg:max-w-[260px] h-[90px] sm:h-[105px] md:h-[150px] rounded-2xl overflow-hidden border ${card.borderColor} ${card.glowColor} ${card.rotation} transition-all duration-300 hover:scale-105 hover:rotate-0 hover:z-20 cursor-pointer shadow-xl bg-[#0E132D]`}
-                            >
-                                <img
-                                    src={card.image}
-                                    alt={card.title}
-                                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                                    onError={(e) => {
-                                        e.currentTarget.style.opacity = "0.7";
-                                    }}
-                                />
-
-                                {card.hasPlayButton && (
-                                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                        <div className="w-8 h-8 rounded-full bg-white/80 text-black flex items-center justify-center text-xs font-bold shadow-lg backdrop-blur-sm pl-0.5">
-                                            ▶
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                            </div>
-                        ))}
-                    </div> */}
-
                     <div className="lg:col-span-3 relative z-10 flex flex-col items-center justify-center gap-3 sm:gap-3.5 py-4 sm:py-6">
                         {/* Right Side Vertical Spiral Wave Overlay */}
-                        <div className="absolute top-1/2 -translate-y-1/2 right-0 sm:-right-4 w-[320px] sm:w-[420px] lg:w-[460px] h-[550px] sm:h-[680px] pointer-events-none z-0 mix-blend-screen opacity-95 select-none flex items-center justify-center">
+                        <div className="absolute top-1/2 -translate-y-1/2 right-0 sm:-right-4 w-[320px] sm:w-[420px] lg:w-[460px] h-[550px] sm:h-[680px] pointer-events-none z-0 mix-blend-screen opacity-70 md:opacity-80 select-none flex items-center justify-center">
                             <img
                                 src="/assets/landing-page/allthebest/right_side_wav.png"
                                 alt="Right Wave Glow"
@@ -360,15 +321,6 @@ export default function Allthebest({ onOpenAuth }: AllthebestProps) {
                             ))}
                         </div>
                     </div>
-
-
-
-
-
-
-
-
-
                 </div>
             </div>
         </section>

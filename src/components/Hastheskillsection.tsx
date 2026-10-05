@@ -1,17 +1,14 @@
 "use client";
-import React, { useState } from "react";
-import Image from "next/image";
+import React from "react";
 import {
     Video,
-    Image as ImageIcon,
+    ImageIcon,
     Share2,
     Flame,
     Landmark,
     ShoppingBag,
     Palette,
-    CheckCircle2,
-    Sparkles,
-    ArrowRight
+    CheckCircle2
 } from "lucide-react";
 
 interface HastheskillsectionProps {
@@ -78,54 +75,43 @@ export const defaultSkillBenefits = [
 ];
 
 export default function Hastheskillsection({ onOpenAuth }: HastheskillsectionProps) {
-    const [selectedType, setSelectedType] = useState("video");
-
     return (
         <section className="relative w-full bg-[#030614] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
-            {/* Background Ambient Glows */}
             <div className="absolute top-1/4 left-10 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute top-1/3 right-10 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[140px] pointer-events-none" />
             <div className="absolute bottom-10 right-1/4 w-[450px] h-[450px] bg-cyan-600/15 rounded-full blur-[100px] pointer-events-none" />
 
-            {/* Upper Right Glowing Spiral Wave Overlay */}
-            <div className="absolute -top-10 sm:-top-20 -right-20 sm:-right-10 w-[550px] sm:w-[750px] md:w-[900px] h-[600px] sm:h-[800px] pointer-events-none z-0 mix-blend-screen opacity-85 select-none flex items-center justify-center rotate-[-15deg]">
+            <div className="absolute -top-10 sm:-top-20 -right-16 sm:-right-4 w-[550px] sm:w-[750px] md:w-[900px] h-[550px] sm:h-[750px] pointer-events-none z-0 mix-blend-screen select-none flex items-center justify-center opacity-70 md:opacity-80">
                 <img
-                    src="/assets/landing-page/allthebest/left_side_wav.png"
+                    src="/assets/landing-page/hastheskill/hastheskillwav.png"
                     alt="Wave Glow Overlay"
                     className="w-full h-full object-contain"
                 />
             </div>
-
             <div className="relative max-w-[1400px] mx-auto z-10 flex flex-col gap-10 sm:gap-12 lg:gap-14">
+                <div className="flex flex-col items-start text-left relative z-10">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#6C56E5]/15 border border-[#6C56E5]/30 mb-3.5">
 
-                {/* ================= 1. TOP HEADER SECTION ================= */}
-                <div className="flex flex-col items-start text-left max-w-3xl relative z-10">
-                    {/* Eyebrow */}
-                    <div className="inline-flex items-center gap-2 mb-2 sm:mb-3">
                         <span className="font-mono text-xs sm:text-sm font-bold tracking-widest text-[#E879F9] uppercase">
                             ZERO SKILLS REQUIRED
                         </span>
                     </div>
-
-                    {/* Main Heading */}
                     <h2 className="font-poppins text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-white tracking-tight leading-[1.15]">
                         The AI Has the{" "}
-                        <span className="bg-gradient-to-r from-[#00A3FF] via-[#0EA5E9] to-[#38BDF8] bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] bg-clip-text text-transparent">
                             Skills.
                         </span>
                         <br />
                         So You Don&apos;t Need{" "}
-                        <span className="bg-gradient-to-r from-[#C084FC] via-[#E879F9] to-[#FF2ED9] bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] bg-clip-text text-transparent">
                             Them.
                         </span>
                     </h2>
 
-                    {/* Description */}
                     <p className="mt-3.5 sm:mt-4 font-sans text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed font-normal max-w-2xl">
                         You don&apos;t need to learn complicated prompting, design software or video editing. Just choose what you want to create, provide a few details, and let OneChat AI do the rest.
                     </p>
 
-                    {/* CTA Button */}
                     <div className="mt-5 sm:mt-7">
                         <button
                             onClick={onOpenAuth}
@@ -135,102 +121,94 @@ export default function Hastheskillsection({ onOpenAuth }: HastheskillsectionPro
                             <span className="transition-transform duration-300 group-hover:translate-x-1 font-bold">→</span>
                         </button>
                     </div>
-
-                    {/* 4 Green Checked Benefits Row */}
-                    <div className="mt-8 sm:mt-10 flex flex-wrap items-center gap-4 sm:gap-6 lg:gap-8">
-                        {defaultSkillBenefits.map((benefit, idx) => (
-                            <div key={idx} className="flex items-center gap-2">
-                                <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center shrink-0 text-emerald-400">
-                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <div className="w-full mt-10 justify-center items-center">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 sm:gap-6 lg:gap-col-10">
+                            {defaultSkillBenefits.map((benefit, idx) => (
+                                <div key={idx} className="flex items-center gap-2 select-none whitespace-nowrap">
+                                    <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center shrink-0 text-emerald-400">
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                    </div>
+                                    <span className="text-xs sm:text-sm font-medium text-slate-200">
+                                        {benefit}
+                                    </span>
                                 </div>
-                                <span className="text-xs sm:text-sm font-medium text-slate-200">
-                                    {benefit}
-                                </span>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* ================= 2. THREE-STEP PROCESS CARDS ================= */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch relative z-10">
+                {/* 3 Steps Process Container */}
+                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-6 items-stretch relative z-10">
 
-                    {/* Step 1 -> Step 2 Desktop Connector Arrow */}
                     <div className="hidden lg:flex absolute top-1/2 left-[33.33%] -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-gradient-to-r from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_20px_rgba(0,163,255,0.7)] items-center justify-center text-white text-sm font-bold pointer-events-none">
                         →
                     </div>
 
-                    {/* Step 2 -> Step 3 Desktop Connector Arrow */}
                     <div className="hidden lg:flex absolute top-1/2 left-[66.66%] -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-gradient-to-r from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_20px_rgba(0,163,255,0.7)] items-center justify-center text-white text-sm font-bold pointer-events-none">
                         →
                     </div>
 
-                    {/* ---------------- CARD 1: Choose what you want to create ---------------- */}
-                    <div className="lg:col-span-4 rounded-3xl bg-[#080D24]/90 border border-indigo-500/20 p-4 sm:p-5 shadow-2xl backdrop-blur-xl flex flex-col justify-between">
+                    {/* Step 1: Choose what you want to create */}
+                    <div className="w-full lg:col-span-4 rounded-3xl bg-[#080D24]/90 border border-indigo-500/20 p-4 sm:p-5 shadow-2xl backdrop-blur-xl flex flex-col justify-between">
                         <div>
                             <div className="text-xs sm:text-sm font-bold text-slate-200 mb-4 px-1 flex items-center gap-2">
                                 <span>1. Choose what you want to create</span>
                             </div>
 
-                            {/* Row 1 (4 items) */}
                             <div className="grid grid-cols-4 gap-2 mb-2">
-                                {defaultCreationTypes.slice(0, 4).map((item) => {
-                                    const isSelected = selectedType === item.id;
-                                    return (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => setSelectedType(item.id)}
-                                            className={`flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl transition-all duration-200 cursor-pointer text-center ${
-                                                isSelected
-                                                    ? "bg-gradient-to-br from-[#6366F1] to-[#A855F7] shadow-[0_0_20px_rgba(168,85,247,0.5)] border border-purple-300/40 scale-105"
-                                                    : "bg-[#0D132D] border border-white/10 hover:border-white/20 text-slate-300 hover:bg-white/5"
+                                {defaultCreationTypes.slice(0, 4).map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className={`flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl cursor-default select-none text-center ${item.isActive
+                                            ? "bg-gradient-to-br from-[#6366F1] to-[#A855F7] shadow-[0_0_20px_rgba(168,85,247,0.5)] border border-purple-300/40"
+                                            : "bg-[#0D132D] border border-white/10 text-slate-300"
                                             }`}
-                                        >
-                                            <div className="mb-1.5 flex items-center justify-center">
-                                                {item.icon}
-                                            </div>
-                                            <span className="text-[10px] sm:text-[11px] font-semibold truncate w-full">
-                                                {item.label}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
+                                    >
+                                        <div className="mb-1.5 flex items-center justify-center">
+                                            {item.icon}
+                                        </div>
+                                        <span className="text-[10px] sm:text-[11px] font-semibold truncate w-full">
+                                            {item.label}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
 
-                            {/* Row 2 (3 items) */}
                             <div className="grid grid-cols-3 gap-2">
-                                {defaultCreationTypes.slice(4).map((item) => {
-                                    const isSelected = selectedType === item.id;
-                                    return (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => setSelectedType(item.id)}
-                                            className={`flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl transition-all duration-200 cursor-pointer text-center ${
-                                                isSelected
-                                                    ? "bg-gradient-to-br from-[#6366F1] to-[#A855F7] shadow-[0_0_20px_rgba(168,85,247,0.5)] border border-purple-300/40 scale-105"
-                                                    : "bg-[#0D132D] border border-white/10 hover:border-white/20 text-slate-300 hover:bg-white/5"
+                                {defaultCreationTypes.slice(4).map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className={`flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-2xl cursor-default select-none text-center ${item.isActive
+                                            ? "bg-gradient-to-br from-[#6366F1] to-[#A855F7] shadow-[0_0_20px_rgba(168,85,247,0.5)] border border-purple-300/40"
+                                            : "bg-[#0D132D] border border-white/10 text-slate-300"
                                             }`}
-                                        >
-                                            <div className="mb-1.5 flex items-center justify-center">
-                                                {item.icon}
-                                            </div>
-                                            <span className="text-[10px] sm:text-[11px] font-semibold truncate w-full">
-                                                {item.label}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
+                                    >
+                                        <div className="mb-1.5 flex items-center justify-center">
+                                            {item.icon}
+                                        </div>
+                                        <span className="text-[10px] sm:text-[11px] font-semibold truncate w-full">
+                                            {item.label}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
 
-                    {/* ---------------- CARD 2: Add a few details ---------------- */}
-                    <div className="lg:col-span-4 rounded-3xl bg-[#080D24]/90 border border-indigo-500/20 p-4 sm:p-5 shadow-2xl backdrop-blur-xl flex flex-col justify-between">
+                    {/* Mobile Down Arrow between Step 1 and Step 2 */}
+                    <div className="flex lg:hidden justify-center items-center py-1">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_18px_rgba(0,163,255,0.7)] flex items-center justify-center text-white text-sm font-bold">
+                            ↓
+                        </div>
+                    </div>
+
+                    {/* Step 2: Add a few details */}
+                    <div className="w-full lg:col-span-4 rounded-3xl bg-[#080D24]/90 border border-indigo-500/20 p-4 sm:p-5 shadow-2xl backdrop-blur-xl flex flex-col justify-between">
                         <div>
                             <div className="text-xs sm:text-sm font-bold text-slate-200 mb-3 px-1 flex items-center gap-2">
                                 <span>2. Add a few details</span>
                             </div>
 
-                            {/* Prompt Input Preview Box */}
                             <div className="rounded-2xl bg-[#0B1028] border border-white/10 p-3 sm:p-3.5 mb-3 shadow-inner">
                                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-300 mb-2">
                                     <span className="text-sm">💬</span>
@@ -241,7 +219,6 @@ export default function Hastheskillsection({ onOpenAuth }: HastheskillsectionPro
                                 </div>
                             </div>
 
-                            {/* Meta Options & Action */}
                             <div className="flex items-center justify-between gap-2 pt-1">
                                 <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-slate-400">
                                     <div className="px-2 py-1 rounded-lg bg-white/5 border border-white/10">
@@ -257,7 +234,6 @@ export default function Hastheskillsection({ onOpenAuth }: HastheskillsectionPro
                                         <span className="text-slate-200 font-medium">Veo</span>
                                     </div>
                                 </div>
-
                                 <button
                                     onClick={onOpenAuth}
                                     className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#00A3FF] to-[#D946EF] shadow-[0_0_15px_rgba(0,163,255,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
@@ -268,55 +244,32 @@ export default function Hastheskillsection({ onOpenAuth }: HastheskillsectionPro
                         </div>
                     </div>
 
-                    {/* ---------------- CARD 3: Get amazing results ---------------- */}
-                    <div className="lg:col-span-4 rounded-3xl bg-[#080D24]/90 border border-indigo-500/20 p-4 sm:p-5 shadow-2xl backdrop-blur-xl flex flex-col justify-between relative overflow-hidden">
+                    {/* Mobile Down Arrow between Step 2 and Step 3 */}
+                    <div className="flex lg:hidden justify-center items-center py-1">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_18px_rgba(0,163,255,0.7)] flex items-center justify-center text-white text-sm font-bold">
+                            ↓
+                        </div>
+                    </div>
+
+                    {/* Step 3: Get amazing results */}
+                    <div className="w-full lg:col-span-4 rounded-3xl bg-[#080D24]/90 border border-indigo-500/20 p-4 sm:p-5 shadow-2xl backdrop-blur-xl flex flex-col justify-between relative overflow-hidden">
                         <div>
                             <div className="text-xs sm:text-sm font-bold text-slate-200 mb-3 px-1 flex items-center gap-2">
                                 <span>3. Get amazing results</span>
                             </div>
-
-                            {/* Generated Result Showcase Card */}
-                            <div className="relative w-full h-[180px] sm:h-[200px] rounded-2xl overflow-hidden border border-blue-500/40 shadow-[0_0_30px_rgba(0,163,255,0.35)] group">
+                            <div className="relative w-full h-[190px] sm:h-[210px] rounded-2xl overflow-hidden border border-blue-500/40 shadow-[0_0_30px_rgba(0,163,255,0.35)] group bg-[#0D132D]">
                                 <img
-                                    src="/assets/landing-page/allthebest/girls.png"
+                                    src="/assets/landing-page/hastheskill/Ancient_Egypt_Golden.png"
                                     alt="Generated Ancient Egypt Thumbnail"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    className="w-full h-full object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
                                     onError={(e) => {
                                         e.currentTarget.src = "/assets/landing-page/createzeroskillsection/Design.png";
                                     }}
                                 />
-
-                                {/* Subtle Ancient Egypt Overlay Banner */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3 sm:p-4">
-                                    <div className="flex items-end justify-between">
-                                        <div>
-                                            <span className="text-[10px] font-bold tracking-widest text-amber-400 uppercase">
-                                                FEATURED RESULT
-                                            </span>
-                                            <h4 className="font-poppins font-extrabold text-sm sm:text-base text-white drop-shadow">
-                                                ANCIENT EGYPT
-                                            </h4>
-                                        </div>
-
-                                        {/* Avatar Badge */}
-                                        <div className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-md">
-                                            <img
-                                                src="/assets/landing-page/allthebest/cat.png"
-                                                alt="Creator Avatar"
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    e.currentTarget.style.display = "none";
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             </div>
         </section>
     );

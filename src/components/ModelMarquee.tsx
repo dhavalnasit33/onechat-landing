@@ -5,7 +5,6 @@ interface AIModel {
   asset: string;
   isLarge: boolean;
 }
-
 const row1Models: AIModel[] = [
   {
     name: "ChatGPT",
@@ -222,7 +221,7 @@ const row3Models: AIModel[] = [
     name: "Veo",
     asset: "/assets/landing-page/section-2-veo.png",
     isLarge: false,
-  }, //isLarge: true
+  },
   {
     name: "Sora",
     asset: "/assets/landing-page/section-2-sora.png",

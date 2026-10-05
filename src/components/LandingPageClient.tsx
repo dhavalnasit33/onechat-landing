@@ -4,19 +4,12 @@ import dynamic from "next/dynamic";
 import Navbar from "./Navbar";
 import Hero from "./Hero";
 import ModelMarquee from "./ModelMarquee";
-// import AmazingFeatures from "./AmazingFeatures";
-// import OneQuestionSection from "./OneQuestionSection";
 import Wanttocreate from "./Wanttocreate";
 import CreateZeroSkillSection from "./Createzeroskillsection";
 import Oneplace from "./Oneplace";
 import Allthebest from "./Allthebest";
 import Hastheskillsection from "./Hastheskillsection";
 import TemplatesShowcase from "./TemplatesShowcase";
-
-// const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
-// const FeaturesList = dynamic(() => import("./FeaturesList"));
-// const WhoItsFor = dynamic(() => import("./WhoItsFor"));
-// const AdvantageMarquee = dynamic(() => import("./AdvantageMarquee"));
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
 const Footer = dynamic(() => import("./Footer"));
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
@@ -36,7 +29,7 @@ export default function LandingPageClient() {
       // Helper to set a cookie on host and root domain
       const setDomainCookie = (name: string, value: string) => {
         const cookieStr = `${name}=${encodeURIComponent(value)}; ${cookieOpts}`;
-        document.cookie = cookieStr; // host-only
+        document.cookie = cookieStr; 
         if (!currentDomain.includes("localhost") && !currentDomain.includes("127.0.0.1")) {
           const hostParts = currentDomain.split(".");
           const rootDomain = hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
@@ -44,12 +37,11 @@ export default function LandingPageClient() {
         }
       };
 
-      // Capture Reddit Click ID (rdt_cid)
       const rdtCid = params.get("rdt_cid");
       if (rdtCid) {
         try {
           setDomainCookie("oc_rdt_cid", rdtCid);
-          setDomainCookie("rdt_cid", rdtCid); // Fallback old name
+          setDomainCookie("rdt_cid", rdtCid); 
           console.log("Captured rdt_cid cookie successfully:", rdtCid);
         } catch (e) {
           console.error("Error saving rdt_cid cookie:", e);
@@ -156,13 +148,7 @@ export default function LandingPageClient() {
         <Oneplace onOpenAuth={() => setAuthOpen(true)} />
         <Allthebest onOpenAuth={() => setAuthOpen(true)} />
         <Hastheskillsection onOpenAuth={() => setAuthOpen(true)} />
-        {/* <AmazingFeatures onOpenAuth={() => setAuthOpen(true)} /> */}
-        {/* <OneQuestionSection onOpenAuth={() => setAuthOpen(true)} /> */}
-        {/* <VideoSliderSection /> */}
-        {/* <FeaturesList onOpenAuth={() => setAuthOpen(true)} /> */}
-        {/* <WhoItsFor /> */}
-        {/* <AdvantageMarquee onOpenAuth={() => setAuthOpen(true)} /> */}
-           <TemplatesShowcase onOpenAuth={() => setAuthOpen(true)} />
+        <TemplatesShowcase onOpenAuth={() => setAuthOpen(true)} />
         <FAQAccordion onOpenAuth={() => setAuthOpen(true)} />
       </main>
       <Footer />

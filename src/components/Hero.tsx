@@ -71,7 +71,6 @@ export default function Hero({ onOpenAuth }: HeroProps) {
           alt="Hero Wave Background"
           className="w-full h-full object-cover md:object-contain opacity-85 mix-blend-screen scale-110 lg:scale-125"
           onError={(e) => {
-            // If image is not found yet, hide element gracefully
             e.currentTarget.style.display = "none";
           }}
         />
