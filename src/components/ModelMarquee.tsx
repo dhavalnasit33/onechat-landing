@@ -255,13 +255,13 @@ export default function ModelMarquee() {
     return (
       <div
         key={`${model.name}-${idx}`}
-        className="flex flex-col items-center justify-center mx-6 sm:mx-10 shrink-0 select-none group transition-all duration-300 transform hover:-translate-y-2.5 cursor-pointer"
+        className="flex flex-col items-center justify-center mx-5 sm:mx-8 md:mx-10 shrink-0 select-none group transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
       >
         <div
-          className={`relative rounded-full shadow-md bg-white border border-brand-border overflow-hidden transition-all duration-300 group-hover:shadow-xl ${
+          className={`relative rounded-full shadow-md bg-[#0F1426] border border-white/10 overflow-hidden transition-all duration-300 group-hover:border-purple-500/50 group-hover:shadow-[0_0_20px_rgba(108,86,229,0.35)] ${
             model.isLarge
-              ? "w-[82px] h-[82px] md:w-[106px] md:h-[120px]"
-              : "w-[72px] h-[72px] md:w-[98px] md:h-[98px]"
+              ? "w-[82px] h-[82px] md:w-[106px] md:h-[106px]"
+              : "w-[70px] h-[70px] md:w-[92px] md:h-[92px]"
           }`}
         >
           <img
@@ -271,7 +271,7 @@ export default function ModelMarquee() {
             decoding="async"
             width={98}
             height={98}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
               // Fallback if image fails to load
               e.currentTarget.style.display = "none";
@@ -279,11 +279,11 @@ export default function ModelMarquee() {
               if (fallback) fallback.style.display = "flex";
             }}
           />
-          <div className="absolute inset-0 bg-brand-purple/5 hidden flex-col items-center justify-center text-xs font-bold text-brand-purple">
+          <div className="absolute inset-0 bg-purple-900/40 hidden flex-col items-center justify-center text-xs font-bold text-purple-300">
             {model.name[0]}
           </div>
         </div>
-        <span className="mt-3 text-[11px] md:text-[13px] font-semibold text-brand-dark/50 group-hover:text-brand-dark/80 transition-colors">
+        <span className="mt-2.5 text-[11px] md:text-[13px] font-medium text-slate-400 group-hover:text-white transition-colors">
           {model.name}
         </span>
       </div>
@@ -291,36 +291,37 @@ export default function ModelMarquee() {
   };
 
   return (
-    <section className="w-full py-16 md:py-24 bg-gradient-to-b from-[#E8F4FF] via-[#F0EDFF] via-[#FAFAFF] to-white">
-      <div className="max-w-[1440px] mx-auto px-4 text-center">
-        {/* Section Title */}
-        <h2 className="font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight">
-          Replace up to 100 Apps and{" "}
-          <span className="text-brand-purple">AI Tools</span>
+    <section className="relative w-full py-16 md:py-24 bg-[#070913] text-white overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-80 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(108,86,229,0.15),transparent)] pointer-events-none" />
+
+      <div className="relative max-w-[1440px] mx-auto px-4 text-center">
+        {/* Section Title with exact gradient headline */}
+        <h2 className="font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+          <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2E93] bg-clip-text text-transparent">
+            Replace up to 100 Apps & AI Tools
+          </span>
         </h2>
-        {/* <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-brand-dark/80 max-w-[850px] mx-auto leading-relaxed">
-          OneChat AI is your all-in-one AI super app. Get access to every major AI model, and 300+ tools, all in one place.
-        </p> */}
       </div>
 
       {/* Marquee Rows Container */}
-      <div className="mt-16 overflow-hidden flex flex-col gap-6 md:gap-10">
+      <div className="relative mt-12 md:mt-16 overflow-hidden flex flex-col gap-6 md:gap-10">
         {/* Row 1: Left scrolling */}
-        <div className="relative w-full flex items-center overflow-hidden py-4">
+        <div className="relative w-full flex items-center overflow-hidden py-3">
           <div className="flex animate-marquee hover:pause-marquee hover:cursor-pointer">
             {triplicatedRow1.map((model, idx) => renderModelItem(model, idx))}
           </div>
         </div>
 
         {/* Row 2: Right scrolling */}
-        <div className="relative w-full flex items-center overflow-hidden py-4">
+        <div className="relative w-full flex items-center overflow-hidden py-3">
           <div className="flex animate-marquee-reverse hover:pause-marquee hover:cursor-pointer">
             {triplicatedRow2.map((model, idx) => renderModelItem(model, idx))}
           </div>
         </div>
 
         {/* Row 3: Left scrolling */}
-        <div className="relative w-full flex items-center overflow-hidden py-4">
+        <div className="relative w-full flex items-center overflow-hidden py-3">
           <div className="flex animate-marquee hover:pause-marquee hover:cursor-pointer">
             {triplicatedRow3.map((model, idx) => renderModelItem(model, idx))}
           </div>

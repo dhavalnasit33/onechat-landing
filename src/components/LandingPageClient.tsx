@@ -6,6 +6,10 @@ import Hero from "./Hero";
 import ModelMarquee from "./ModelMarquee";
 import AmazingFeatures from "./AmazingFeatures";
 import OneQuestionSection from "./OneQuestionSection";
+import Wanttocreate from "./Wanttocreate";
+import CreateZeroSkillSection from "./Createzeroskillsection";
+
+
 
 const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
 const FeaturesList = dynamic(() => import("./FeaturesList"));
@@ -144,7 +148,9 @@ export default function LandingPageClient() {
       <Navbar onOpenAuth={() => setAuthOpen(true)} />
       <main className="flex-1 w-full flex flex-col">
         <Hero onOpenAuth={() => setAuthOpen(true)} />
+        <CreateZeroSkillSection onOpenAuth={() => setAuthOpen(true)} />
         <ModelMarquee />
+        <Wanttocreate onOpenAuth={() => setAuthOpen(true)} />
         <AmazingFeatures onOpenAuth={() => setAuthOpen(true)} />
         <OneQuestionSection onOpenAuth={() => setAuthOpen(true)} />
         <VideoSliderSection />

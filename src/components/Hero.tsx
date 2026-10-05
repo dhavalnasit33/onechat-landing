@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 interface HeroProps {
-  onOpenAuth: () => void;
+  onOpenAuth?: () => void;
 }
 
 const rotatingWords = [
@@ -23,6 +23,8 @@ const rotatingWords = [
   "Researchers",
   "Students & Learners",
 ];
+
+export const heroWaveBgPath = "/assets/landing-page/Hero_section_wav.png";
 
 export default function Hero({ onOpenAuth }: HeroProps) {
   const [wordIndex, setWordIndex] = useState(0);
@@ -61,34 +63,37 @@ export default function Hero({ onOpenAuth }: HeroProps) {
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#0E1120] pt-32 pb-24 md:pt-40 md:pb-36 px-4">
-      {/* Generated Background Gradient Image */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <Image
-          src="/assets/landing-page/hero-gradient-bg-v3.png"
-          alt="Hero Background Gradient"
-          fill
-          priority
-          className="object-cover"
+    <section className="relative overflow-hidden bg-[#050711] pt-32 pb-24 md:pt-40 md:pb-36 px-4 text-white">
+      {/* Background Wave Graphic Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-visible">
+        <img
+          src={heroWaveBgPath}
+          alt="Hero Wave Background"
+          className="w-full h-full object-cover md:object-contain opacity-85 mix-blend-screen scale-110 lg:scale-125"
+          onError={(e) => {
+            // If image is not found yet, hide element gracefully
+            e.currentTarget.style.display = "none";
+          }}
         />
+        {/* Ambient fallback radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_35%,rgba(108,86,229,0.22),rgba(0,163,255,0.12),transparent)] pointer-events-none" />
       </div>
 
-      {/* Background decorations */}
-      <div className="absolute top-1/4 left-1/10 w-96 h-96 bg-brand-purple/5 rounded-full blur-3xl pointer-events-none z-0" />
-      <div className="absolute bottom-10 right-1/10 w-96 h-96 bg-brand-purple-light/5 rounded-full blur-3xl pointer-events-none z-0" />
+      {/* Ambient background blur circles */}
+      <div className="absolute top-1/4 left-5 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none z-0" />
+      <div className="absolute top-1/3 right-5 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none z-0" />
 
       <div className="max-w-[1440px] mx-auto text-center relative z-10">
         {/* Headline */}
-        <h1 className="font-poppins text-[20px] min-[375px]:text-[24px] min-[450px]:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-5xl mx-auto">
+        <h1 className="font-poppins text-[24px] min-[375px]:text-[28px] min-[450px]:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-5xl mx-auto">
           The #1 AI Super App
-          {/* <span className="hidden sm:inline"> for</span> */}
           <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-3 mt-1 sm:mt-2">
             <span className="inline text-white font-extrabold">
               for
             </span>
-            <div className="h-[32px] min-[375px]:h-[38px] min-[425px]:h-[44px] sm:h-[60px] md:h-[80px] overflow-hidden flex items-center justify-center">
+            <div className="h-[36px] min-[375px]:h-[42px] min-[425px]:h-[48px] sm:h-[60px] md:h-[80px] overflow-hidden flex items-center justify-center">
               <span
-                className={`inline-block text-brand-purple transition-all duration-400 transform text-center font-extrabold tracking-tight whitespace-nowrap ${
+                className={`inline-block bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent transition-all duration-400 transform text-center font-extrabold tracking-tight whitespace-nowrap ${
                   fadeState === "fade-in"
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 -translate-y-6"
@@ -100,30 +105,30 @@ export default function Hero({ onOpenAuth }: HeroProps) {
           </div>
         </h1>
 
-        {/* Subtitle */}
-        {/* <p className="mt-8 font-sans text-base sm:text-lg md:text-xl text-[#0E1120]/70 max-w-[650px] mx-auto leading-relaxed">
-          From idea to income — hundreds of AI tools for every step of building your online business.
-        </p> */}
-
         {/* CTA Button */}
-        <div className="mt-10 flex flex-col items-center justify-center gap-4">
+        <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-3">
           <button
             onClick={() => {
-              window.location.href = "/generate-ai-videos";
+              if (onOpenAuth) {
+                onOpenAuth();
+              } else {
+                window.location.href = "/generate-ai-videos";
+              }
             }}
-            className="px-14 py-7 rounded-full text-xl sm:text-2xl font-bold text-white bg-gradient-to-r from-brand-purple to-brand-purple-light shadow-[0_8px_32px_rgba(108,86,229,0.32)] transition-all hover:scale-105 hover:shadow-[0_12px_40px_rgba(108,86,229,0.4)] cursor-pointer"
+            className="group cursor-pointer inline-flex items-center justify-center gap-2 px-10 sm:px-14 py-4 sm:py-5 rounded-2xl text-lg sm:text-2xl font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-[0.98]"
           >
-            Start 7-Day Free Trial
+            <span>Start 7-Day Free Trial</span>
+            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </button>
-          <p className="font-sans text-[13px] sm:text-[14px] text-white/70 font-medium mt-2">
-            Hundreds of AI tools • Dozens of AI models • One Platform
+          <p className="font-sans text-xs sm:text-sm text-slate-300 font-medium mt-1 tracking-wide">
+            Hundreds of AI Models • Dozens of AI Tools • One Platform
           </p>
         </div>
 
         {/* Video Card */}
-        <div className="mt-16 md:mt-24 px-2 sm:px-6">
-          <div className="relative w-full max-w-[1200px] mx-auto shadow-[0_20px_50px_rgba(108,86,229,0.25)] rounded-2xl md:rounded-3xl">
-            <div className="overflow-hidden rounded-2xl md:rounded-3xl aspect-[16/10] bg-brand-dark">
+        <div className="mt-12 sm:mt-16 md:mt-20 px-2 sm:px-6">
+          <div className="relative w-full max-w-[1200px] mx-auto rounded-2xl md:rounded-3xl border border-white/20 shadow-[0_0_60px_rgba(108,86,229,0.35)] bg-[#0A0D1D]/80 backdrop-blur-sm p-1 sm:p-2">
+            <div className="overflow-hidden rounded-xl md:rounded-2xl aspect-[16/10] bg-[#0E1120]">
               <video
                 ref={videoRef}
                 onClick={handleVideoClick}
