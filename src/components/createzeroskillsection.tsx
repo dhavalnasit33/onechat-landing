@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
+import { ArrowRight } from "lucide-react";
 
 interface CreateZeroSkillProps {
   onOpenAuth?: () => void;
@@ -161,7 +162,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
             transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-[0.98]"
           >
             <span>Start Creating Free</span>
-            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            <span className="transition-transform duration-300 group-hover:translate-x-1"><ArrowRight /></span>
           </button>
         </div>
 

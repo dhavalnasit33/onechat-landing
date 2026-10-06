@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef } from "react";
 import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
+import { ArrowRight } from "lucide-react";
 
 interface TemplatesShowcaseProps {
   onOpenAuth?: () => void;
@@ -118,7 +119,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
     }
   };
 
-   const handleCardClick = (template: TemplateItem) => {
+  const handleCardClick = (template: TemplateItem) => {
     const slug = template.id.replace(/-/g, "_");
     const attribution: RegistrationCTAInput = {
       cta_id: `template_${slug}`,
@@ -246,7 +247,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
               className="group cursor-pointer inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl text-base sm:text-lg font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_4px_24px_rgba(0,163,255,0.35)] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_32px_rgba(255,46,217,0.45)] active:scale-[0.98]"
             >
               <span>Browse All Templates</span>
-              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              <span className="transition-transform duration-300 group-hover:translate-x-1"><ArrowRight /> </span>
             </button>
           </div>
         </div>

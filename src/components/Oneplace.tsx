@@ -2,6 +2,7 @@
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
+import { ArrowRight } from "lucide-react";
 
 interface OneplaceProps {
     onOpenAuth?: () => void;
@@ -69,14 +70,14 @@ const bottomModels = [
 export interface TopNavTab {
     id: string;
     label: string;
-    icon?: string; 
+    icon?: string;
     isActive?: boolean;
 }
 
 export interface SidebarNavTab {
     id: string;
     label: string;
-    icon?: string; 
+    icon?: string;
     isActive?: boolean;
 }
 
@@ -249,7 +250,7 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                         Hundreds of tools, the best AI models, and ready-to-use templates — all in one platform.
                     </p>
                 </div>
-              
+
                 <div className="w-full bg-[#0C1126]/90 border border-white/10 rounded-2xl p-1.5 sm:p-2 mb-6 sm:mb-8 shadow-inner">
 
                     {/* First Row */}
@@ -278,7 +279,7 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                             );
                         })}
 
-                    {/* Second Row */}
+                        {/* Second Row */}
                         {defaultTopNavTabs.slice(5).map((tab) => (
                             <div
                                 key={tab.id}
@@ -472,7 +473,7 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                                 className="w-full group cursor-pointer inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-4 rounded-xl font-sans font-bold text-sm sm:text-base text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-95"
                             >
                                 <span>Try Compare AI</span>
-                                <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                                <span className="transition-transform duration-300 group-hover:translate-x-1"><ArrowRight /></span>
                             </button>
                         </div>
                     </div>

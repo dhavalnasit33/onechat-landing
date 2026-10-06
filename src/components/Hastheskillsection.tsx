@@ -8,7 +8,10 @@ import {
     Landmark,
     ShoppingBag,
     Palette,
-    CheckCircle2
+    CheckCircle2,
+    ArrowLeft,
+    ArrowRight,
+    ArrowDown
 } from "lucide-react";
 import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
@@ -135,7 +138,7 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
                             className="group cursor-pointer inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-sans font-bold text-xs sm:text-sm md:text-base text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-95"
                         >
                             <span>See How It Works</span>
-                            <span className="transition-transform duration-300 group-hover:translate-x-1 font-bold">→</span>
+                            <span className="transition-transform duration-300 group-hover:translate-x-1 font-bold"><ArrowRight /></span>
                         </button>
                     </div>
                     <div className="w-full mt-8 sm:mt-10">
@@ -157,12 +160,12 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
                 {/* 3 Steps Process Container */}
                 <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-6 items-stretch relative z-10">
 
-                    <div className="hidden lg:flex absolute top-1/2 left-[33.33%] -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-gradient-to-r from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_20px_rgba(0,163,255,0.7)] items-center justify-center text-white text-sm font-bold pointer-events-none">
-                        →
+                    <div className="hidden lg:flex absolute top-1/2 left-[33.33%] -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-gradient-to-r from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_20px_rgba(0,163,255,0.7)] items-center justify-center text-white font-bold pointer-events-none">
+                        <ArrowRight size={16} />
                     </div>
 
-                    <div className="hidden lg:flex absolute top-1/2 left-[66.66%] -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-gradient-to-r from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_20px_rgba(0,163,255,0.7)] items-center justify-center text-white text-sm font-bold pointer-events-none">
-                        →
+                    <div className="hidden lg:flex absolute top-1/2 left-[66.66%] -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-gradient-to-r from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_20px_rgba(0,163,255,0.7)] items-center justify-center text-white font-bold pointer-events-none">
+                        <ArrowRight size={16} />
                     </div>
 
                     {/* Step 1: Choose what you want to create */}
@@ -215,7 +218,7 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
                     {/* Mobile Down Arrow between Step 1 and Step 2 */}
                     <div className="flex lg:hidden justify-center items-center py-1">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_18px_rgba(0,163,255,0.7)] flex items-center justify-center text-white text-sm font-bold">
-                            ↓
+                            <ArrowDown size={16} />
                         </div>
                     </div>
 
@@ -264,7 +267,7 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
                     {/* Mobile Down Arrow between Step 2 and Step 3 */}
                     <div className="flex lg:hidden justify-center items-center py-1">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#00A3FF] to-[#6366F1] border border-blue-300 shadow-[0_0_18px_rgba(0,163,255,0.7)] flex items-center justify-center text-white text-sm font-bold">
-                            ↓
+                            <ArrowDown size={16} />
                         </div>
                     </div>
 
