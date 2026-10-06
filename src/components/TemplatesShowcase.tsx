@@ -118,10 +118,31 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
     }
   };
 
+   const handleCardClick = (template: TemplateItem) => {
+    const slug = template.id.replace(/-/g, "_");
+    const attribution: RegistrationCTAInput = {
+      cta_id: `template_${slug}`,
+      cta_label: template.title,
+      section_id: "templates",
+      section_label: "Start With What You Want to Make",
+      item_id: slug,
+      item_label: template.title,
+      page: "landing_page",
+    };
+    if (onCTA) {
+      onCTA(attribution);
+    } else if (onOpenAuth) {
+      handleRegistrationCTA(attribution, onOpenAuth);
+    } else {
+      handleRegistrationCTA(attribution);
+    }
+  };
+
   const renderCard = (template: TemplateItem) => (
     <div
       key={template.id}
-      className="group w-full rounded-2xl bg-[#090D22] border border-[#1E293B]/80 hover:border-[#8B5CF6]/80 overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_12px_32px_rgba(108,86,229,0.35)] flex flex-col min-w-0"
+      onClick={() => handleCardClick(template)}
+      className="group w-full rounded-2xl bg-[#090D22] border border-[#1E293B]/80 hover:border-[#8B5CF6]/80 overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_12px_32px_rgba(108,86,229,0.35)] flex flex-col min-w-0 cursor-pointer"
     >
       {/* Image Container */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#101633]">
