@@ -240,7 +240,7 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between gap-2 pt-1">
+                            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                                 <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-400 flex-wrap sm:flex-nowrap">
                                     <div className="px-1.5 py-1 rounded-lg bg-white/5 border border-white/10 whitespace-nowrap">
                                         <span className="text-slate-500">Style: </span>
