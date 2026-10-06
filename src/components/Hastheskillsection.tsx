@@ -138,8 +138,8 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
                             <span className="transition-transform duration-300 group-hover:translate-x-1 font-bold">→</span>
                         </button>
                     </div>
-                    <div className="w-full mt-10 justify-center items-center">
-                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-4 gap-y-3 sm:gap-6 lg:gap-col-10">
+                    <div className="w-full mt-8 sm:mt-10">
+                        <div className="flex flex-wrap items-center gap-x-5 sm:gap-x-6 lg:gap-x-8 gap-y-3 sm:gap-y-3.5">
                             {defaultSkillBenefits.map((benefit, idx) => (
                                 <div key={idx} className="flex items-center gap-2 select-none whitespace-nowrap">
                                     <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center shrink-0 text-emerald-400">
@@ -238,15 +238,15 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
 
                             <div className="flex items-center justify-between gap-2 pt-1">
                                 <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-slate-400">
-                                    <div className="px-2 py-1 rounded-lg bg-white/5 border border-white/10">
+                                    <div className="px-1 py-1 rounded-lg bg-white/5 border border-white/10">
                                         <span className="text-slate-500">Style: </span>
                                         <span className="text-slate-200 font-medium">Cinematic</span>
                                     </div>
-                                    <div className="px-2 py-1 rounded-lg bg-white/5 border border-white/10">
+                                    <div className="px-1 py-1 rounded-lg bg-white/5 border border-white/10">
                                         <span className="text-slate-500">Ratio: </span>
                                         <span className="text-slate-200 font-medium">16:9</span>
                                     </div>
-                                    <div className="px-2 py-1 rounded-lg bg-white/5 border border-white/10">
+                                    <div className="px-1 py-1 rounded-lg bg-white/5 border border-white/10">
                                         <span className="text-slate-500">Model: </span>
                                         <span className="text-slate-200 font-medium">Veo</span>
                                     </div>

@@ -489,25 +489,31 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                         {bottomModels.map((model, idx) => (
                             <div
                                 key={idx}
-                                className="flex flex-col items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0C1022] border border-white/10 shadow-sm justify-center hover:border-white/20 transition-colors"
+                                title={model.name}
+                                className="flex flex-col items-center gap-1.5 px-1.5 sm:px-2.5 py-1.5 rounded-lg bg-[#0C1022] border border-white/10 shadow-sm justify-center hover:border-white/20 transition-colors min-w-0 w-full overflow-hidden"
                             >
                                 <img
                                     src={model.icon}
                                     alt={model.name}
-                                    className="w-3.5 h-3.5 object-contain"
+                                    className="w-3.5 h-3.5 object-contain shrink-0"
                                     onError={(e) => {
                                         e.currentTarget.style.display = "none";
                                     }}
                                 />
-                                <span className="text-[10px] font-medium text-slate-300 truncate">
+                                <span className="text-[10px] font-medium text-slate-300 truncate w-full text-center block px-0.5">
                                     {model.name}
                                 </span>
                             </div>
                         ))}
 
                         {/* "And many more..." Pill */}
-                        <div className="flex items-center justify-center px-2 py-4 rounded-lg bg-[#0C1022]/60 border border-white/10 text-[10px] text-slate-400 font-medium whitespace-nowrap col-span-1">
-                            And many more...
+                        <div
+                            title="And many more..."
+                            className="flex items-center justify-center px-1.5 py-3 sm:py-3.5 rounded-lg bg-[#0C1022]/60 border border-white/10 text-[10px] text-slate-400 font-medium col-span-1 min-w-0 w-full overflow-hidden text-center"
+                        >
+                            <span className="truncate w-full block px-0.5">
+                                And many more...
+                            </span>
                         </div>
                     </div>
                 </div>

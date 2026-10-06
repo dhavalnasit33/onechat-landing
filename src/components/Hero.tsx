@@ -125,7 +125,7 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
                 window.location.href = "/generate-ai-videos";
               }
             }}
-            className="group cursor-pointer inline-flex items-center justify-center gap-2 px-10 sm:px-14 py-4 sm:py-5 rounded-2xl text-lg sm:text-2xl font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-[0.98]"
+            className="group cursor-pointer inline-flex items-center justify-center gap-2 px-10 sm:px-14 py-4 sm:py-5 rounded-2xl text-lg sm:text-2xl font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-[0.98] whitespace-nowrap"
           >
             <span>Start 7-Day Free Trial</span>
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>

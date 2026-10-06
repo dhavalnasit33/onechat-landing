@@ -69,12 +69,12 @@ export const defaultVideoModels: AIModelItem[] = [
     { name: "Veo", icon: "/assets/landing-page/section-2-veo.png" },
     { name: "Kling", icon: "/assets/landing-page/section-2-kling.png" },
     { name: "Runway", icon: "/assets/landing-page/section-2-runway.png" },
-    { name: "Seedance", icon: "/assets/landing-page/section-2-sora.png" },
+    { name: "Seedance", icon: "/assets/landing-page/section-2-seedream.png" },
     { name: "MiniMax", icon: "/assets/landing-page/section-2-minimax.png" },
-    { name: "Wan", icon: "/assets/landing-page/section-2-pika.png" },
+    { name: "Wan", icon: "/assets/landing-page/section-2-qwen.png" },
     { name: "Luma", icon: "/assets/landing-page/section-2-mimo.png" },
-    { name: "PixVerse", icon: "/assets/landing-page/section-2-monica-ai.png" },
-    { name: "H3 Max", icon: "/assets/landing-page/section-2-pika.png" },
+    { name: "PixVerse", icon: "/assets/landing-page/section-2-pix-verse.png" },
+    { name: "Pika", icon: "/assets/landing-page/section-2-pika.png" },
     { name: "And more...", icon: "/assets/images/left-arrow.png", isMore: true },
 ];
 
@@ -84,36 +84,35 @@ export const defaultShowcaseCards: ShowcaseCardItem[] = [
         id: "card-1",
         title: "AI Portrait Art",
         image: "/assets/landing-page/allthebest/girls.png",
-        glowColor: "shadow-[0_0_25px_rgba(236,72,153,0.45)]",
+        glowColor: "shadow-[0_0_25px_rgba(236,72,153,0.4)]",
         borderColor: "border-pink-500/50 hover:border-pink-400",
-        rotation: "rotate-[6deg] sm:rotate-[7deg]",
+        rotation: "rotate-0 lg:rotate-[6deg]",
     },
     {
         id: "card-2",
-        title: "Dog with Sunglasses",
+        title: "Cyberpunk City Video",
         image: "/assets/landing-page/allthebest/fantastic.png",
-        glowColor: "shadow-[0_0_25px_rgba(245,158,11,0.45)]",
+        glowColor: "shadow-[0_0_25px_rgba(245,158,11,0.4)]",
         borderColor: "border-amber-500/50 hover:border-amber-400",
-        rotation: "rotate-[-3deg] sm:rotate-[-4deg]",
+        rotation: "rotate-0 lg:-rotate-[3deg]",
+        hasPlayButton: true,
     },
     {
         id: "card-3",
-        title: "Cyberpunk City Video",
+        title: "Astronaut Cat in Space",
         image: "/assets/landing-page/allthebest/cat.png",
-        glowColor: "shadow-[0_0_25px_rgba(59,130,246,0.5)]",
+        glowColor: "shadow-[0_0_25px_rgba(59,130,246,0.45)]",
         borderColor: "border-blue-500/50 hover:border-blue-400",
-        rotation: "rotate-[4deg] sm:rotate-[5deg]",
-        hasPlayButton: false,
+        rotation: "rotate-0 lg:rotate-[4deg]",
     },
     {
         id: "card-4",
-        title: "Astronaut Cat in Space",
+        title: "Futuristic Sneaker",
         image: "/assets/landing-page/allthebest/shose.png",
-        glowColor: "shadow-[0_0_25px_rgba(168,85,247,0.45)]",
+        glowColor: "shadow-[0_0_25px_rgba(168,85,247,0.4)]",
         borderColor: "border-purple-500/50 hover:border-purple-400",
-        rotation: "rotate-[-4deg] sm:rotate-[-5deg]",
+        rotation: "rotate-0 lg:-rotate-[4deg]",
     },
-
 ];
 
 // 5. Default Feature Badges (Bottom Left)
@@ -147,25 +146,28 @@ const renderModelCard = (model: AIModelItem, idx: number) => {
     return (
         <div
             key={idx}
-            className="flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl cursor-default select-none"
+            className="flex flex-col items-center justify-center p-1 sm:p-1.5 rounded-xl cursor-default select-none min-w-0 w-full overflow-hidden"
         >
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center mb-1 relative">
+            <div className="w-6 h-6 min-[380px]:w-7 min-[380px]:h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center mb-1 relative shrink-0">
                 {model.isMore ? (
-                    <div className="w-7 h-7 p-2 rounded-full bg-white/10 flex items-center justify-center text-slate-400 text-[10px] font-bold">
+                    <div className="w-6 h-6 min-[380px]:w-7 min-[380px]:h-7 p-1.5 sm:p-2 rounded-full bg-white/10 flex items-center justify-center text-slate-400 text-[9px] sm:text-[10px] font-bold">
                         •••
                     </div>
                 ) : (
                     <img
                         src={model.icon}
                         alt={model.name}
-                        className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow-sm"
+                        className="w-5 h-5 min-[380px]:w-6 min-[380px]:h-6 sm:w-7 sm:h-7 object-contain drop-shadow-sm"
                         onError={(e) => {
                             e.currentTarget.style.display = "none";
                         }}
                     />
                 )}
             </div>
-            <span className="text-[10px] sm:text-[11px] font-medium text-slate-300 text-center truncate max-w-[60px] sm:max-w-[70px]">
+            <span
+                title={model.name}
+                className="text-[9px] min-[380px]:text-[10px] sm:text-[11px] font-medium text-slate-300 text-center truncate w-full block px-0.5"
+            >
                 {model.name}
             </span>
         </div>
@@ -222,9 +224,9 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                         {/* Main Heading */}
                         <h2 className="font-poppins text-3xl sm:text-4xl md:text-[44px] lg:text-[48px] font-extrabold text-white tracking-tight leading-[1.15]">
                             All the Best AI. <br />
-                            <span>One </span>
+                        
                             <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">
-                                Place.
+                               One Place.
                             </span>
                         </h2>
 
@@ -246,7 +248,7 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
 
                         {/* 4 Feature Badges in a Row */}
                         {/* <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"> */}
-                        <div className="flex flex-row mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 gap-3 sm:gap-4">
+                        <div className="flex flex-row justify-between mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 gap-3 sm:gap-4">
                             {defaultFeatures.map((feat) => (
                                 <div key={feat.id} className="flex flex-col items-center justify-center sm:items-center gap-1.5 text-center">
 
@@ -298,9 +300,11 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
 
                     </div>
 
-                    <div className="lg:col-span-3 relative z-10 flex flex-col items-center justify-center gap-3 sm:gap-3.5 py-4 sm:py-6">
-                        {/* Right Side Vertical Spiral Wave Overlay */}
-                        <div className="absolute top-1/2 -translate-y-1/2 right-0 sm:-right-4 w-[320px] sm:w-[420px] lg:w-[460px] h-[550px] sm:h-[680px] pointer-events-none z-0 mix-blend-screen opacity-70 md:opacity-80 select-none flex items-center justify-center">
+                    {/* ================= COLUMN 3 (Right - 3 cols on desktop, 2x2 grid below 1024px): 4 Showcase Cards ================= */}
+                    <div className="lg:col-span-3 relative z-10 flex flex-col items-center justify-center gap-3 sm:gap-3.5 py-4 sm:py-6 w-full">
+                      
+                        {/* Wave Glow Background Effect */}
+                        <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-0 sm:lg:-right-4 w-[320px] sm:w-[500px] md:w-[600px] lg:w-[460px] h-[400px] sm:h-[550px] lg:h-[680px] pointer-events-none z-0 mix-blend-screen opacity-70 md:opacity-80 select-none flex items-center justify-center">
                             <img
                                 src="/assets/landing-page/allthebest/right_side_wav.png"
                                 alt="Right Wave Glow"
@@ -311,12 +315,12 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                         {/* Background Aura */}
                         <div className="absolute inset-0 bg-gradient-to-t from-purple-600/20 via-blue-600/10 to-transparent blur-2xl pointer-events-none" />
 
-                        {/* Cards */}
-                        <div className="relative z-10 grid grid-cols-2 gap-3 sm:flex sm:flex-col sm:items-center sm:gap-3.5">
+                    
+                        <div className="relative z-10 grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 w-full sm:max-w-full lg:flex lg:flex-col lg:items-center lg:gap-3.5">
                             {defaultShowcaseCards.map((card, idx) => (
                                 <div
                                     key={card.id || idx}
-                                    className={`relative w-full max-w-[160px] sm:max-w-[250px] lg:max-w-[260px] h-[90px] sm:h-[105px] md:h-[150px] rounded-2xl overflow-hidden border ${card.borderColor} ${card.glowColor} ${card.rotation} transition-all duration-300 hover:scale-105 hover:rotate-0 hover:z-20 shadow-xl bg-[#0E132D]`}
+                                    className={`relative w-full aspect-[16/10] lg:aspect-auto lg:w-[260px] lg:h-[145px] xl:h-[150px] rounded-xl sm:rounded-2xl overflow-hidden border ${card.borderColor} ${card.glowColor} ${card.rotation} transition-all duration-300 hover:scale-105 hover:rotate-0 hover:z-20 shadow-xl bg-[#0E132D]`}
                                 >
                                     <img
                                         src={card.image}
@@ -328,14 +332,16 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                                     />
 
                                     {card.hasPlayButton && (
-                                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                            <div className="w-8 h-8 rounded-full bg-white/80 text-black flex items-center justify-center text-xs font-bold shadow-lg backdrop-blur-sm pl-0.5">
-                                                ▶
+                                        <div className="absolute inset-0 bg-black/25 flex items-center justify-center pointer-events-none">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/30 border border-white/50 backdrop-blur-sm text-white flex items-center justify-center shadow-lg">
+                                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white text-black flex items-center justify-center text-[9px] sm:text-[10px] font-bold pl-0.5 shadow">
+                                                    ▶
+                                                </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                                 </div>
                             ))}
                         </div>
