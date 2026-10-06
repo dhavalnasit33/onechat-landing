@@ -4,7 +4,7 @@ import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution"
 
 interface NavbarProps {
   onOpenAuth?: (mode?: "signin" | "signup") => void;
-  onCTA?: (attribution: RegistrationCTAInput) => void;
+  onCTA?: (attribution: RegistrationCTAInput, mode?: "signin" | "signup") => void;
 }
 
 export default function Navbar({ onOpenAuth, onCTA }: NavbarProps) {
@@ -108,7 +108,22 @@ export default function Navbar({ onOpenAuth, onCTA }: NavbarProps) {
           {/* Desktop Auth & CTA Buttons */}
           <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
             <button
-              onClick={() => onOpenAuth?.("signin")}
+              onClick={() => {
+                const attribution: RegistrationCTAInput = {
+                  cta_id: "navbar_signin",
+                  cta_label: "Sign In",
+                  section_id: "navbar",
+                  section_label: "Navbar",
+                  page: "landing_page",
+                };
+                if (onCTA) {
+                  onCTA(attribution, "signin");
+                } else if (onOpenAuth) {
+                  handleRegistrationCTA(attribution, onOpenAuth, "signin");
+                } else {
+                  handleRegistrationCTA(attribution, undefined, "signin");
+                }
+              }}
               className="px-4 lg:px-5 py-2.5 rounded-xl text-sm lg:text-base font-semibold text-slate-200 border border-[#3B3B47] hover:text-white hover:bg-white/10 transition-all cursor-pointer whitespace-nowrap"
             >
               Sign In
@@ -196,7 +211,20 @@ export default function Navbar({ onOpenAuth, onCTA }: NavbarProps) {
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenAuth?.("signin");
+                const attribution: RegistrationCTAInput = {
+                  cta_id: "navbar_signin",
+                  cta_label: "Sign In",
+                  section_id: "navbar",
+                  section_label: "Navbar",
+                  page: "landing_page",
+                };
+                if (onCTA) {
+                  onCTA(attribution, "signin");
+                } else if (onOpenAuth) {
+                  handleRegistrationCTA(attribution, onOpenAuth, "signin");
+                } else {
+                  handleRegistrationCTA(attribution, undefined, "signin");
+                }
               }}
               className="w-full text-center px-6 py-3 rounded-full text-base font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/10 cursor-pointer"
             >

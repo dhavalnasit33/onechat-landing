@@ -26,11 +26,15 @@ export default function LandingPageClient() {
     setAuthOpen(true);
   };
 
-  const handleCTA = (attribution: RegistrationCTAInput) => {
-    handleRegistrationCTA(attribution, (mode) => {
-      setAuthMode(mode || "signup");
-      setAuthOpen(true);
-    });
+  const handleCTA = (attribution: RegistrationCTAInput, mode: "signin" | "signup" = "signup") => {
+    handleRegistrationCTA(
+      attribution,
+      (targetMode) => {
+        setAuthMode(targetMode || mode || "signup");
+        setAuthOpen(true);
+      },
+      mode
+    );
   };
 
   useEffect(() => {

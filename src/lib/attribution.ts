@@ -113,7 +113,8 @@ export function clearRegistrationAttribution() {
  */
 export function handleRegistrationCTA(
   attributionInput: RegistrationCTAInput,
-  onOpenAuth?: (mode?: "signin" | "signup") => void
+  onOpenAuth?: (mode?: "signin" | "signup") => void,
+  mode: "signin" | "signup" = "signup"
 ) {
   const attribution: RegistrationAttribution = {
     source: "landing_page",
@@ -133,8 +134,9 @@ export function handleRegistrationCTA(
   // 2. Save attribution temporarily in browser (sessionStorage)
   saveRegistrationAttribution(attribution);
 
-  // 3. Open registration popup immediately
+  // 3. Open registration/auth popup immediately
   if (typeof onOpenAuth === "function") {
-    onOpenAuth("signup");
+    onOpenAuth(mode);
   }
 }
+
