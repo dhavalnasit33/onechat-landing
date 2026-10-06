@@ -108,8 +108,7 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
             </div>
             <div className="relative max-w-[1400px] mx-auto z-10 flex flex-col gap-10 sm:gap-12 lg:gap-14">
                 <div className="flex flex-col items-start text-left relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#6C56E5]/15 border border-[#6C56E5]/30 mb-3.5">
-
+                    <div className="inline-flex w-fit items-center gap-2 px-3 py-1 mb-3.5">
                         <span className="font-mono text-xs sm:text-sm font-bold tracking-widest text-[#E879F9] uppercase">
                             ZERO SKILLS REQUIRED
                         </span>
@@ -140,7 +139,7 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
                         </button>
                     </div>
                     <div className="w-full mt-10 justify-center items-center">
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 sm:gap-6 lg:gap-col-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-4 gap-y-3 sm:gap-6 lg:gap-col-10">
                             {defaultSkillBenefits.map((benefit, idx) => (
                                 <div key={idx} className="flex items-center gap-2 select-none whitespace-nowrap">
                                     <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center shrink-0 text-emerald-400">

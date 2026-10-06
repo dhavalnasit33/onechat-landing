@@ -253,7 +253,7 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                 <div className="w-full bg-[#0C1126]/90 border border-white/10 rounded-2xl p-1.5 sm:p-2 mb-6 sm:mb-8 shadow-inner">
 
                     {/* First Row */}
-                    <div className="flex items-center justify-center gap-1.5 gap-10 sm:gap-0  flex-wrap">
+                    <div className="flex items-center justify-center gap-1.5 gap-x-3 md:gap-x-10 sm:gap-y-4  flex-wrap">
                         {defaultTopNavTabs.slice(0, 5).map((tab) => {
                             if (tab.isActive) {
                                 return (

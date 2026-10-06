@@ -213,7 +213,7 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                     {/* ================= COLUMN 1 (Left - 4 cols): Headline, CTA, 4 Badges ================= */}
                     <div className="lg:col-span-4 flex flex-col justify-center text-left relative z-10">
 
-                        <div className="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-[#6C56E5]/15 border border-[#6C56E5]/30 mb-3.5">
+                        <div className="inline-flex w-fit items-center gap-2 px-3 py-1 mb-3.5">
                             <span className="font-mono text-xs sm:text-sm font-bold tracking-widest text-[#E879F9] uppercase">
                                 LEADING AI MODELS
                             </span>
@@ -248,11 +248,11 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                         {/* <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"> */}
                         <div className="flex flex-row mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 gap-3 sm:gap-4">
                             {defaultFeatures.map((feat) => (
-                                <div key={feat.id} className="flex flex-col items-center sm:items-center gap-1.5 text-center sm:text-left">
+                                <div key={feat.id} className="flex flex-col items-center justify-center sm:items-center gap-1.5 text-center">
 
                                     <span className="bg-[#061742] rounded-full p-2">{feat.icon}</span>
 
-                                    <span className="text-[11px] sm:text-xs font-semibold text-slate-300 whitespace-nowrap">
+                                    <span className="text-[11px] sm:text-xs font-semibold text-slate-300">
                                         {feat.label}
                                     </span>
                                 </div>

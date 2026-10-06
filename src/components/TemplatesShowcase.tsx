@@ -198,7 +198,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
         {/* Section Header (Left-aligned matching Image 2) */}
         <div className="text-left flex flex-col items-start max-w-3xl mb-10 px-2 sm:px-4">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#6C56E5]/15 border border-[#6C56E5]/30 mb-3.5">
+          <div className="inline-flex w-fit items-center gap-2 px-3 py-1 mb-3.5">
             <span className="font-mono text-xs sm:text-sm font-bold tracking-widest text-[#E879F9] uppercase">
               READY-TO-USE TEMPLATES
             </span>

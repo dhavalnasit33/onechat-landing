@@ -120,7 +120,7 @@ export default function FAQAccordion({ onOpenAuth, onCTA }: FAQAccordionProps) {
 
                   {/* Circle Plus Icon */}
                   <div
-                    className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-300 ${
+                    className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-300 p-[7px] ${
                       isExpanded
                         ? "bg-[#6C56E5] border-[#6C56E5] text-white rotate-45"
                         : "bg-[#0F1426] border-white/10 text-[#94A3B8]"
@@ -163,7 +163,8 @@ export default function FAQAccordion({ onOpenAuth, onCTA }: FAQAccordionProps) {
         <div className="mt-16 text-center">
           <button
             onClick={handleButtonClick}
-            className="px-14 py-5 rounded-2xl text-lg sm:text-xl font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_8px_32px_rgba(0,163,255,0.35)] transition-all hover:scale-105 cursor-pointer"
+            // className="px-14 py-5 rounded-2xl text-lg sm:text-xl font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_8px_32px_rgba(0,163,255,0.35)] transition-all hover:scale-105 cursor-pointer"
+            className="group cursor-pointer inline-flex items-center justify-center gap-2 px-10 sm:px-14 py-4 sm:py-5 rounded-2xl text-lg sm:text-2xl font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-[0.98]"
           >
             Start 7-Day Free Trial
           </button>
