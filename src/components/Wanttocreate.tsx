@@ -107,20 +107,20 @@ export default function Wanttocreate({ onOpenAuth, onCTA }: WanttocreateProps) {
 
       <div className="relative max-w-7xl mx-auto flex flex-col items-center">
         {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-14 px-2">
           <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            What do you {" "}
-            <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">
+            What do you{" "}
+            <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent inline-block">
               want to create?
             </span>
           </h2>
-          <p className="mt-3 sm:mt-4 font-sans text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto whitespace-nowrap">
+          <p className="mt-3 sm:mt-4 font-sans text-xs sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Turn your ideas into amazing content with ready-to-use templates and powerful AI tools.
           </p>
         </div>
 
-        {/* Cards Grid: 2 columns on mobile, 3 on sm, 4 on md, 6 on lg */}
-        <div className="w-full grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-4.5">
+        {/* Cards Grid: 3 columns on mobile, 3 on sm, 4 on md, 6 on lg */}
+        <div className="w-full grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-4 lg:gap-4.5">
           {createItemsData.map((item, index) => (
             <div
               key={index}
