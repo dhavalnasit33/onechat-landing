@@ -1,5 +1,5 @@
-"use client";
 import React, { useState } from "react";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface FAQItem {
   q: string;
@@ -38,14 +38,33 @@ const faqData: FAQItem[] = [
 ];
 
 interface FAQAccordionProps {
-  onOpenAuth: () => void;
+  onOpenAuth?: () => void;
+  onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
-export default function FAQAccordion({ onOpenAuth }: FAQAccordionProps) {
+export default function FAQAccordion({ onOpenAuth, onCTA }: FAQAccordionProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const toggleExpand = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
+  const handleButtonClick = () => {
+    const attribution: RegistrationCTAInput = {
+      cta_id: "faq_start_trial",
+      cta_label: "Start 7-Day Free Trial",
+      section_id: "faq",
+      section_label: "Questions? We've got answers.",
+      page: "landing_page",
+    };
+    if (onCTA) {
+      onCTA(attribution);
+    } else if (onOpenAuth) {
+      handleRegistrationCTA(attribution, onOpenAuth);
+    } else {
+      handleRegistrationCTA(attribution);
+      window.location.href = "/generate-ai-videos";
+    }
   };
 
   return (
@@ -143,10 +162,7 @@ export default function FAQAccordion({ onOpenAuth }: FAQAccordionProps) {
         {/* Bottom CTA Button */}
         <div className="mt-16 text-center">
           <button
-            onClick={() => {
-              if (onOpenAuth) onOpenAuth();
-              else window.location.href = "/generate-ai-videos";
-            }}
+            onClick={handleButtonClick}
             className="px-14 py-5 rounded-2xl text-lg sm:text-xl font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_8px_32px_rgba(0,163,255,0.35)] transition-all hover:scale-105 cursor-pointer"
           >
             Start 7-Day Free Trial

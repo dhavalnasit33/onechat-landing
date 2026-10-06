@@ -1,8 +1,10 @@
 "use client";
 import React, { useRef } from "react";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface TemplatesShowcaseProps {
   onOpenAuth?: () => void;
+  onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
 interface TemplateItem {
@@ -88,7 +90,7 @@ const bottomRowTemplates: TemplateItem[] = [
   },
 ];
 
-export default function TemplatesShowcase({ onOpenAuth }: TemplatesShowcaseProps) {
+export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowcaseProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -98,10 +100,20 @@ export default function TemplatesShowcase({ onOpenAuth }: TemplatesShowcaseProps
     }
   };
 
-  const handleClick = () => {
-    if (onOpenAuth) {
-      onOpenAuth();
+  const handleBrowseClick = () => {
+    const attribution: RegistrationCTAInput = {
+      cta_id: "templates_browse_all",
+      cta_label: "Browse All Templates",
+      section_id: "templates",
+      section_label: "Start With What You Want to Make",
+      page: "landing_page",
+    };
+    if (onCTA) {
+      onCTA(attribution);
+    } else if (onOpenAuth) {
+      handleRegistrationCTA(attribution, onOpenAuth);
     } else {
+      handleRegistrationCTA(attribution);
       window.location.href = "/generate-ai-videos";
     }
   };
@@ -109,15 +121,14 @@ export default function TemplatesShowcase({ onOpenAuth }: TemplatesShowcaseProps
   const renderCard = (template: TemplateItem) => (
     <div
       key={template.id}
-      onClick={handleClick}
-      className="group w-full rounded-2xl bg-[#090D22] border border-[#1E293B]/80 hover:border-[#8B5CF6]/80 overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_12px_32px_rgba(108,86,229,0.35)] flex flex-col min-w-0"
+      className="group w-full rounded-2xl bg-[#090D22] border border-[#1E293B]/80 hover:border-[#8B5CF6]/80 overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_12px_32px_rgba(108,86,229,0.35)] flex flex-col min-w-0"
     >
       {/* Image Container */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#101633]">
         <img
           src={template.image}
           alt={template.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-100"
         />
 
         {/* Gradient overlay */}
@@ -210,7 +221,7 @@ export default function TemplatesShowcase({ onOpenAuth }: TemplatesShowcaseProps
           {/* CTA Button */}
           <div className="mt-6">
             <button
-              onClick={handleClick}
+              onClick={handleBrowseClick}
               className="group cursor-pointer inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl text-base sm:text-lg font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_4px_24px_rgba(0,163,255,0.35)] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_32px_rgba(255,46,217,0.45)] active:scale-[0.98]"
             >
               <span>Browse All Templates</span>

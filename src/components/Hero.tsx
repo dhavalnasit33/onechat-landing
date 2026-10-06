@@ -1,9 +1,11 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface HeroProps {
   onOpenAuth?: () => void;
+  onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
 const rotatingWords = [
@@ -26,7 +28,7 @@ const rotatingWords = [
 
 export const heroWaveBgPath = "/assets/landing-page/Hero_section_wav.png";
 
-export default function Hero({ onOpenAuth }: HeroProps) {
+export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
   const [wordIndex, setWordIndex] = useState(0);
   const [fadeState, setFadeState] = useState("fade-in");
   const [videoSrc, setVideoSrc] = useState("");
@@ -108,9 +110,19 @@ export default function Hero({ onOpenAuth }: HeroProps) {
         <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-3">
           <button
             onClick={() => {
-              if (onOpenAuth) {
-                onOpenAuth();
+              const attribution: RegistrationCTAInput = {
+                cta_id: "hero_start_trial",
+                cta_label: "Start 7-Day Free Trial",
+                section_id: "hero",
+                section_label: "The #1 AI Super App",
+                page: "landing_page",
+              };
+              if (onCTA) {
+                onCTA(attribution);
+              } else if (onOpenAuth) {
+                handleRegistrationCTA(attribution, onOpenAuth);
               } else {
+                handleRegistrationCTA(attribution);
                 window.location.href = "/generate-ai-videos";
               }
             }}

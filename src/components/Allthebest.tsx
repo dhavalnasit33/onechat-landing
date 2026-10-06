@@ -7,9 +7,11 @@ import {
     Settings,
     ShieldCheck
 } from "lucide-react";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface AllthebestProps {
     onOpenAuth?: () => void;
+    onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
 export interface AIModelItem {
@@ -170,7 +172,24 @@ const renderModelCard = (model: AIModelItem, idx: number) => {
     );
 };
 
-export default function Allthebest({ onOpenAuth }: AllthebestProps) {
+export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
+    const handleButtonClick = () => {
+        const attribution: RegistrationCTAInput = {
+            cta_id: "models_explore_all",
+            cta_label: "Explore All AI Models",
+            section_id: "all_best_ai",
+            section_label: "All the Best AI. One Place.",
+            page: "landing_page",
+        };
+        if (onCTA) {
+            onCTA(attribution);
+        } else if (onOpenAuth) {
+            handleRegistrationCTA(attribution, onOpenAuth);
+        } else {
+            handleRegistrationCTA(attribution);
+        }
+    };
+
     return (
         <section className="relative w-full bg-[#030614] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
             {/* Ambient Background Glows & Electric Wave Effects */}
@@ -217,7 +236,7 @@ export default function Allthebest({ onOpenAuth }: AllthebestProps) {
                         {/* CTA Button */}
                         <div className="mt-5 sm:mt-7">
                             <button
-                                onClick={onOpenAuth}
+                                onClick={handleButtonClick}
                                 className="group cursor-pointer inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-sans font-bold text-xs sm:text-sm md:text-base text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-95"
                             >
                                 <span>Explore All AI Models</span>
@@ -297,7 +316,7 @@ export default function Allthebest({ onOpenAuth }: AllthebestProps) {
                             {defaultShowcaseCards.map((card, idx) => (
                                 <div
                                     key={card.id || idx}
-                                    className={`relative w-full max-w-[160px] sm:max-w-[250px] lg:max-w-[260px] h-[90px] sm:h-[105px] md:h-[150px] rounded-2xl overflow-hidden border ${card.borderColor} ${card.glowColor} ${card.rotation} transition-all duration-300 hover:scale-105 hover:rotate-0 hover:z-20 cursor-pointer shadow-xl bg-[#0E132D]`}
+                                    className={`relative w-full max-w-[160px] sm:max-w-[250px] lg:max-w-[260px] h-[90px] sm:h-[105px] md:h-[150px] rounded-2xl overflow-hidden border ${card.borderColor} ${card.glowColor} ${card.rotation} transition-all duration-300 hover:scale-105 hover:rotate-0 hover:z-20 shadow-xl bg-[#0E132D]`}
                                 >
                                     <img
                                         src={card.image}

@@ -1,68 +1,103 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface WanttocreateProps {
   onOpenAuth?: () => void;
+  onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
 interface CreateItem {
   title: string;
   image: string;
+  slug?: string;
 }
 
 const createItemsData: CreateItem[] = [
   {
     title: "AI Videos",
     image: "/assets/landing-page/image/AI_Videos.png",
+    slug: "ai_videos",
   },
   {
     title: "AI Images",
     image: "/assets/landing-page/image/AI_Images.png",
+    slug: "ai_images",
   },
   {
     title: "Social Media Posts",
     image: "/assets/landing-page/image/Social_Media_Posts.png",
+    slug: "social_media_posts",
   },
   {
     title: "YouTube Content",
     image: "/assets/landing-page/image/YouTube_Content.png",
+    slug: "youtube_content",
   },
   {
     title: "Product & Ads",
     image: "/assets/landing-page/image/Product_Ads.png",
+    slug: "product_ads",
   },
   {
     title: "Presentations",
     image: "/assets/landing-page/image/Presentations.png",
+    slug: "presentations",
   },
   {
     title: "AI Design",
     image: "/assets/landing-page/image/AI_Design.png",
+    slug: "ai_design",
   },
   {
     title: "Documents",
     image: "/assets/landing-page/image/Documents.png",
+    slug: "documents",
   },
   {
     title: "AI Writing",
     image: "/assets/landing-page/image/AI_Writing.png",
+    slug: "ai_writing",
   },
   {
     title: "Websites",
     image: "/assets/landing-page/image/Websites.png",
+    slug: "websites",
   },
   {
     title: "Research",
     image: "/assets/landing-page/image/Research.png",
+    slug: "research",
   },
   {
     title: "Just for Fun",
     image: "/assets/landing-page/image/Just_for_Fun.png",
+    slug: "just_for_fun",
   },
 ];
 
-export default function Wanttocreate({ onOpenAuth }: WanttocreateProps) {
+export default function Wanttocreate({ onOpenAuth, onCTA }: WanttocreateProps) {
+  const handleItemClick = (item: CreateItem) => {
+    const slug = item.slug || item.title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+    const attribution: RegistrationCTAInput = {
+      cta_id: `create_category_${slug}`,
+      cta_label: item.title,
+      section_id: "create_categories",
+      section_label: "What Do You Want to Create",
+      item_id: slug,
+      item_label: item.title,
+      page: "landing_page",
+    };
+    if (onCTA) {
+      onCTA(attribution);
+    } else if (onOpenAuth) {
+      handleRegistrationCTA(attribution, onOpenAuth);
+    } else {
+      handleRegistrationCTA(attribution);
+    }
+  };
+
   return (
     <section className="relative w-full bg-[#070913] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
       {/* Background Ambient Glows */}
@@ -89,7 +124,7 @@ export default function Wanttocreate({ onOpenAuth }: WanttocreateProps) {
           {createItemsData.map((item, index) => (
             <div
               key={index}
-              onClick={onOpenAuth}
+              onClick={() => handleItemClick(item)}
               className="group cursor-pointer relative flex flex-col rounded-2xl bg-[#0F1426] border border-white/10 overflow-hidden shadow-md transform transition-all duration-200 ease-out hover:scale-[1.04] hover:border-purple-500/50 hover:shadow-[0_8px_25px_rgba(108,86,229,0.25)] active:scale-[0.97]"
             >
               {/* Image Preview Container */}

@@ -1,11 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface NavbarProps {
   onOpenAuth?: (mode?: "signin" | "signup") => void;
+  onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
-export default function Navbar({ onOpenAuth }: NavbarProps) {
+export default function Navbar({ onOpenAuth, onCTA }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -112,7 +114,22 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
               Sign In
             </button>
             <button
-              onClick={() => onOpenAuth?.("signup")}
+              onClick={() => {
+                const attribution: RegistrationCTAInput = {
+                  cta_id: "navbar_start_creating",
+                  cta_label: "Start Creating Free",
+                  section_id: "navbar",
+                  section_label: "Navbar",
+                  page: "landing_page",
+                };
+                if (onCTA) {
+                  onCTA(attribution);
+                } else if (onOpenAuth) {
+                  handleRegistrationCTA(attribution, onOpenAuth);
+                } else {
+                  handleRegistrationCTA(attribution);
+                }
+              }}
               className="px-6 lg:px-8 py-3 rounded-2xl text-sm lg:text-base font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_20px_rgba(0,163,255,0.35)]
                transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(255,46,217,0.45)] cursor-pointer whitespace-nowrap"
             >
@@ -188,7 +205,20 @@ export default function Navbar({ onOpenAuth }: NavbarProps) {
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenAuth?.("signup");
+                const attribution: RegistrationCTAInput = {
+                  cta_id: "navbar_start_creating",
+                  cta_label: "Start Creating Free",
+                  section_id: "navbar",
+                  section_label: "Navbar",
+                  page: "landing_page",
+                };
+                if (onCTA) {
+                  onCTA(attribution);
+                } else if (onOpenAuth) {
+                  handleRegistrationCTA(attribution, onOpenAuth);
+                } else {
+                  handleRegistrationCTA(attribution);
+                }
               }}
               className="w-full text-center px-6 py-3.5 rounded-full text-base font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_20px_rgba(0,163,255,0.35)] cursor-pointer"
             >

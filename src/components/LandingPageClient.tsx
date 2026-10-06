@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Navbar from "./Navbar";
@@ -10,6 +10,7 @@ import Oneplace from "./Oneplace";
 import Allthebest from "./Allthebest";
 import Hastheskillsection from "./Hastheskillsection";
 import TemplatesShowcase from "./TemplatesShowcase";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
 const Footer = dynamic(() => import("./Footer"));
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
@@ -17,6 +18,19 @@ const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 export default function LandingPageClient() {
   const [authOpen, setAuthOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
+
+  const handleOpenAuth = (mode: "signin" | "signup" = "signup") => {
+    setAuthMode(mode);
+    setAuthOpen(true);
+  };
+
+  const handleCTA = (attribution: RegistrationCTAInput) => {
+    handleRegistrationCTA(attribution, (mode) => {
+      setAuthMode(mode || "signup");
+      setAuthOpen(true);
+    });
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -29,7 +43,7 @@ export default function LandingPageClient() {
       // Helper to set a cookie on host and root domain
       const setDomainCookie = (name: string, value: string) => {
         const cookieStr = `${name}=${encodeURIComponent(value)}; ${cookieOpts}`;
-        document.cookie = cookieStr; 
+        document.cookie = cookieStr;
         if (!currentDomain.includes("localhost") && !currentDomain.includes("127.0.0.1")) {
           const hostParts = currentDomain.split(".");
           const rootDomain = hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
@@ -41,7 +55,7 @@ export default function LandingPageClient() {
       if (rdtCid) {
         try {
           setDomainCookie("oc_rdt_cid", rdtCid);
-          setDomainCookie("rdt_cid", rdtCid); 
+          setDomainCookie("rdt_cid", rdtCid);
           console.log("Captured rdt_cid cookie successfully:", rdtCid);
         } catch (e) {
           console.error("Error saving rdt_cid cookie:", e);
@@ -139,20 +153,20 @@ export default function LandingPageClient() {
 
   return (
     <>
-      <Navbar onOpenAuth={() => setAuthOpen(true)} />
+      <Navbar onOpenAuth={handleOpenAuth} onCTA={handleCTA} />
       <main className="flex-1 w-full flex flex-col">
-        <Hero onOpenAuth={() => setAuthOpen(true)} />
-        <CreateZeroSkillSection onOpenAuth={() => setAuthOpen(true)} />
+        <Hero onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+        <CreateZeroSkillSection onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
         <ModelMarquee />
-        <Wanttocreate onOpenAuth={() => setAuthOpen(true)} />
-        <Oneplace onOpenAuth={() => setAuthOpen(true)} />
-        <Allthebest onOpenAuth={() => setAuthOpen(true)} />
-        <Hastheskillsection onOpenAuth={() => setAuthOpen(true)} />
-        <TemplatesShowcase onOpenAuth={() => setAuthOpen(true)} />
-        <FAQAccordion onOpenAuth={() => setAuthOpen(true)} />
+        <Wanttocreate onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+        <Oneplace onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+        <Allthebest onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+        <Hastheskillsection onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+        <TemplatesShowcase onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+        <FAQAccordion onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
       </main>
       <Footer />
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
     </>
   );
 }

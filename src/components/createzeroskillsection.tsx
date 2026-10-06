@@ -1,8 +1,10 @@
 "use client";
 import React from "react";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface CreateZeroSkillProps {
   onOpenAuth?: () => void;
+  onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
 export interface ZeroSkillCardItem {
@@ -98,7 +100,7 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
   },
 ];
 
-export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillProps) {
+export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZeroSkillProps) {
   const videoItem = zeroSkillItemsData[0];
   const imageItem = zeroSkillItemsData[1];
   const templatesItem = zeroSkillItemsData[2];
@@ -107,6 +109,23 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
   const writingItem = zeroSkillItemsData[5];
   const researchItem = zeroSkillItemsData[6];
   const moreItem = zeroSkillItemsData[7];
+
+  const handleButtonClick = () => {
+    const attribution: RegistrationCTAInput = {
+      cta_id: "create_anything_start_creating",
+      cta_label: "Start Creating Free",
+      section_id: "create_anything",
+      section_label: "Create Anything With AI",
+      page: "landing_page",
+    };
+    if (onCTA) {
+      onCTA(attribution);
+    } else if (onOpenAuth) {
+      handleRegistrationCTA(attribution, onOpenAuth);
+    } else {
+      handleRegistrationCTA(attribution);
+    }
+  };
 
   return (
     <section className="relative w-full bg-[#050711] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
@@ -136,7 +155,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
           </p>
 
           <button
-            onClick={onOpenAuth}
+            onClick={handleButtonClick}
             className="mt-6 sm:mt-8 w-full max-w-[400px] group cursor-pointer inline-flex items-center justify-center gap-2.5 px-8 py-3.5 sm:py-4 rounded-xl font-sans font-bold text-sm sm:text-base text-white 
             bg-gradient-to-r  from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] 
             transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-[0.98]"
@@ -170,8 +189,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
             {zeroSkillItemsData.map((item) => (
               <div
                 key={item.id}
-                onClick={onOpenAuth}
-                className={`absolute group cursor-pointer rounded-2xl bg-[#0D1226]/90 border overflow-hidden  ${item.desktopClass}`}
+                className={`absolute group rounded-2xl bg-[#0D1226]/90 border overflow-hidden ${item.desktopClass}`}
               >
                 {/* Badge Chip */}
                 <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold pointer-events-none shadow-md">
@@ -202,8 +220,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
 
             {/* Mobile Row 1: AI Video (Full Width) */}
             <div
-              onClick={onOpenAuth}
-              className={`group cursor-pointer relative w-full h-48 sm:h-56 rounded-2xl bg-[#0D1226]/90 border overflow-hidden active:scale-[0.98]`}
+              className={`group relative w-full h-48 sm:h-56 rounded-2xl bg-[#0D1226]/90 border overflow-hidden`}
             >
               <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold">
                 <span className={`w-3.5 h-3.5 rounded-full ${videoItem.badgeBg} flex items-center justify-center text-[8px] font-bold`}>
@@ -224,8 +241,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
             {/* Mobile Row 2: AI Image (Left) & Templates (Right) */}
             <div className="grid grid-cols-2 gap-3">
               <div
-                onClick={onOpenAuth}
-                className={`group cursor-pointer relative h-36 rounded-2xl bg-[#0D1226]/90 border overflow-hidden active:scale-[0.98] rotate-[1.5deg]`}
+                className={`group relative h-36 rounded-2xl bg-[#0D1226]/90 border overflow-hidden rotate-[1.5deg]`}
               >
                 <div className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold">
                   <span className={`w-3 h-3 rounded-full ${imageItem.badgeBg} flex items-center justify-center text-[7px] font-bold`}>
@@ -243,8 +259,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
               </div>
 
               <div
-                onClick={onOpenAuth}
-                className={`group cursor-pointer relative h-36 rounded-2xl bg-[#0D1226]/90 border overflow-hidden active:scale-[0.98] -rotate-[2deg]`}
+                className={`group relative h-36 rounded-2xl bg-[#0D1226]/90 border overflow-hidden -rotate-[2deg]`}
               >
                 <div className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold">
                   <span className={`w-3 h-3 rounded-full ${templatesItem.badgeBg} flex items-center justify-center text-[7px] font-bold`}>
@@ -265,8 +280,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
             {/* Mobile Row 3: Design (Left) & AI Chat (Right) */}
             <div className="grid grid-cols-2 gap-3">
               <div
-                onClick={onOpenAuth}
-                className={`group cursor-pointer relative h-32 rounded-2xl bg-[#0D1226]/90 border overflow-hidden active:scale-[0.98]`}
+                className={`group relative h-32 rounded-2xl bg-[#0D1226]/90 border overflow-hidden`}
               >
                 <div className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold">
                   <span className={`w-3 h-3 rounded-full ${designItem.badgeBg} flex items-center justify-center text-[7px] font-bold`}>
@@ -285,8 +299,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
 
               {/* AI Chat Card */}
               <div
-                onClick={onOpenAuth}
-                className={`group cursor-pointer relative h-32 rounded-2xl bg-[#0D1226]/90 border overflow-hidden active:scale-[0.98]`}
+                className={`group relative h-32 rounded-2xl bg-[#0D1226]/90 border overflow-hidden`}
               >
                 <div className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold">
                   <span className={`w-3 h-3 rounded-full ${chatItem.badgeBg} flex items-center justify-center text-[7px] font-bold`}>
@@ -307,8 +320,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
             {/* Mobile Row 4: Writing (Left), Research (Middle), And More... (Right) */}
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <div
-                onClick={onOpenAuth}
-                className={`group cursor-pointer relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden active:scale-[0.98] rotate-[2deg]`}
+                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden rotate-[2deg]`}
               >
                 <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
                   <span className={`w-2.5 h-2.5 rounded-full ${writingItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>
@@ -326,8 +338,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
               </div>
 
               <div
-                onClick={onOpenAuth}
-                className={`group cursor-pointer relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden active:scale-[0.98] rotate-[1deg]`}
+                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden rotate-[1deg]`}
               >
                 <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
                   <span className={`w-2.5 h-2.5 rounded-full ${researchItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>
@@ -345,8 +356,7 @@ export default function CreateZeroSkillSection({ onOpenAuth }: CreateZeroSkillPr
               </div>
 
               <div
-                onClick={onOpenAuth}
-                className={`group cursor-pointer relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden active:scale-[0.98] rotate-[0deg]`}
+                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden rotate-[0deg]`}
               >
                 <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
                   <span className={`w-2.5 h-2.5 rounded-full ${moreItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>

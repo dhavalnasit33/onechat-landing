@@ -10,9 +10,11 @@ import {
     Palette,
     CheckCircle2
 } from "lucide-react";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface HastheskillsectionProps {
     onOpenAuth?: () => void;
+    onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
 export interface CreationTypeItem {
@@ -74,7 +76,23 @@ export const defaultSkillBenefits = [
     "Professional results in minutes",
 ];
 
-export default function Hastheskillsection({ onOpenAuth }: HastheskillsectionProps) {
+export default function Hastheskillsection({ onOpenAuth, onCTA }: HastheskillsectionProps) {
+    const handleSeeHowClick = () => {
+        const attribution: RegistrationCTAInput = {
+            cta_id: "zero_skills_see_how",
+            cta_label: "See How It Works",
+            section_id: "zero_skills",
+            section_label: "The AI Has the Skills. So You Don't Need Them.",
+            page: "landing_page",
+        };
+        if (onCTA) {
+            onCTA(attribution);
+        } else if (onOpenAuth) {
+            handleRegistrationCTA(attribution, onOpenAuth);
+        } else {
+            handleRegistrationCTA(attribution);
+        }
+    };
     return (
         <section className="relative w-full bg-[#030614] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
             <div className="absolute top-1/4 left-10 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-[120px] pointer-events-none" />
@@ -114,7 +132,7 @@ export default function Hastheskillsection({ onOpenAuth }: HastheskillsectionPro
 
                     <div className="mt-5 sm:mt-7">
                         <button
-                            onClick={onOpenAuth}
+                            onClick={handleSeeHowClick}
                             className="group cursor-pointer inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-sans font-bold text-xs sm:text-sm md:text-base text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-95"
                         >
                             <span>See How It Works</span>
@@ -235,8 +253,8 @@ export default function Hastheskillsection({ onOpenAuth }: HastheskillsectionPro
                                     </div>
                                 </div>
                                 <button
-                                    onClick={onOpenAuth}
-                                    className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#00A3FF] to-[#D946EF] shadow-[0_0_15px_rgba(0,163,255,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+                                    type="button"
+                                    className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#00A3FF] to-[#D946EF] shadow-[0_0_15px_rgba(0,163,255,0.4)] hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
                                 >
                                     Create →
                                 </button>

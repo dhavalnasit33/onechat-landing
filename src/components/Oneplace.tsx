@@ -1,9 +1,11 @@
 "use client";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
+import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
 interface OneplaceProps {
     onOpenAuth?: () => void;
+    onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
 interface ModelResponse {
@@ -118,7 +120,7 @@ const renderIcon = (icon?: string, label?: string, className = "w-3.5 h-3.5 sm:w
     return <span className="text-xs leading-none shrink-0">{icon}</span>;
 };
 
-export default function Oneplace({ onOpenAuth }: OneplaceProps) {
+export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
     const sectionRef = useRef<HTMLDivElement>(null);
     const [inView, setInView] = useState(false);
 
@@ -449,7 +451,24 @@ export default function Oneplace({ onOpenAuth }: OneplaceProps) {
                         {/* Try Compare AI CTA Button */}
                         <div className="mt-6 sm:mt-8 pt-2">
                             <button
-                                onClick={onOpenAuth}
+                                onClick={() => {
+                                    const attribution: RegistrationCTAInput = {
+                                        cta_id: "compare_try_compare",
+                                        cta_label: "Try Compare AI",
+                                        section_id: "compare_ai",
+                                        section_label: "One Place. Every Way You Use AI.",
+                                        item_id: "compare_ai",
+                                        item_label: "Compare AI",
+                                        page: "landing_page",
+                                    };
+                                    if (onCTA) {
+                                        onCTA(attribution);
+                                    } else if (onOpenAuth) {
+                                        handleRegistrationCTA(attribution, onOpenAuth);
+                                    } else {
+                                        handleRegistrationCTA(attribution);
+                                    }
+                                }}
                                 className="w-full group cursor-pointer inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-4 rounded-xl font-sans font-bold text-sm sm:text-base text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-95"
                             >
                                 <span>Try Compare AI</span>

@@ -1,17 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { auth, googleProvider } from "../lib/firebase";
-import {
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
-} from "firebase/auth";
+import { getRedirectResult } from "firebase/auth";
 import apiService from "../lib/apiService";
+import { getRegistrationAttribution, clearRegistrationAttribution } from "../lib/attribution";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialMode?: "signin" | "signup";
 }
+
 
 interface UserResponse {
   success: boolean;
@@ -40,17 +39,27 @@ interface UserResponse {
   };
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [isLoginTab, setIsLoginTab] = useState(true);
+
+
+  export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: AuthModalProps) {
+  const [isLoginTab, setIsLoginTab] = useState(initialMode === "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+
+    useEffect(() => {
+    if (isOpen) {
+      setIsLoginTab(initialMode === "signin");
+      setErrorMsg(null);
+    }
+  }, [isOpen, initialMode]);
+
   const [savedName, setSavedName] = useState<string | null>(null);
   const [savedEmail, setSavedEmail] = useState<string | null>(null);
-
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
       const getUnwrapped = (key: string) => {
@@ -208,7 +217,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       localStorage.setItem(
         "flutter.user_roles",
         "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIGxpc3Qu" +
-          JSON.stringify(user.roles || ["User"]),
+        JSON.stringify(user.roles || ["User"]),
       );
       localStorage.setItem(
         "flutter.user_status",
@@ -284,16 +293,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       }
 
       const rdtCid = getCookie("_rdt_cid") || getCookie("rdt_cid");
+      const attribution = getRegistrationAttribution();
       const response = await apiService<UserResponse>("/auth/google", {
         method: "POST",
-        body: { 
-          idToken, 
+        body: {
+          idToken,
           ...(region ? { region } : {}),
-          ...(rdtCid ? { rdt_cid: rdtCid } : {})
+          ...(rdtCid ? { rdt_cid: rdtCid } : {}),
+          ...(attribution ? { registration_attribution: attribution } : {}),
         },
       });
 
       if (response && response.token) {
+        clearRegistrationAttribution();
         saveAuthSession(response);
       } else {
         throw new Error("Invalid backend token response.");
@@ -334,6 +346,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         // Register Flow (Firstname and lastname defaulted to name split of email)
         const namePart = email.split("@")[0];
         const rdtCid = getCookie("_rdt_cid") || getCookie("rdt_cid");
+        const attribution = getRegistrationAttribution();
         const response = await apiService<UserResponse & {
           success: boolean;
           message: string;
@@ -345,11 +358,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             email: email.trim(),
             password: password.trim(),
             roles: ["User"],
-            ...(rdtCid ? { rdt_cid: rdtCid } : {})
+            ...(rdtCid ? { rdt_cid: rdtCid } : {}),
+            ...(attribution ? { registration_attribution: attribution } : {}),
           },
         });
 
         if (response.success && response.token) {
+          clearRegistrationAttribution();
           saveAuthSession(response);
         } else {
           throw new Error(response.message || "Registration failed.");
@@ -394,11 +409,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               setIsLoginTab(true);
               setErrorMsg(null);
             }}
-            className={`flex-1 text-center py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer font-sans ${
-              isLoginTab
-                ? "bg-black text-white shadow-sm"
-                : "text-slate-400 hover:text-slate-600"
-            }`}
+            className={`flex-1 text-center py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer font-sans ${isLoginTab
+              ? "bg-black text-white shadow-sm"
+              : "text-slate-400 hover:text-slate-600"
+              }`}
           >
             Login
           </button>
@@ -407,11 +421,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               setIsLoginTab(false);
               setErrorMsg(null);
             }}
-            className={`flex-1 text-center py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer font-sans ${
-              !isLoginTab
-                ? "bg-black text-white shadow-sm"
-                : "text-slate-400 hover:text-slate-600"
-            }`}
+            className={`flex-1 text-center py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer font-sans ${!isLoginTab
+              ? "bg-black text-white shadow-sm"
+              : "text-slate-400 hover:text-slate-600"
+              }`}
           >
             Sign Up
           </button>
