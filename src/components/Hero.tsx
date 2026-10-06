@@ -94,11 +94,10 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
             </span>
             <div className="h-[36px] min-[375px]:h-[42px] min-[425px]:h-[48px] sm:h-[60px] md:h-[80px] overflow-hidden flex items-center justify-center">
               <span
-                className={`inline-block bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent transition-all duration-400 transform text-center font-extrabold tracking-tight whitespace-nowrap ${
-                  fadeState === "fade-in"
+                className={`inline-block bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent transition-all duration-400 transform text-center font-extrabold tracking-tight whitespace-nowrap ${fadeState === "fade-in"
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 -translate-y-6"
-                }`}
+                  }`}
               >
                 {rotatingWords[wordIndex]}
               </span>
@@ -132,7 +131,9 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </button>
           <p className="font-sans text-xs sm:text-sm text-slate-300 font-medium mt-1 tracking-wide">
-            Hundreds of AI Models • Dozens of AI Tools • One Platform
+            {/* Hundreds of AI Models • Dozens of AI Tools • One Platform */}
+            Dozens of AI Models • Hundreds of AI Tools & Templates • One Platform
+
           </p>
         </div>
 

@@ -11,6 +11,7 @@ import Allthebest from "./Allthebest";
 import Hastheskillsection from "./Hastheskillsection";
 import TemplatesShowcase from "./TemplatesShowcase";
 import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
+import VideoSliderSection from "./VideoSliderSection";
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
 const Footer = dynamic(() => import("./Footer"));
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
@@ -159,6 +160,7 @@ export default function LandingPageClient() {
         <CreateZeroSkillSection onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
         <ModelMarquee />
         <Wanttocreate onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+        <VideoSliderSection />
         <Oneplace onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
         <Allthebest onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
         <Hastheskillsection onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
