@@ -6,7 +6,8 @@ import {
     MonitorOff,
     Settings,
     ShieldCheck,
-    ArrowRight
+    ArrowRight,
+    Play
 } from "lucide-react";
 import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
 
@@ -48,7 +49,7 @@ export const defaultTextChatModels: AIModelItem[] = [
     { name: "Qwen", icon: "/assets/landing-page/section-2-qwen.png" },
     { name: "Kimi", icon: "/assets/landing-page/section-2-kimi.png" },
     { name: "Mistral", icon: "/assets/landing-page/section-2-mistral.png" },
-    { name: "And more...", icon: "/assets/images/left-arrow.png", isMore: true },
+    { name: "And more...", icon: "", isMore: true },
 ];
 
 // 2. Default Image Generation Models
@@ -62,7 +63,7 @@ export const defaultImageModels: AIModelItem[] = [
     { name: "Krea", icon: "/assets/landing-page/section-2-kling.png" },
     { name: "Stable Diffusion", icon: "/assets/landing-page/section-2-stable-diffusion.png" },
     { name: "Qwen Image", icon: "/assets/landing-page/section-2-qwen.png" },
-    { name: "And more...", icon: "/assets/images/left-arrow.png", isMore: true },
+    { name: "And more...", icon: "", isMore: true },
 ];
 
 // 3. Default Video Generation Models
@@ -76,7 +77,7 @@ export const defaultVideoModels: AIModelItem[] = [
     { name: "Luma", icon: "/assets/landing-page/section-2-mimo.png" },
     { name: "PixVerse", icon: "/assets/landing-page/section-2-pix-verse.png" },
     { name: "Pika", icon: "/assets/landing-page/section-2-pika.png" },
-    { name: "And more...", icon: "/assets/images/left-arrow.png", isMore: true },
+    { name: "And more...", icon: "", isMore: true },
 ];
 
 // 4. Default Showcase Floating Cards (Right Side)
@@ -243,7 +244,9 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                                 className="group cursor-pointer inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-sans font-bold text-xs sm:text-sm md:text-base text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-95"
                             >
                                 <span>Explore All AI Models</span>
-                                <span className="transition-transform duration-300 group-hover:translate-x-1 font-bold"><ArrowRight /></span>
+                                <span className="transition-transform duration-300 group-hover:translate-x-1 inline-flex items-center">
+                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                                </span>
                             </button>
                         </div>
 
@@ -335,8 +338,8 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                                     {card.hasPlayButton && (
                                         <div className="absolute inset-0 bg-black/25 flex items-center justify-center pointer-events-none">
                                             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/30 border border-white/50 backdrop-blur-sm text-white flex items-center justify-center shadow-lg">
-                                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white text-black flex items-center justify-center text-[9px] sm:text-[10px] font-bold pl-0.5 shadow">
-                                                    ▶
+                                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white text-black flex items-center justify-center shadow">
+                                                    <Play className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-black text-black ml-0.5" />
                                                 </div>
                                             </div>
                                         </div>

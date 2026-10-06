@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef } from "react";
 import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Play } from "lucide-react";
 
 interface TemplatesShowcaseProps {
   onOpenAuth?: () => void;
@@ -160,9 +160,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
         {template.isVideo && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-black/45 border border-white/40 flex items-center justify-center backdrop-blur-md group-hover:scale-110 group-hover:bg-[#6C56E5]/80 group-hover:border-white transition-all duration-300 shadow-lg">
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
+              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white fill-white ml-0.5" />
             </div>
           </div>
         )}
@@ -247,7 +245,9 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
               className="group cursor-pointer inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl text-base sm:text-lg font-bold text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_4px_24px_rgba(0,163,255,0.35)] transition-all duration-300 hover:scale-105 hover:shadow-[0_6px_32px_rgba(255,46,217,0.45)] active:scale-[0.98]"
             >
               <span>Browse All Templates</span>
-              <span className="transition-transform duration-300 group-hover:translate-x-1"><ArrowRight /> </span>
+              <span className="transition-transform duration-300 group-hover:translate-x-1 inline-flex items-center">
+                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </span>
             </button>
           </div>
         </div>
@@ -260,9 +260,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
             aria-label="Scroll left"
             className="hidden md:flex absolute -left-2 lg:-left-4 top-[50%] -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-[#090D22] border border-white/20 text-white items-center justify-center hover:bg-[#6C56E5] hover:border-[#6C56E5] transition-all duration-200 cursor-pointer shadow-xl"
           >
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-5 h-5 text-white" />
           </button>
 
           {/* Right Arrow Button */}
@@ -271,9 +269,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
             aria-label="Scroll right"
             className="hidden md:flex absolute -right-2 lg:-right-4 top-[50%] -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-[#090D22] border border-white/20 text-white items-center justify-center hover:bg-[#6C56E5] hover:border-[#6C56E5] transition-all duration-200 shadow-xl cursor-pointer"
           >
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-5 h-5 text-white" />
           </button>
 
           {/* Main Card Panel (Matches 2nd Image Layout) */}

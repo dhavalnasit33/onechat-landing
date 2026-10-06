@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 interface OneplaceProps {
     onOpenAuth?: () => void;
@@ -352,13 +352,8 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                                         />
                                         <span className="font-normal italic truncate">Tell me the best travel destinations for 2026</span>
                                     </div>
-                                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-r from-[#00A3FF] to-[#6366F1] flex items-center justify-center text-white shrink-0 text-xs shadow-md font-bold">
-                                        <Image src="/assets/images/left-arrow.png"
-                                            width={20}
-                                            height={20}
-                                            alt="arrow"
-                                            className="rotate-[180deg]"
-                                        />
+                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[#00A3FF] to-[#6366F1] flex items-center justify-center text-white shrink-0 shadow-md">
+                                        <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </div>
 
@@ -438,8 +433,8 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                                     "Save time and get more accurate results",
                                 ].map((bullet, idx) => (
                                     <div key={idx} className="flex items-start gap-2.5">
-                                        <div className="w-5 h-5 rounded-full bg-purple-600/30 border border-purple-400 flex items-center justify-center shrink-0 mt-0.5 text-purple-300 text-xs font-bold shadow-sm">
-                                            ✓
+                                        <div className="w-5 h-5 rounded-full bg-purple-600/30 border border-purple-400 flex items-center justify-center shrink-0 mt-0.5 text-purple-300 shadow-sm">
+                                            <Check className="w-3 h-3 text-purple-300" />
                                         </div>
                                         <span className="text-xs sm:text-sm text-slate-200 font-medium">
                                             {bullet}
@@ -473,7 +468,9 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                                 className="w-full group cursor-pointer inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-4 rounded-xl font-sans font-bold text-sm sm:text-base text-white bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] to-[#FF2ED9] shadow-[0_0_30px_rgba(0,163,255,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-95"
                             >
                                 <span>Try Compare AI</span>
-                                <span className="transition-transform duration-300 group-hover:translate-x-1"><ArrowRight /></span>
+                                <span className="transition-transform duration-300 group-hover:translate-x-1 inline-flex items-center">
+                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                                </span>
                             </button>
                         </div>
                     </div>

@@ -16,8 +16,6 @@ export interface ZeroSkillCardItem {
   badgeBg?: string;
   badgeIconLetter?: string;
   desktopClass: string;
-  isVideo?: boolean;
-  isChat?: boolean;
   chatText?: string;
 }
 
@@ -32,7 +30,6 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-rose-500",
     badgeIconLetter: "A",
     desktopClass: "top-[-2%] left-[10%] w-[45%] h-[170px] xl:h-[200px] rotate-[5deg] z-[12]",
-    isVideo: false,
   },
   {
     id: "ai-image",
@@ -69,7 +66,6 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-indigo-500",
     badgeIconLetter: "⚡",
     desktopClass: "top-[30%] right-[0%] w-[40%] h-[130px] xl:h-[140px] rotate-[4deg] z-[16]",
-    isChat: true,
     chatText: "Help me create a marketing plan for my business",
   },
   {
@@ -162,7 +158,9 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
             transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(255,46,217,0.55)] active:scale-[0.98]"
           >
             <span>Start Creating Free</span>
-            <span className="transition-transform duration-300 group-hover:translate-x-1"><ArrowRight /></span>
+            <span className="transition-transform duration-300 group-hover:translate-x-1 inline-flex items-center">
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </span>
           </button>
         </div>
 
