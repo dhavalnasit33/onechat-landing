@@ -129,7 +129,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="min-h-full flex flex-col bg-white text-[#0E1120] font-sans">
+      <body className="min-h-full flex flex-col bg-[#050711] text-white font-sans">
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

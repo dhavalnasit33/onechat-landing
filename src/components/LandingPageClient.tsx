@@ -159,7 +159,7 @@ export default function LandingPageClient() {
   return (
     <>
       <Navbar onOpenAuth={handleOpenAuth} onCTA={handleCTA} />
-      <main className="flex-1 w-full flex flex-col">
+      <main className="flex-1 w-full flex flex-col bg-[#050711]">
         <Hero onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
         <CreateZeroSkillSection onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
         <ModelMarquee />
