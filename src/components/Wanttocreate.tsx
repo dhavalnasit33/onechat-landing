@@ -99,7 +99,7 @@ export default function Wanttocreate({ onOpenAuth, onCTA }: WanttocreateProps) {
   };
 
   return (
-    <section className="relative w-full bg-[#070913] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
+    <section className="relative w-full bg-[#070913] pt-32 pb-30 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
       {/* Background Ambient Glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-96 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(108,86,229,0.2),transparent)] pointer-events-none" />
       <div className="absolute -top-24 right-10 w-72 h-72 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />

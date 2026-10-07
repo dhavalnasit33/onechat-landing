@@ -143,7 +143,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
   };
 
   return (
-    <section className="relative w-full bg-[#050711] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
+    <section className="relative w-full bg-[#050711] py-28 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
       {/* Ambient background glows */}
       <div className="absolute top-1/4 -left-24 w-[550px] h-[550px] bg-[radial-gradient(circle_at_center,rgba(0,163,255,0.28),rgba(14,165,233,0.20),transparent_70%)] rounded-full blur-[90px] pointer-events-none z-0" />
       <div className="absolute top-10 right-10 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />

@@ -12,7 +12,8 @@ interface OneplaceProps {
 interface ModelResponse {
     id: string;
     name: string;
-    icon: string;
+    icon: string;
+
     fullText: string;
 }
 
@@ -20,28 +21,32 @@ const modelResponses: ModelResponse[] = [
     {
         id: "chatgpt",
         name: "ChatGPT",
-        icon: "/assets/landing-page/section-2-chatgpt.png",
+        icon: "/assets/landing-page/section-2-chatgpt.png",
+
         fullText:
             "Japan — for culture, food and incredible city experiences. Portugal and New Zealand are also excellent choices.",
     },
     {
         id: "claude",
         name: "Claude",
-        icon: "/assets/landing-page/section-2-claude.png",
+        icon: "/assets/landing-page/section-2-claude.png",
+
         fullText:
             "For culture, consider Japan. For affordability, Portugal. For nature and adventure, New Zealand stands out.",
     },
     {
         id: "gemini",
         name: "Gemini",
-        icon: "/assets/landing-page/section-2-gemini.png",
+        icon: "/assets/landing-page/section-2-gemini.png",
+
         fullText:
             "Top picks: Japan, Portugal and New Zealand — each offering a very different travel experience.",
     },
     {
         id: "deepseek",
         name: "DeepSeek",
-        icon: "/assets/landing-page/section-2-deepSeek.png",
+        icon: "/assets/landing-page/section-2-deepSeek.png",
+
         fullText:
             "1. Japan — Culture\n2. Portugal — Value\n3. New Zealand — Adventure",
     },
@@ -223,7 +228,7 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
         <section
             ref={sectionRef}
             id="features"
-            className="relative w-full bg-[#050711] py-16 sm:py-20 md:py-24 px-3 sm:px-6 lg:px-8 overflow-hidden text-white"
+            className="relative w-full bg-[#050711] py-28 sm:py-20 md:py-24 px-3 sm:px-6 lg:px-8 overflow-hidden text-white"
         >
             {/* Background Ambient Glows */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-[700px] bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(108,86,229,0.2),rgba(0,163,255,0.12),transparent)] pointer-events-none" />

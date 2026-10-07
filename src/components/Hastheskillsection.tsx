@@ -96,7 +96,7 @@ export default function Hastheskillsection({ onOpenAuth, onCTA }: Hastheskillsec
         }
     };
     return (
-        <section className="relative w-full bg-[#030614] py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
+        <section className="relative w-full bg-[#030614] py-28 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
             <div className="absolute top-1/4 left-10 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute top-1/3 right-10 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[140px] pointer-events-none" />
             <div className="absolute bottom-10 right-1/4 w-[450px] h-[450px] bg-cyan-600/15 rounded-full blur-[100px] pointer-events-none" />

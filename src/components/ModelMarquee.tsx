@@ -290,7 +290,7 @@ export default function ModelMarquee() {
   };
 
   return (
-    <section className="relative w-full py-16 md:py-24 bg-[#070913] text-white overflow-hidden">
+    <section className="relative w-full py-28 md:py-24 bg-[#070913] text-white overflow-hidden">
       {/* Ambient background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-80 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(108,86,229,0.15),transparent)] pointer-events-none" />
 

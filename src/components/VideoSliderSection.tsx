@@ -217,7 +217,7 @@ export default function VideoSliderSection() {
   return (
     <section
       id="video-showcase"
-      className="relative w-full py-16 sm:py-20 md:py-24 bg-[#070913] overflow-hidden text-white border-t border-white/5"
+      className="relative w-full py-28 sm:py-20 md:py-24 bg-[#070913] overflow-hidden text-white border-t border-white/5"
     >
       {/* Background Ambient Glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-96 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(108,86,229,0.15),transparent)] pointer-events-none" />

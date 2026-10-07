@@ -66,7 +66,7 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#050711] pt-32 pb-24 md:pt-40 md:pb-36 px-4 text-white">
+    <section className="relative overflow-hidden bg-[#050711] pt-32 pb-28 md:pt-40 md:pb-36 px-4 text-white ">
       {/* Background Wave Graphic Overlay */}
       <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-visible">
         <img
