@@ -12,8 +12,7 @@ interface OneplaceProps {
 interface ModelResponse {
     id: string;
     name: string;
-    icon: string;
-    image: string;
+    icon: string;
     fullText: string;
 }
 
@@ -21,32 +20,28 @@ const modelResponses: ModelResponse[] = [
     {
         id: "chatgpt",
         name: "ChatGPT",
-        icon: "/assets/landing-page/section-2-chatgpt.png",
-        image: "/assets/landing-page/createzeroskillsection/AI_image.png",
+        icon: "/assets/landing-page/section-2-chatgpt.png",
         fullText:
             "Japan — for culture, food and incredible city experiences. Portugal and New Zealand are also excellent choices.",
     },
     {
         id: "claude",
         name: "Claude",
-        icon: "/assets/landing-page/section-2-claude.png",
-        image: "/assets/landing-page/createzeroskillsection/Research.png",
+        icon: "/assets/landing-page/section-2-claude.png",
         fullText:
             "For culture, consider Japan. For affordability, Portugal. For nature and adventure, New Zealand stands out.",
     },
     {
         id: "gemini",
         name: "Gemini",
-        icon: "/assets/landing-page/section-2-gemini.png",
-        image: "/assets/landing-page/createzeroskillsection/And_More.png",
+        icon: "/assets/landing-page/section-2-gemini.png",
         fullText:
             "Top picks: Japan, Portugal and New Zealand — each offering a very different travel experience.",
     },
     {
         id: "deepseek",
         name: "DeepSeek",
-        icon: "/assets/landing-page/section-2-deepSeek.png",
-        image: "/assets/landing-page/createzeroskillsection/Templates.png",
+        icon: "/assets/landing-page/section-2-deepSeek.png",
         fullText:
             "1. Japan — Culture\n2. Portugal — Value\n3. New Zealand — Adventure",
     },
@@ -362,7 +357,7 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                                     {modelResponses.map((model) => (
                                         <div
                                             key={model.id}
-                                            className="rounded-xl bg-[#0E1326] border border-white/10 p-2 sm:p-2.5 flex flex-col justify-between h-[215px] sm:h-[235px] shadow-md relative overflow-hidden"
+                                            className="rounded-xl bg-[#0E1326] border border-white/10 p-2 sm:p-2.5 flex flex-col justify-between h-[160px] sm:h-[175px] shadow-md relative overflow-hidden"
                                         >
                                             {/* Model Badge */}
                                             <div className="flex items-center gap-1.5 mb-2">
@@ -386,24 +381,13 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
                                                         <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse delay-200" />
                                                     </div>
                                                 ) : (
-                                                    <p className="text-[10px] sm:text-[11px] text-slate-300 font-sans leading-relaxed line-clamp-4 whitespace-pre-line">
+                                                    <p className="text-[10px] sm:text-[11px] text-slate-300 font-sans leading-relaxed line-clamp-6 whitespace-pre-line">
                                                         {displayedTexts[model.id] || "..."}
                                                     </p>
                                                 )}
                                             </div>
 
-                                            {/* Card Bottom Image Preview */}
-                                            <div className="w-full h-16 sm:h-18 rounded-lg overflow-hidden bg-[#161C36] relative shrink-0">
-                                                <img
-                                                    src={model.image}
-                                                    alt={model.name}
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => {
-                                                        e.currentTarget.style.opacity = "0.6";
-                                                    }}
-                                                />
                                             </div>
-                                        </div>
                                     ))}
                                 </div>
                             </div>

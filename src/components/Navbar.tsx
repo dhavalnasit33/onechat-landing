@@ -91,18 +91,31 @@ export default function Navbar({ onOpenAuth, onCTA }: NavbarProps) {
 
           {/* Desktop Nav items */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`text-[13px] lg:text-[14px] font-semibold transition-colors hover:text-white cursor-pointer whitespace-nowrap ${activeSection === item.id
-                  ? "text-[#00A3FF]"
-                  : "text-slate-300"
-                  }`}
-              >
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) => {
+              const className = `text-[13px] lg:text-[14px] font-semibold transition-colors hover:text-white cursor-pointer whitespace-nowrap ${
+                activeSection === item.id ? "text-[#00A3FF]" : "text-slate-300"
+              }`;
+              if (item.id === "contact-us") {
+                return (
+                  <a
+                    key={item.id}
+                    href="mailto:support@onechatai.ai"
+                    className={className}
+                  >
+                    {item.label}
+                  </a>
+                );
+              }
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={className}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Desktop Auth & CTA Buttons */}
@@ -195,18 +208,34 @@ export default function Navbar({ onOpenAuth, onCTA }: NavbarProps) {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#070913]/98 backdrop-blur-xl border-b border-white/10 px-4 pt-3 pb-6 space-y-2 shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id)}
-              className={`block w-full text-left px-3 py-2.5 rounded-lg text-base font-semibold cursor-pointer transition-colors ${activeSection === item.id
+          {navItems.map((item) => {
+            const className = `block w-full text-left px-3 py-2.5 rounded-lg text-base font-semibold cursor-pointer transition-colors ${
+              activeSection === item.id
                 ? "text-[#00A3FF] bg-white/5"
                 : "text-slate-200 hover:bg-white/5"
-                }`}
-            >
-              {item.label}
-            </button>
-          ))}
+            }`;
+            if (item.id === "contact-us") {
+              return (
+                <a
+                  key={item.id}
+                  href="mailto:support@onechatai.ai"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={className}
+                >
+                  {item.label}
+                </a>
+              );
+            }
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={className}
+              >
+                {item.label}
+              </button>
+            );
+          })}
           <div className="pt-3 space-y-2.5 px-1">
             <button
               onClick={() => {

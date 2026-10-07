@@ -324,7 +324,8 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                             {defaultShowcaseCards.map((card, idx) => (
                                 <div
                                     key={card.id || idx}
-                                    className={`relative w-full aspect-[16/10] lg:aspect-auto lg:w-[260px] lg:h-[145px] xl:h-[150px] rounded-xl sm:rounded-2xl overflow-hidden border ${card.borderColor} ${card.glowColor} ${card.rotation} transition-all duration-300 hover:scale-105 hover:rotate-0 hover:z-20 shadow-xl bg-[#0E132D]`}
+                                    onClick={handleButtonClick}
+                                    className={`relative w-full aspect-[16/10] lg:aspect-auto lg:w-[260px] lg:h-[145px] xl:h-[150px] rounded-xl sm:rounded-2xl overflow-hidden border ${card.borderColor} ${card.glowColor} ${card.rotation} transition-all duration-300 hover:scale-105 hover:rotate-0 hover:z-20 shadow-xl bg-[#0E132D] cursor-pointer`}
                                 >
                                     <img
                                         src={card.image}

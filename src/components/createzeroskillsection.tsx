@@ -17,6 +17,8 @@ export interface ZeroSkillCardItem {
   badgeIconLetter?: string;
   desktopClass: string;
   chatText?: string;
+  borderColor: string;
+  glowColor: string;
 }
 
 export const waveBgPath = "/assets/landing-page/createzeroskillsection/wav.png";
@@ -30,6 +32,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-rose-500",
     badgeIconLetter: "A",
     desktopClass: "top-[-2%] left-[10%] w-[45%] h-[170px] xl:h-[200px] rotate-[5deg] z-[12]",
+    borderColor: "border-rose-500/50 hover:border-rose-400",
+    glowColor: "shadow-[0_0_25px_rgba(244,63,94,0.4)]",
   },
   {
     id: "ai-image",
@@ -39,6 +43,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-blue-500",
     badgeIconLetter: "A",
     desktopClass: "top-[-5%] right-[0%] w-[40%] h-[170px] xl:h-[200px] -rotate-[4deg] z-[8]",
+    borderColor: "border-blue-500/50 hover:border-blue-400",
+    glowColor: "shadow-[0_0_25px_rgba(59,130,246,0.45)]",
   },
   {
     id: "templates",
@@ -48,6 +54,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-amber-500",
     badgeIconLetter: "T",
     desktopClass: "top-[33%] left-[0%] w-[27%] h-[190px] xl:h-[215px] rotate-[3deg] z-[14]",
+    borderColor: "border-amber-500/50 hover:border-amber-400",
+    glowColor: "shadow-[0_0_25px_rgba(245,158,11,0.4)]",
   },
   {
     id: "design",
@@ -57,6 +65,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-pink-500",
     badgeIconLetter: "D",
     desktopClass: "top-[37%] left-[28%] w-[30%] h-[135px] xl:h-[150px] rotate-[0.5deg] z-[15]",
+    borderColor: "border-pink-500/50 hover:border-pink-400",
+    glowColor: "shadow-[0_0_25px_rgba(236,72,153,0.4)]",
   },
   {
     id: "ai-chat",
@@ -67,6 +77,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeIconLetter: "⚡",
     desktopClass: "top-[30%] right-[0%] w-[40%] h-[130px] xl:h-[140px] rotate-[4deg] z-[16]",
     chatText: "Help me create a marketing plan for my business",
+    borderColor: "border-indigo-500/50 hover:border-indigo-400",
+    glowColor: "shadow-[0_0_25px_rgba(99,102,241,0.4)]",
   },
   {
     id: "writing",
@@ -76,6 +88,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-sky-500",
     badgeIconLetter: "W",
     desktopClass: "top-[65%] left-[6%] w-[29%] h-[145px] xl:h-[165px] rotate-[3deg] z-[17]",
+    borderColor: "border-sky-500/50 hover:border-sky-400",
+    glowColor: "shadow-[0_0_25px_rgba(14,165,233,0.4)]",
   },
   {
     id: "research",
@@ -85,6 +99,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-blue-600",
     badgeIconLetter: "R",
     desktopClass: "top-[67%] left-[37%] w-[31%] h-[135px] xl:h-[150px] -rotate-[1deg] z-[18]",
+    borderColor: "border-blue-600/50 hover:border-blue-500",
+    glowColor: "shadow-[0_0_25px_rgba(37,99,235,0.4)]",
   },
   {
     id: "and-more",
@@ -94,6 +110,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
     badgeBg: "bg-teal-500",
     badgeIconLetter: "A",
     desktopClass: "top-[60%] right-[0%] w-[30%] h-[145px] xl:h-[165px] -rotate-[4deg] z-[20]",
+    borderColor: "border-teal-500/50 hover:border-teal-400",
+    glowColor: "shadow-[0_0_25px_rgba(20,184,166,0.4)]",
   },
 ];
 
@@ -183,12 +201,12 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
 
           {/* ========================================================================= */}
           {/* DESKTOP VIEW (lg and up) - Exact Overlapping Floating Collage             */}
-          {/* ========================================================================= */}
           <div className="hidden lg:block relative w-full h-[520px] xl:h-[580px] z-10">
             {zeroSkillItemsData.map((item) => (
               <div
                 key={item.id}
-                className={`absolute group rounded-2xl bg-[#0D1226]/90 border overflow-hidden ${item.desktopClass}`}
+                onClick={handleButtonClick}
+                className={`absolute group rounded-2xl bg-[#0D1226]/90 border ${item.borderColor} ${item.glowColor} overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:rotate-0 hover:z-30 shadow-xl ${item.desktopClass}`}
               >
                 {/* Badge Chip */}
                 <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold pointer-events-none shadow-md">
@@ -202,7 +220,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-500"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
                 />
 
@@ -214,12 +232,12 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
 
           {/* ========================================================================= */}
           {/* MOBILE VIEW (< lg) - Clean Stacked Collage Grid with Glow & Wave          */}
-          {/* ========================================================================= */}
           <div className="flex lg:hidden flex-col gap-3 relative z-10 w-full mt-4">
 
             {/* Mobile Row 1: AI Video (Full Width) */}
             <div
-              className={`group relative w-full h-48 sm:h-56 rounded-2xl bg-[#0D1226]/90 border overflow-hidden`}
+              onClick={handleButtonClick}
+              className={`group relative w-full h-48 sm:h-56 rounded-2xl bg-[#0D1226]/90 border ${videoItem.borderColor} ${videoItem.glowColor} overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] shadow-xl`}
             >
               <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold">
                 <span className={`w-3.5 h-3.5 rounded-full ${videoItem.badgeBg} flex items-center justify-center text-[8px] font-bold`}>
@@ -231,7 +249,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
               <img
                 src={videoItem.image}
                 alt={videoItem.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                 onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
@@ -240,7 +258,8 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
             {/* Mobile Row 2: AI Image (Left) & Templates (Right) */}
             <div className="grid grid-cols-2 gap-3">
               <div
-                className={`group relative h-36 rounded-2xl bg-[#0D1226]/90 border overflow-hidden rotate-[1.5deg]`}
+                onClick={handleButtonClick}
+                className={`group relative h-36 rounded-2xl bg-[#0D1226]/90 border ${imageItem.borderColor} ${imageItem.glowColor} overflow-hidden rotate-[1.5deg] cursor-pointer transition-all duration-300 hover:scale-105 hover:rotate-0 shadow-xl`}
               >
                 <div className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold">
                   <span className={`w-3 h-3 rounded-full ${imageItem.badgeBg} flex items-center justify-center text-[7px] font-bold`}>
@@ -251,14 +270,15 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 <img
                   src={imageItem.image}
                   alt={imageItem.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
               </div>
 
               <div
-                className={`group relative h-36 rounded-2xl bg-[#0D1226]/90 border overflow-hidden -rotate-[2deg]`}
+                onClick={handleButtonClick}
+                className={`group relative h-36 rounded-2xl bg-[#0D1226]/90 border ${templatesItem.borderColor} ${templatesItem.glowColor} overflow-hidden -rotate-[2deg] cursor-pointer transition-all duration-300 hover:scale-105 hover:rotate-0 shadow-xl`}
               >
                 <div className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold">
                   <span className={`w-3 h-3 rounded-full ${templatesItem.badgeBg} flex items-center justify-center text-[7px] font-bold`}>
@@ -269,7 +289,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 <img
                   src={templatesItem.image}
                   alt={templatesItem.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
@@ -279,7 +299,8 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
             {/* Mobile Row 3: Design (Left) & AI Chat (Right) */}
             <div className="grid grid-cols-2 gap-3">
               <div
-                className={`group relative h-32 rounded-2xl bg-[#0D1226]/90 border overflow-hidden`}
+                onClick={handleButtonClick}
+                className={`group relative h-32 rounded-2xl bg-[#0D1226]/90 border ${designItem.borderColor} ${designItem.glowColor} overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 shadow-xl`}
               >
                 <div className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold">
                   <span className={`w-3 h-3 rounded-full ${designItem.badgeBg} flex items-center justify-center text-[7px] font-bold`}>
@@ -290,7 +311,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 <img
                   src={designItem.image}
                   alt={designItem.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
@@ -298,7 +319,8 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
 
               {/* AI Chat Card */}
               <div
-                className={`group relative h-32 rounded-2xl bg-[#0D1226]/90 border overflow-hidden`}
+                onClick={handleButtonClick}
+                className={`group relative h-32 rounded-2xl bg-[#0D1226]/90 border ${chatItem.borderColor} ${chatItem.glowColor} overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 shadow-xl`}
               >
                 <div className="absolute top-2 left-2 z-20 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[10px] font-semibold">
                   <span className={`w-3 h-3 rounded-full ${chatItem.badgeBg} flex items-center justify-center text-[7px] font-bold`}>
@@ -309,7 +331,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 <img
                   src={chatItem.image}
                   alt={chatItem.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
@@ -319,7 +341,8 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
             {/* Mobile Row 4: Writing (Left), Research (Middle), And More... (Right) */}
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <div
-                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden rotate-[2deg]`}
+                onClick={handleButtonClick}
+                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border ${writingItem.borderColor} ${writingItem.glowColor} overflow-hidden rotate-[2deg] cursor-pointer transition-all duration-300 hover:scale-105 hover:rotate-0 shadow-xl`}
               >
                 <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
                   <span className={`w-2.5 h-2.5 rounded-full ${writingItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>
@@ -330,14 +353,15 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 <img
                   src={writingItem.image}
                   alt={writingItem.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
               </div>
 
               <div
-                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden rotate-[1deg]`}
+                onClick={handleButtonClick}
+                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border ${researchItem.borderColor} ${researchItem.glowColor} overflow-hidden rotate-[1deg] cursor-pointer transition-all duration-300 hover:scale-105 hover:rotate-0 shadow-xl`}
               >
                 <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
                   <span className={`w-2.5 h-2.5 rounded-full ${researchItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>
@@ -348,14 +372,15 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 <img
                   src={researchItem.image}
                   alt={researchItem.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
               </div>
 
               <div
-                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border overflow-hidden rotate-[0deg]`}
+                onClick={handleButtonClick}
+                className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border ${moreItem.borderColor} ${moreItem.glowColor} overflow-hidden rotate-[0deg] cursor-pointer transition-all duration-300 hover:scale-105 shadow-xl`}
               >
                 <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
                   <span className={`w-2.5 h-2.5 rounded-full ${moreItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>
@@ -366,7 +391,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 <img
                   src={moreItem.image}
                   alt={moreItem.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   onError={(e) => { e.currentTarget.style.opacity = "0.7"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />

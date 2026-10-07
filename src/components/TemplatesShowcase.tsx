@@ -216,7 +216,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
 
       <div className="max-w-[1440px] mx-auto relative z-10">
         {/* Section Header (Left-aligned matching Image 2) */}
-        <div className="text-left flex flex-col items-start max-w-3xl mb-10 px-2 sm:px-4">
+        <div className="text-center flex flex-col items-center max-w-3xl mx-auto mb-10 px-2 sm:px-4">
           {/* Badge */}
           <div className="inline-flex w-fit items-center gap-2 px-3 py-1 mb-3.5">
             <span className="font-mono text-xs sm:text-sm font-bold tracking-widest text-[#E879F9] uppercase">
@@ -234,7 +234,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
           </h2>
 
           {/* Subtitle */}
-          <p className="mt-3.5 font-sans text-sm sm:text-base md:text-lg text-[#fff] font-normal max-w-xl leading-relaxed">
+          <p className="mt-3.5 font-sans text-sm sm:text-base md:text-lg text-[#fff] font-normal max-w-2xl leading-relaxed">
             You don't have to start from scratch. Choose from hundreds of templates across videos, images, social media, business, design and more.
           </p>
 
@@ -254,23 +254,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
 
         {/* Carousel Outer Container with Left & Right Floating Arrows */}
         <div className="relative px-2 sm:px-6">
-          {/* Left Arrow Button */}
-          <button
-            onClick={() => scroll("left")}
-            aria-label="Scroll left"
-            className="hidden md:flex absolute -left-2 lg:-left-4 top-[50%] -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-[#090D22] border border-white/20 text-white items-center justify-center hover:bg-[#6C56E5] hover:border-[#6C56E5] transition-all duration-200 cursor-pointer shadow-xl"
-          >
-            <ChevronLeft className="w-5 h-5 text-white" />
-          </button>
-
-          {/* Right Arrow Button */}
-          <button
-            onClick={() => scroll("right")}
-            aria-label="Scroll right"
-            className="hidden md:flex absolute -right-2 lg:-right-4 top-[50%] -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-[#090D22] border border-white/20 text-white items-center justify-center hover:bg-[#6C56E5] hover:border-[#6C56E5] transition-all duration-200 shadow-xl cursor-pointer"
-          >
-            <ChevronRight className="w-5 h-5 text-white" />
-          </button>
+          
 
           {/* Main Card Panel (Matches 2nd Image Layout) */}
           <div className="w-full bg-[#070A1E]/80 border border-[#1E293B]/70 rounded-[28px] p-4 sm:p-6 md:p-7 backdrop-blur-xl shadow-2xl">
