@@ -15,26 +15,52 @@ import VideoSliderSection from "./VideoSliderSection";
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
 const Footer = dynamic(() => import("./Footer"));
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
+const InterestModal = dynamic(() => import("./InterestModal"), { ssr: false });
 
 export default function LandingPageClient() {
+  const [interestOpen, setInterestOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   const handleOpenAuth = (mode: "signin" | "signup" = "signup") => {
-    setAuthMode(mode);
-    setAuthOpen(true);
+    if (mode === "signin") {
+      setAuthMode("signin");
+      setInterestOpen(false);
+      setAuthOpen(true);
+    } else {
+      // Signup flow: Landing Page CTA -> Interest Selection -> Registration -> Pricing
+      setAuthMode("signup");
+      setAuthOpen(false);
+      setInterestOpen(true);
+    }
   };
 
   const handleCTA = (attribution: RegistrationCTAInput, mode: "signin" | "signup" = "signup") => {
     handleRegistrationCTA(
       attribution,
       (targetMode) => {
-        setAuthMode(targetMode || mode || "signup");
-        setAuthOpen(true);
+        const finalMode = targetMode || mode || "signup";
+        if (finalMode === "signin") {
+          setAuthMode("signin");
+          setInterestOpen(false);
+          setAuthOpen(true);
+        } else {
+          setAuthMode("signup");
+          setAuthOpen(false);
+          setInterestOpen(true);
+        }
       },
       mode
     );
+  };
+
+  const handleInterestContinue = (interests: string[]) => {
+    setSelectedInterests(interests);
+    setInterestOpen(false);
+    setAuthMode("signup");
+    setAuthOpen(true);
   };
 
   useEffect(() => {
@@ -172,7 +198,26 @@ export default function LandingPageClient() {
         <FAQAccordion onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
       </main>
       <Footer />
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
+
+      {/* 1. Step 1: Interest Selection Modal */}
+      <InterestModal
+        isOpen={interestOpen}
+        onClose={() => setInterestOpen(false)}
+        onContinue={handleInterestContinue}
+        initialSelected={selectedInterests}
+      />
+
+      {/* 2. Step 2: Registration / Auth Modal */}
+      <AuthModal
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+        initialMode={authMode}
+        selectedInterests={selectedInterests}
+        onBackToInterests={() => {
+          setAuthOpen(false);
+          setInterestOpen(true);
+        }}
+      />
     </>
   );
 }
