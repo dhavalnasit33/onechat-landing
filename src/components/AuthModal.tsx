@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { auth, googleProvider } from "../lib/firebase";
-import { getRedirectResult, signInWithPopup } from "firebase/auth";
+import { getRedirectResult, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import apiService from "../lib/apiService";
 import { getRegistrationAttribution, clearRegistrationAttribution } from "../lib/attribution";
 
@@ -266,8 +266,10 @@ export default function AuthModal({
     try {
       const result = await signInWithPopup(auth, googleProvider);
       if (result && result.user) {
-        const idToken = await result.user.getIdToken();
-        await handleBackendGoogleLogin(idToken);
+        // Extract Google OAuth ID Token using credentialFromResult
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const googleIdToken = credential?.idToken || (await result.user.getIdToken());
+        await handleBackendGoogleLogin(googleIdToken);
       }
     } catch (err: any) {
       if (err?.code !== "auth/popup-closed-by-user" && err?.code !== "auth/cancelled-popup-request") {
