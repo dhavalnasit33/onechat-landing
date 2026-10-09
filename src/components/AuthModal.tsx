@@ -97,11 +97,16 @@ export default function AuthModal({
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Take the first 3 selected interests as required
+  // Take the first 3 selected interests as required (fallback to default 3 if empty)
   const displayInterests =
-    selectedInterests && selectedInterests.length > 0
+    selectedInterests && selectedInterests.length >= 3
       ? selectedInterests.slice(0, 3)
-      : [""];
+      : selectedInterests && selectedInterests.length > 0
+      ? [
+          ...selectedInterests,
+          ...["AI Chat", "AI Images", "AI Video"].filter((x) => !selectedInterests.includes(x)),
+        ].slice(0, 3)
+      : ["AI Chat", "AI Images", "AI Video"];
 
   useEffect(() => {
     if (isOpen) {
@@ -147,13 +152,17 @@ export default function AuthModal({
 
   if (!isOpen) return null;
 
-  const saveAuthSession = (data: UserResponse) => {
+  const saveAuthSession = (data: UserResponse, isNewSignup: boolean = false) => {
     const { token, fb_session_token, user } = data;
 
     // Save tokens and login states for SharedPreferences compatibility in Flutter Web
     localStorage.setItem("flutter.user_token", JSON.stringify(token));
     localStorage.setItem("flutter.is_logged_in", JSON.stringify(true));
     localStorage.setItem("flutter.user_interests", JSON.stringify(selectedInterests));
+    if (isNewSignup || !isLoginTab) {
+      localStorage.setItem("flutter.is_new_registration", JSON.stringify(true));
+      localStorage.setItem("flutter.has_seen_welcome_popup", JSON.stringify(false));
+    }
 
     if (user) {
       const userId = user._id || user.id || "";
@@ -176,7 +185,9 @@ export default function AuthModal({
       localStorage.setItem("flutter.user_status", JSON.stringify(user.status || ""));
       localStorage.setItem("flutter.user_profile_picture", JSON.stringify(user.profile_picture || ""));
       localStorage.setItem("flutter.user_auth_provider", JSON.stringify(user.authProvider || ""));
-      localStorage.setItem("flutter.has_seen_welcome_popup", JSON.stringify(user.hasSeenWelcomePopup ?? false));
+      if (!isNewSignup && isLoginTab) {
+        localStorage.setItem("flutter.has_seen_welcome_popup", JSON.stringify(user.hasSeenWelcomePopup ?? true));
+      }
       localStorage.setItem("flutter.user_created_at", JSON.stringify(user.createdAt || ""));
     }
 
@@ -184,19 +195,24 @@ export default function AuthModal({
       localStorage.setItem("flutter.fb_session_token", JSON.stringify(fb_session_token));
 
       const currentDomain = window.location.hostname;
-      const cookieStr = `FBSESSION=${fb_session_token}; path=/; max-age=2592000; secure; samesite=lax`;
+      const isSecure = window.location.protocol === "https:";
+      const secureFlag = isSecure ? "; secure" : "";
+      const cookieStr = `FBSESSION=${fb_session_token}; path=/; max-age=2592000; samesite=lax${secureFlag}`;
 
-      if (currentDomain.includes("localhost") || currentDomain.includes("127.0.0.1")) {
-        document.cookie = cookieStr;
-      } else {
+      // Set on current domain
+      document.cookie = cookieStr;
+
+      if (!currentDomain.includes("localhost") && !currentDomain.includes("127.0.0.1")) {
         const hostParts = currentDomain.split(".");
         const rootDomain = hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
         document.cookie = `${cookieStr}; domain=.${rootDomain}`;
       }
     }
 
-    // Redirect to app (Nginx will route to Flutter now that FBSESSION is set)
-    // window.location.href = "/";
+    // Redirect to Flutter App dashboard
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 200);
   };
 
   const getCookie = (name: string) => {
