@@ -263,7 +263,7 @@ export default function InterestModal({
         </button>
 
         {/* Top Progress Bar & Header */}
-        <div className="w-full max-w-[820px] mx-auto mb-2 sm:mb-3 shrink-0">
+        <div className="w-full max-w-[820px] mx-auto mb-2 sm:mb-3 shrink-0 pt-7">
           <div className="flex items-center justify-between text-[11px] sm:text-[13.5px] mb-1.5">
             <span className="text-[#94A3B8] font-medium">Almost there! Personalize your experience.</span>
             <span className="font-extrabold bg-gradient-to-r from-[#EC4899] via-[#8B5CF6] to-[#3B82F6] bg-clip-text text-transparent text-xs sm:text-[15px]">66%</span>

@@ -67,4 +67,14 @@ video::-webkit-media-controls-overflow-button {
   display: none !important;
 }
 
+.email-autofill-fix:-webkit-autofill,
+.email-autofill-fix:-webkit-autofill:hover,
+.email-autofill-fix:-webkit-autofill:focus,
+.email-autofill-fix:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px #060b1b inset !important;
+  box-shadow: 0 0 0 1000px #060b1b inset !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
 

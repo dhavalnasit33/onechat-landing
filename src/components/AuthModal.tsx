@@ -646,7 +646,7 @@ export default function AuthModal({
                     placeholder="you@example.com"
                     disabled={loading}
                     required
-                    className="bg-transparent text-white placeholder-slate-500 text-[13.5px] w-full outline-none"
+                    className="email-autofill-fix bg-transparent text-white placeholder-slate-500 text-[13.5px] w-full outline-none"
                   />
                 </div>
               </div>
