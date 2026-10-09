@@ -249,7 +249,7 @@ export default function InterestModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
       {/* Dialog Container */}
-      <div className="relative w-full max-w-[440px] md:max-w-[1170px] h-[95vh] md:h-[92vh] max-h-[890px] my-auto bg-[#070b1e] rounded-[22px] md:rounded-[26px] border border-[#1e3264]/70 shadow-[0_0_60px_rgba(20,40,95,0.45)] p-3.5 sm:p-6 md:p-7 flex flex-col text-white animate-in fade-in zoom-in-95 duration-200 select-none">
+      <div className="relative w-full max-w-[440px] md:max-w-[980px] h-[95vh] md:h-[92vh] max-h-[840px] my-auto bg-[#070b1e] rounded-[22px] md:rounded-[26px] border border-[#1e3264]/70 shadow-[0_0_60px_rgba(20,40,95,0.45)] p-3.5 sm:p-6 md:p-7 flex flex-col text-white animate-in fade-in zoom-in-95 duration-200 select-none">
         
         {/* Close Button */}
         <button

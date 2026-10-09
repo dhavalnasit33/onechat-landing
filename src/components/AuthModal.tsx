@@ -344,8 +344,11 @@ export default function AuthModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
       {/* Modal Card */}
-      <div className="relative w-full max-w-[440px] my-auto bg-[#070b1e] rounded-[24px] border border-[#1e3264]/70 shadow-[0_0_60px_rgba(20,40,95,0.45)] p-5 sm:p-7 flex flex-col animate-in fade-in zoom-in-95 duration-200 text-white select-none">
-        
+      <div
+        className={`relative w-full max-w-[440px] my-auto bg-[#070b1e] rounded-[24px] border border-[#1e3264]/70 shadow-[0_0_60px_rgba(20,40,95,0.45)] flex flex-col animate-in fade-in zoom-in-95 duration-200 text-white select-none transition-all ${
+          showEmailForm ? "p-4 sm:p-5" : "p-5 sm:p-7"
+        }`}
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -358,7 +361,7 @@ export default function AuthModal({
         </button>
 
         {/* Top Header: Sparkle Logo + Brand Name */}
-        <div className="flex items-center gap-2.5 mb-3.5">
+        <div className={`flex items-center gap-2.5 ${showEmailForm ? "mb-2" : "mb-3.5"}`}>
           <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#6366f1] via-[#8b5cf6] to-[#d946ef] flex items-center justify-center shadow-[0_0_12px_rgba(139,92,246,0.5)]">
             <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L14.4 8.6L21 11L14.4 13.4L12 20L9.6 13.4L3 11L9.6 8.6L12 2Z" />
@@ -371,7 +374,7 @@ export default function AuthModal({
 
         {/* Progress Bar & Step Indicator */}
         {!isLoginTab && (
-          <div className="w-full mb-3.5">
+          <div className={`w-full ${showEmailForm ? "mb-2" : "mb-3.5"}`}>
             <div className="text-[11.5px] sm:text-xs mb-1.5">
               <span className="font-semibold text-white">Step 2 of 3</span>
               <span className="text-slate-400 ml-2">Create your account</span>
@@ -387,7 +390,7 @@ export default function AuthModal({
 
         {/* Status / Checkmark Graphic with Sparkles */}
         {!isLoginTab && (
-          <div className="relative flex flex-col items-center mt-1 mb-1.5">
+          <div className={`relative flex flex-col items-center ${showEmailForm ? "mt-0.5 mb-1" : "mt-1 mb-1.5"}`}>
             {/* Sparkle decorative icons */}
             <div className="relative flex items-center justify-center">
               {/* Top-left small sparkle */}
@@ -398,25 +401,44 @@ export default function AuthModal({
               <span className="absolute -top-2 -right-4 text-[#38bdf8] text-xs font-bold animate-pulse">
                 ✦
               </span>
-              {/* Mid-left tiny star */}
-              <span className="absolute top-5 -left-6 text-[#a855f7] text-[10px]">
-                ✦
-              </span>
-              {/* Mid-right tiny star */}
-              <span className="absolute top-6 -right-6 text-[#38bdf8] text-[9px]">
-                ✦
-              </span>
+              {!showEmailForm && (
+                <>
+                  <span className="absolute top-5 -left-6 text-[#a855f7] text-[10px]">
+                    ✦
+                  </span>
+                  <span className="absolute top-6 -right-6 text-[#38bdf8] text-[9px]">
+                    ✦
+                  </span>
+                </>
+              )}
 
               {/* Glowing Purple Checkmark Badge */}
-              <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-[#9333ea] via-[#a855f7] to-[#c084fc] flex items-center justify-center shadow-[0_0_28px_rgba(168,85,247,0.7)] border-2 border-[#d8b4fe]/40">
-                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div
+                className={`rounded-full bg-gradient-to-tr from-[#9333ea] via-[#a855f7] to-[#c084fc] flex items-center justify-center border-2 border-[#d8b4fe]/40 ${
+                  showEmailForm
+                    ? "w-10 h-10 shadow-[0_0_18px_rgba(168,85,247,0.6)]"
+                    : "w-13 h-13 shadow-[0_0_28px_rgba(168,85,247,0.7)]"
+                }`}
+              >
+                <svg
+                  className={`${showEmailForm ? "w-5 h-5" : "w-7 h-7"} text-white`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
 
             {/* Headline */}
-            <h2 className="font-extrabold text-[23px] sm:text-[25px] text-white tracking-tight mt-3 text-center leading-tight">
+            <h2
+              className={`font-extrabold text-white tracking-tight text-center leading-tight ${
+                showEmailForm
+                  ? "text-[20px] sm:text-[22px] mt-1.5"
+                  : "text-[23px] sm:text-[25px] mt-3"
+              }`}
+            >
               Your Interests Are{" "}
               <span className="bg-gradient-to-r from-[#00d2ff] via-[#818cf8] to-[#ff2ebd] bg-clip-text text-transparent">
                 Selected!
@@ -424,29 +446,36 @@ export default function AuthModal({
             </h2>
 
             {/* Subtitle */}
-            <p className="text-slate-300 text-[12.5px] sm:text-[13px] text-center max-w-[340px] mt-1.5 leading-snug">
+            <p
+              className={`text-slate-300 text-center leading-snug ${
+                showEmailForm
+                  ? "text-[11.5px] max-w-[320px] mt-1"
+                  : "text-[12.5px] sm:text-[13px] max-w-[340px] mt-1.5"
+              }`}
+            >
               You're one step closer to exploring the AI tools you're excited about.
             </p>
 
-            {/* 3 Selected Interests Badges (First 3 selected by user) */}
-            <div className="grid grid-cols-3 gap-2 w-full mt-4">
+            {/* 3 Selected Interests Badges */}
+            <div className={`grid grid-cols-3 gap-2 w-full ${showEmailForm ? "mt-2" : "mt-4"}`}>
               {displayInterests.map((interestName, i) => {
                 const iconSrc = getInterestBadgeIcon(interestName);
-                const shortLabel = getDisplayShortLabel(interestName);
                 return (
                   <div
                     key={i}
-                    className="bg-[#0e1630] border border-[#223363] rounded-xl px-2.5 py-2 flex items-center gap-2 shadow-inner min-w-0"
+                    className={`bg-[#0e1630] border border-[#223363] rounded-xl flex items-center justify-center gap-1.5 shadow-inner ${
+                      showEmailForm ? "px-2 py-1.5" : "px-2.5 py-2"
+                    }`}
                   >
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0">
+                    <div className={`${showEmailForm ? "w-4 h-4" : "w-5 h-5"} rounded-md flex items-center justify-center shrink-0`}>
                       <img
                         src={iconSrc}
                         alt={interestName}
                         className="w-full h-full object-contain"
                       />
                     </div>
-                    <span className="text-white font-semibold text-[11px] sm:text-[12px] truncate">
-                      {shortLabel}
+                    <span className="text-white font-medium text-[11.5px] sm:text-[12px] truncate">
+                      {interestName}
                     </span>
                   </div>
                 );
@@ -474,16 +503,27 @@ export default function AuthModal({
           </div>
         )}
 
-        {/* Google Authentication Button (Directly below chips in Signup mode) */}
+        {/* Continue With Divider */}
+        <div className={`relative flex items-center w-full ${showEmailForm ? "mt-2.5 mb-2" : "mt-4 mb-3"}`}>
+          <div className="flex-grow border-t border-[#1d2b52]"></div>
+          <span className="flex-shrink mx-3 text-slate-400 text-[11px] font-medium tracking-wide">
+            Continue with
+          </span>
+          <div className="flex-grow border-t border-[#1d2b52]"></div>
+        </div>
+
+        {/* Google Authentication Button */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="relative w-full h-[52px] rounded-xl flex items-center justify-center bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#06b6d4] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_24px_rgba(147,51,234,0.35)] cursor-pointer disabled:opacity-50 mt-4"
+          className={`relative w-full rounded-xl flex items-center justify-center bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#06b6d4] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_24px_rgba(147,51,234,0.35)] cursor-pointer disabled:opacity-50 ${
+            showEmailForm ? "h-[44px]" : "h-[50px]"
+          }`}
         >
           {/* Logo + Text centered */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5 shadow-sm shrink-0">
+            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center p-1 shadow-sm shrink-0">
               <svg className="w-full h-full" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -503,7 +543,7 @@ export default function AuthModal({
                 />
               </svg>
             </div>
-            <span className="font-bold text-white text-[15px]">Continue with Google</span>
+            <span className="font-bold text-white text-[14.5px]">Continue with Google</span>
           </div>
 
           {/* Right Arrow pinned to right */}
@@ -523,7 +563,7 @@ export default function AuthModal({
         </button>
 
         {/* "or" Divider */}
-        <div className="relative flex items-center w-full my-3">
+        <div className={`relative flex items-center w-full ${showEmailForm ? "my-1.5" : "my-2.5"}`}>
           <div className="flex-grow border-t border-[#1d2b52]"></div>
           <span className="flex-shrink mx-3 text-slate-500 text-[11px] font-medium">
             or
@@ -531,79 +571,83 @@ export default function AuthModal({
           <div className="flex-grow border-t border-[#1d2b52]"></div>
         </div>
 
-        {/* "Continue with Email" Button (Mail icon + text centered, arrow on right) */}
-        <button
-          type="button"
-          onClick={() => setShowEmailForm(!showEmailForm)}
-          className="relative w-full h-[50px] rounded-xl flex items-center justify-center px-4 sm:px-5 bg-[#090f24] border border-[#a855f7]/40 hover:border-[#a855f7] transition-all active:scale-[0.99] cursor-pointer"
-        >
-          {/* Mail Icon + Text centered */}
-          <div className="flex items-center gap-2.5">
-            <svg
-              className="w-5 h-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.8}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-            <span className="font-semibold text-white text-[14.5px]">Continue with Email</span>
-          </div>
+        {/* "Continue with Email" Button with Gradient Border */}
+        <div className="w-full p-[1px] rounded-xl bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#06b6d4] hover:opacity-95 transition-opacity">
+          <button
+            type="button"
+            onClick={() => setShowEmailForm(!showEmailForm)}
+            className={`relative w-full rounded-[11px] flex items-center justify-center px-4 sm:px-5 bg-[#090f24] hover:bg-[#0c1430] transition-all active:scale-[0.99] cursor-pointer ${
+              showEmailForm ? "h-[42px]" : "h-[48px]"
+            }`}
+          >
+            {/* Mail Icon + Text centered */}
+            <div className="flex items-center gap-2.5">
+              <svg
+                className="w-4.5 h-4.5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.8}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              <span className="font-semibold text-white text-[14px]">Continue with Email</span>
+            </div>
 
-          {/* Right Icon (Arrow or Chevron) pinned to right */}
-          <div className="absolute right-4 sm:right-5 flex items-center">
-            {showEmailForm ? (
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            )}
-          </div>
-        </button>
+            {/* Right Icon (Arrow or Chevron) pinned to right */}
+            <div className="absolute right-4 sm:right-5 flex items-center">
+              {showEmailForm ? (
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              )}
+            </div>
+          </button>
+        </div>
 
         {/* Expandable Email & Password Card (Mock 2) */}
         {showEmailForm && (
-          <div className="bg-[#0a1128] border border-[#1d2b52] rounded-2xl p-4 sm:p-5 mt-3 flex flex-col gap-3.5 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-[#0b122c] border border-[#1e3264] rounded-xl p-3 sm:p-3.5 mt-2 flex flex-col gap-2.5 animate-in fade-in zoom-in-95 duration-200 shadow-inner">
             {/* Header of email section */}
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-white text-[14px] sm:text-[15px]">
+              <h3 className="font-bold text-white text-[13.5px]">
                 {isLoginTab ? "Log in with email" : "Create your account with email"}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowEmailForm(false)}
-                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-white transition-colors cursor-pointer p-0.5"
               >
                 <svg
-                  className="w-4 h-4"
+                  className="w-3.5 h-3.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -619,15 +663,15 @@ export default function AuthModal({
             </div>
 
             {/* Email Form */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
               {/* Email Field */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11.5px] font-medium text-slate-300">
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-slate-300">
                   Email address
                 </label>
-                <div className="bg-[#060b1b] border border-[#1d2b52] focus-within:border-[#38bdf8] rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 transition-colors">
+                <div className="bg-[#060b1c] border border-[#1b2b52] focus-within:border-[#38bdf8] rounded-lg px-3 py-2 flex items-center gap-2 transition-colors">
                   <svg
-                    className="w-4 h-4 text-slate-400 shrink-0"
+                    className="w-3.5 h-3.5 text-slate-400 shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -646,19 +690,19 @@ export default function AuthModal({
                     placeholder="you@example.com"
                     disabled={loading}
                     required
-                    className="email-autofill-fix bg-transparent text-white placeholder-slate-500 text-[13.5px] w-full outline-none"
+                    className="email-autofill-fix bg-transparent text-white placeholder-slate-500 text-[12.5px] w-full outline-none"
                   />
                 </div>
               </div>
 
               {/* Password Field */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11.5px] font-medium text-slate-300">
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-medium text-slate-300">
                   Password
                 </label>
-                <div className="bg-[#060b1b] border border-[#1d2b52] focus-within:border-[#38bdf8] rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 transition-colors relative">
+                <div className="bg-[#060b1c] border border-[#1b2b52] focus-within:border-[#38bdf8] rounded-lg px-3 py-2 flex items-center gap-2 transition-colors relative">
                   <svg
-                    className="w-4 h-4 text-slate-400 shrink-0"
+                    className="w-3.5 h-3.5 text-slate-400 shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -677,16 +721,16 @@ export default function AuthModal({
                     placeholder={isLoginTab ? "Enter your password" : "Create a password"}
                     disabled={loading}
                     required
-                    className="bg-transparent text-white placeholder-slate-500 text-[13.5px] w-full outline-none pr-7"
+                    className="bg-transparent text-white placeholder-slate-500 text-[12.5px] w-full outline-none pr-6"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 text-slate-400 hover:text-white cursor-pointer"
+                    className="absolute right-3 text-slate-400 hover:text-white cursor-pointer"
                   >
                     {showPassword ? (
                       <svg
-                        className="w-4 h-4"
+                        className="w-3.5 h-3.5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -706,7 +750,7 @@ export default function AuthModal({
                       </svg>
                     ) : (
                       <svg
-                        className="w-4 h-4"
+                        className="w-3.5 h-3.5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -727,17 +771,17 @@ export default function AuthModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-[46px] rounded-xl font-bold text-white text-[14px] sm:text-[15px] bg-gradient-to-r from-[#d946ef] via-[#7c3aed] to-[#2563eb] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_20px_rgba(124,58,237,0.35)] flex items-center justify-center gap-2 cursor-pointer mt-1 disabled:opacity-50"
+                className="w-full h-[42px] rounded-xl font-bold text-white text-[13.5px] bg-gradient-to-r from-[#d946ef] via-[#7c3aed] to-[#38bdf8] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_18px_rgba(124,58,237,0.35)] flex items-center justify-center gap-2 cursor-pointer mt-0.5 disabled:opacity-50"
               >
                 {loading ? (
-                  <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 ) : (
                   <>
                     <span>{isLoginTab ? "Sign In" : "Create My Account"}</span>
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </>
@@ -748,7 +792,7 @@ export default function AuthModal({
         )}
 
         {/* Footer: Already have account / Log in */}
-        <div className="text-center mt-4">
+        <div className={`text-center ${showEmailForm ? "mt-2.5" : "mt-4"}`}>
           <p className="text-slate-400 text-xs">
             {isLoginTab ? (
               <>
@@ -787,8 +831,8 @@ export default function AuthModal({
             )}
           </p>
 
-          {/* Privacy Policy & Terms in single line on large screens, responsive wrap on small screens */}
-          <p className="text-slate-400 text-[10.5px] sm:text-[11px] text-center leading-normal mt-2.5 px-1 max-w-[370px] mx-auto">
+          {/* Privacy Policy & Terms */}
+          <p className={`text-slate-400 text-center leading-normal px-1 max-w-[370px] mx-auto ${showEmailForm ? "text-[10px] mt-1.5" : "text-[10.5px] sm:text-[11px] mt-2.5"}`}>
             By continuing, you agree to our{" "}
             <a
               href="/terms-of-service"
