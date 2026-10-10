@@ -10,8 +10,12 @@ import Oneplace from "./Oneplace";
 import Allthebest from "./Allthebest";
 import Hastheskillsection from "./Hastheskillsection";
 import TemplatesShowcase from "./TemplatesShowcase";
-import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
+import {
+  handleRegistrationCTA,
+  RegistrationCTAInput,
+} from "../lib/attribution";
 import VideoSliderSection from "./VideoSliderSection";
+import SectionTrialCTA from "./SectionTrialCTA";
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
 const Footer = dynamic(() => import("./Footer"));
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
@@ -37,7 +41,10 @@ export default function LandingPageClient() {
     }
   };
 
-  const handleCTA = (attribution: RegistrationCTAInput, mode: "signin" | "signup" = "signup") => {
+  const handleCTA = (
+    attribution: RegistrationCTAInput,
+    mode: "signin" | "signup" = "signup",
+  ) => {
     handleRegistrationCTA(
       attribution,
       (targetMode) => {
@@ -52,7 +59,7 @@ export default function LandingPageClient() {
           setInterestOpen(true);
         }
       },
-      mode
+      mode,
     );
   };
 
@@ -75,9 +82,15 @@ export default function LandingPageClient() {
       const setDomainCookie = (name: string, value: string) => {
         const cookieStr = `${name}=${encodeURIComponent(value)}; ${cookieOpts}`;
         document.cookie = cookieStr;
-        if (!currentDomain.includes("localhost") && !currentDomain.includes("127.0.0.1")) {
+        if (
+          !currentDomain.includes("localhost") &&
+          !currentDomain.includes("127.0.0.1")
+        ) {
           const hostParts = currentDomain.split(".");
-          const rootDomain = hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
+          const rootDomain =
+            hostParts.length > 2
+              ? hostParts.slice(-2).join(".")
+              : currentDomain;
           document.cookie = `${cookieStr}; domain=.${rootDomain}`;
         }
       };
@@ -150,7 +163,9 @@ export default function LandingPageClient() {
           ) {
             const hostParts = currentDomain.split(".");
             const rootDomain =
-              hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
+              hostParts.length > 2
+                ? hostParts.slice(-2).join(".")
+                : currentDomain;
             document.cookie = `${cookieStr}; domain=.${rootDomain}`;
           }
 
@@ -160,7 +175,9 @@ export default function LandingPageClient() {
               window.location.href = "/";
             }, 300);
           } else {
-            console.warn("Cookies are blocked/disabled. Skipping redirect fallback.");
+            console.warn(
+              "Cookies are blocked/disabled. Skipping redirect fallback.",
+            );
             setIsRedirecting(false);
           }
         } catch (e) {
@@ -187,16 +204,110 @@ export default function LandingPageClient() {
       <Navbar onOpenAuth={handleOpenAuth} onCTA={handleCTA} />
       <main className="flex-1 w-full flex flex-col bg-[#050711]">
         <Hero onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
-        <CreateZeroSkillSection onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+
+        <SectionTrialCTA
+          sectionId="after_hero"
+          sectionLabel="Hero Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <CreateZeroSkillSection
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_create_anything"
+          sectionLabel="Create Anything Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
         <ModelMarquee />
-        <Wanttocreate onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+
+        <SectionTrialCTA
+          sectionId="after_marquee"
+          sectionLabel="Model Marquee Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <Wanttocreate
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_want_to_create"
+          sectionLabel="What Do You Want to Create Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
         <VideoSliderSection />
-        <Oneplace onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
-        <Allthebest onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
-        <Hastheskillsection onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
-        <TemplatesShowcase onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
-        <FAQAccordion onOpenAuth={() => handleOpenAuth("signup")} onCTA={handleCTA} />
+
+        <SectionTrialCTA
+          sectionId="after_video_slider"
+          sectionLabel="Video Slider Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <Oneplace
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_one_place"
+          sectionLabel="One Place Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <Allthebest
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_all_the_best"
+          sectionLabel="All The Best AI Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <Hastheskillsection
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_has_the_skill"
+          sectionLabel="AI Has The Skill Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <TemplatesShowcase
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_templates"
+          sectionLabel="Templates Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <FAQAccordion
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
       </main>
+
       <Footer />
 
       {/* 1. Step 1: Interest Selection Modal */}

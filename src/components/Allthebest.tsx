@@ -195,7 +195,8 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
     };
 
     return (
-        <section className="relative w-full bg-[#030614] py-28 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
+       <section className="relative w-full bg-[#030614] py-12 md:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
+
             {/* Ambient Background Glows & Electric Wave Effects */}
             <div className="absolute top-1/4 left-10 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-10 right-10 w-[600px] h-[600px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none" />

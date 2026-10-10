@@ -195,7 +195,7 @@ export default function TemplatesShowcase({ onOpenAuth, onCTA }: TemplatesShowca
   );
 
   return (
-    <section className="relative overflow-hidden bg-[#050711] py-28  md:pt-24 md:pb-28 px-4 text-white">
+    <section className="relative overflow-hidden bg-[#050711] py-12 md:py-16 px-4 text-white">
       {/* Decorative Wave Backgrounds */}
       <div className="absolute top-0 left-0 w-[300px] sm:w-[400px] md:w-[600px] h-auto pointer-events-none z-0 opacity-60 md:opacity-80 mix-blend-screen blur-[1px] md:blur-none select-none">
         <img

@@ -225,11 +225,7 @@ export default function Oneplace({ onOpenAuth, onCTA }: OneplaceProps) {
     }, [inView]);
 
     return (
-        <section
-            ref={sectionRef}
-            id="features"
-            className="relative w-full bg-[#050711] py-28 sm:py-20 md:py-24 px-3 sm:px-6 lg:px-8 overflow-hidden text-white"
-        >
+        <section ref={sectionRef} id="features" className="relative w-full bg-[#050711] py-12 md:py-16 px-3 sm:px-6 lg:px-8 overflow-hidden text-white">
             {/* Background Ambient Glows */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-[700px] bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(108,86,229,0.2),rgba(0,163,255,0.12),transparent)] pointer-events-none" />
             <div className="absolute top-10 left-5 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />

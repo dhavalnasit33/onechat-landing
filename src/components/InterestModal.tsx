@@ -45,7 +45,8 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     shortLabel: "Compare Models",
     desc: "Compare responses from multiple AI models side by side.",
     iconAsset: "/assets/landing-page/intrest_select/compare_ai_model_icon.png",
-    imageAsset: "/assets/landing-page/intrest_select/compare_ai_model_image.png",
+    imageAsset:
+      "/assets/landing-page/intrest_select/compare_ai_model_image.png",
     gradient: ["#4F46E5", "#7C3AED"],
   },
   {
@@ -62,8 +63,10 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     label: "Social Media AI Videos",
     shortLabel: "Social Videos",
     desc: "Create engaging videos for TikTok, Instagram, YouTube and more.",
-    iconAsset: "/assets/landing-page/intrest_select/social_media_ai_video_icon.png",
-    imageAsset: "/assets/landing-page/intrest_select/social_media_ai_video_image.png",
+    iconAsset:
+      "/assets/landing-page/intrest_select/social_media_ai_video_icon.png",
+    imageAsset:
+      "/assets/landing-page/intrest_select/social_media_ai_video_image.png",
     gradient: ["#E11D48", "#9333EA"],
   },
   {
@@ -71,8 +74,10 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     label: "Talking Pets AI Videos",
     shortLabel: "Talking Pets",
     desc: "Create fun and realistic talking pet videos with AI.",
-    iconAsset: "/assets/landing-page/intrest_select/talking_pet_ai_video_icon.png",
-    imageAsset: "/assets/landing-page/intrest_select/talking_pet_ai_video_image.png",
+    iconAsset:
+      "/assets/landing-page/intrest_select/talking_pet_ai_video_icon.png",
+    imageAsset:
+      "/assets/landing-page/intrest_select/talking_pet_ai_video_image.png",
     gradient: ["#06B6D4", "#6366F1"],
   },
   {
@@ -143,8 +148,10 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     label: "Cover Letter Generator",
     shortLabel: "Cover Letters",
     desc: "Create professional cover letters with AI.",
-    iconAsset: "/assets/landing-page/intrest_select/cover_leter_ganreter_icon.png",
-    imageAsset: "/assets/landing-page/intrest_select/cover_leter_ganreter_image.png",
+    iconAsset:
+      "/assets/landing-page/intrest_select/cover_leter_ganreter_icon.png",
+    imageAsset:
+      "/assets/landing-page/intrest_select/cover_leter_ganreter_image.png",
     gradient: ["#2563EB", "#60A5FA"],
   },
   {
@@ -171,7 +178,8 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     shortLabel: "History Videos",
     desc: "Bring history to life with AI-generated videos.",
     iconAsset: "/assets/landing-page/intrest_select/history_ai_video_icon.png",
-    imageAsset: "/assets/landing-page/intrest_select/history_ai_video_image.png",
+    imageAsset:
+      "/assets/landing-page/intrest_select/history_ai_video_image.png",
     gradient: ["#8B5CF6", "#6366F1"],
   },
   {
@@ -198,7 +206,8 @@ export default function InterestModal({
   onContinue,
   initialSelected = [],
 }: InterestModalProps) {
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(initialSelected);
+  const [selectedInterests, setSelectedInterests] =
+    useState<string[]>(initialSelected);
 
   useEffect(() => {
     if (isOpen) {
@@ -239,8 +248,14 @@ export default function InterestModal({
     if (!isContinueEnabled) return;
     if (typeof window !== "undefined") {
       try {
-        localStorage.setItem("flutter.user_interests", JSON.stringify(selectedInterests));
-        sessionStorage.setItem("onechat_selected_interests", JSON.stringify(selectedInterests));
+        localStorage.setItem(
+          "flutter.user_interests",
+          JSON.stringify(selectedInterests),
+        );
+        sessionStorage.setItem(
+          "onechat_selected_interests",
+          JSON.stringify(selectedInterests),
+        );
       } catch (_) {}
     }
     onContinue(selectedInterests);
@@ -250,23 +265,37 @@ export default function InterestModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
       {/* Dialog Container */}
       <div className="relative w-full max-w-[440px] md:max-w-[980px] h-[95vh] md:h-[92vh] max-h-[840px] my-auto bg-[#070b1e] rounded-[22px] md:rounded-[26px] border border-[#1e3264]/70 shadow-[0_0_60px_rgba(20,40,95,0.45)] p-3.5 sm:p-6 md:p-7 flex flex-col text-white animate-in fade-in zoom-in-95 duration-200 select-none">
-        
         {/* Close Button */}
         <button
           onClick={onClose}
           aria-label="Close modal"
           className="absolute top-3 right-3 sm:top-5 sm:right-5 w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer z-10"
         >
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
         {/* Top Progress Bar & Header */}
-        <div className="w-full max-w-[820px] mx-auto mb-2 sm:mb-3 shrink-0 pt-7">
+        {/* Top Progress Bar & Header */}
+        <div className="w-full max-w-[820px] mx-auto mb-2 sm:mb-3 shrink-0 pt-7 order-1">
           <div className="flex items-center justify-between text-[11px] sm:text-[13.5px] mb-1.5">
-            <span className="text-[#94A3B8] font-medium">Almost there! Personalize your experience.</span>
-            <span className="font-extrabold bg-gradient-to-r from-[#EC4899] via-[#8B5CF6] to-[#3B82F6] bg-clip-text text-transparent text-xs sm:text-[15px]">66%</span>
+            <span className="text-[#94A3B8] font-medium">
+              Almost there! Personalize your experience.
+            </span>
+            <span className="font-extrabold bg-gradient-to-r from-[#EC4899] via-[#8B5CF6] to-[#3B82F6] bg-clip-text text-transparent text-xs sm:text-[15px]">
+              66%
+            </span>
           </div>
           <div className="w-full h-[6px] sm:h-[8px] bg-[#181D33] rounded-full overflow-hidden">
             <div className="w-[66%] h-full bg-gradient-to-r from-[#EC4899] via-[#8B5CF6] to-[#3B82F6] rounded-full shadow-[0_0_10px_rgba(56,189,248,0.5)]"></div>
@@ -274,7 +303,7 @@ export default function InterestModal({
         </div>
 
         {/* Headline & Subtitle */}
-        <div className="text-center mb-2 sm:mb-3.5 shrink-0">
+        <div className="text-center mb-2 sm:mb-3.5 shrink-0 order-2">
           <h2 className="text-[19px] sm:text-2xl md:text-[32px] font-bold text-white tracking-tight leading-tight">
             Which{" "}
             <span className="bg-gradient-to-r from-[#60A5FA] via-[#818CF8] to-[#A855F7] bg-clip-text text-transparent">
@@ -283,12 +312,14 @@ export default function InterestModal({
             are you most interested in?
           </h2>
           <p className="text-[#94A3B8] text-[10.5px] sm:text-[13px] max-w-[340px] md:max-w-[720px] mx-auto mt-1 leading-snug sm:leading-relaxed">
-            Select the features you're most excited to use (choose at least 3). This helps us understand what matters most to you.
+            Select the features you're most excited to use (choose at least 3).
+            This helps us understand what matters most to you.
           </p>
         </div>
 
         {/* Feature Cards Grid (Single column on mobile, 2 columns on desktop) */}
-        <div className="flex-1 overflow-y-auto px-1 sm:px-2 py-1 grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3.5 my-1 scrollbar-thin scrollbar-thumb-slate-700">
+        {/* Feature Cards Grid (Single column on mobile, 2 columns on desktop) */}
+        <div className="flex-1 overflow-y-auto px-1 sm:px-2 py-1 grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3.5 my-1 scrollbar-thin scrollbar-thumb-slate-700 order-4 md:order-3">
           {INTEREST_OPTIONS.map((option) => {
             const isSelected = selectedInterests.includes(option.label);
             return (
@@ -356,12 +387,11 @@ export default function InterestModal({
         </div>
 
         {/* Bottom Selection Bar & Actions matching mobile screenshots exactly */}
-        <div className="mt-2 sm:mt-3.5 p-2.5 sm:p-4 rounded-2xl bg-[#0B1028] border border-[#223059] flex items-center justify-between gap-2 shrink-0">
-          
+        <div className="mt-0 md:mt-3.5 mb-2 md:mb-0 p-2.5 sm:p-4 rounded-2xl bg-[#0B1028] border border-[#223059] flex items-center justify-between gap-2 shrink-0 order-3 md:order-4 z-10 shadow-md md:shadow-none">
           {/* Left: Selection Counter & 3-Pill Progress Indicator */}
           <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-white text-[11.5px] sm:text-[15px] truncate">
+            <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
+              <span className="font-bold text-white text-[11px] sm:text-[15px] leading-tight sm:truncate">
                 {selectedInterests.length < 3
                   ? "Choose at least 3 features"
                   : "Great selection!"}
@@ -405,17 +435,25 @@ export default function InterestModal({
               }`}
             >
               <span>Continue</span>
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              <svg
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
               </svg>
             </button>
             <span className="text-[#8E95AF] text-[8.5px] sm:text-[11px] mt-1 text-right">
               Next: Start your 7-day free trial.
             </span>
           </div>
-
         </div>
-
       </div>
     </div>
   );

@@ -104,8 +104,8 @@ export const zeroSkillItemsData: ZeroSkillCardItem[] = [
   },
   {
     id: "and-more",
-    title: "And More...",
-    badge: "And More...",
+    title: "Hundreds of Tools",
+    badge: "Hundreds of Tools",
     image: "/assets/landing-page/createzeroskillsection/And_More.png",
     badgeBg: "bg-teal-500",
     badgeIconLetter: "A",
@@ -338,14 +338,16 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
               </div>
             </div>
 
-            {/* Mobile Row 4: Writing (Left), Research (Middle), And More... (Right) */}
+            {/* Mobile Row 4: Writing (Left), Research (Middle), Hundreds of Tools (Right) */}
+            {/* Mobile Row 4: Writing (Left), Research (Middle), Hundreds of Tools (Right) */}
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <div
                 onClick={handleButtonClick}
                 className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border ${writingItem.borderColor} ${writingItem.glowColor} overflow-hidden rotate-[2deg] cursor-pointer transition-all duration-300 hover:scale-105 hover:rotate-0 shadow-xl`}
               >
-                <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
-                  <span className={`w-2.5 h-2.5 rounded-full ${writingItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>
+                {/* Updated Badge */}
+                <div className="absolute top-1.5 left-1 max-w-[calc(100%-8px)] z-20 flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[7px] sm:text-[8px] font-semibold">
+                  <span className={`w-2 h-2 shrink-0 rounded-full ${writingItem.badgeBg} flex items-center justify-center text-[5px] font-bold`}>
                     {writingItem.badgeIconLetter}
                   </span>
                   <span className="truncate">{writingItem.badge}</span>
@@ -363,8 +365,9 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 onClick={handleButtonClick}
                 className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border ${researchItem.borderColor} ${researchItem.glowColor} overflow-hidden rotate-[1deg] cursor-pointer transition-all duration-300 hover:scale-105 hover:rotate-0 shadow-xl`}
               >
-                <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
-                  <span className={`w-2.5 h-2.5 rounded-full ${researchItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>
+                {/* Updated Badge */}
+                <div className="absolute top-1.5 left-1 max-w-[calc(100%-8px)] z-20 flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[7px] sm:text-[8px] font-semibold">
+                  <span className={`w-2 h-2 shrink-0 rounded-full ${researchItem.badgeBg} flex items-center justify-center text-[5px] font-bold`}>
                     {researchItem.badgeIconLetter}
                   </span>
                   <span className="truncate">{researchItem.badge}</span>
@@ -382,8 +385,9 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
                 onClick={handleButtonClick}
                 className={`group relative h-28 rounded-2xl bg-[#0D1226]/90 border ${moreItem.borderColor} ${moreItem.glowColor} overflow-hidden rotate-[0deg] cursor-pointer transition-all duration-300 hover:scale-105 shadow-xl`}
               >
-                <div className="absolute top-1.5 left-1.5 z-20 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-semibold">
-                  <span className={`w-2.5 h-2.5 rounded-full ${moreItem.badgeBg} flex items-center justify-center text-[6px] font-bold`}>
+                {/* Updated Badge */}
+                <div className="absolute top-1.5 left-1 max-w-[calc(100%-8px)] z-20 flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white text-[7px] sm:text-[8px] font-semibold">
+                  <span className={`w-2 h-2 shrink-0 rounded-full ${moreItem.badgeBg} flex items-center justify-center text-[5px] font-bold`}>
                     {moreItem.badgeIconLetter}
                   </span>
                   <span className="truncate">{moreItem.badge}</span>

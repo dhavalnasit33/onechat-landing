@@ -127,27 +127,56 @@ export default function AuthModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Check for Google Redirect Result on load
+  // Render Google Identity Services (GSI) Button dynamically (Original working method)
   useEffect(() => {
     if (!isOpen) return;
 
-    getRedirectResult(auth)
-      .then(async (result) => {
-        if (result && result.user) {
-          setLoading(true);
-          try {
-            const idToken = await result.user.getIdToken();
-            await handleBackendGoogleLogin(idToken);
-          } catch (err: any) {
-            setErrorMsg(err.message || "Google Authentication failed.");
-            setLoading(false);
+    let timeoutId: NodeJS.Timeout;
+
+    const renderGoogleBtn = () => {
+      const g = (window as any).google;
+      if (typeof window !== "undefined" && g && g.accounts) {
+        try {
+          g.accounts.id.initialize({
+            client_id:
+              "361874907943-e4k2cponbo6g12rpu4ssi9f4iq6uguk2.apps.googleusercontent.com",
+            callback: async (response: any) => {
+              setLoading(true);
+              setErrorMsg(null);
+              try {
+                const idToken = response.credential;
+                await handleBackendGoogleLogin(idToken);
+              } catch (err: any) {
+                setErrorMsg(err.message || "Google Authentication failed.");
+                setLoading(false);
+              }
+            },
+            ux_mode: "popup",
+          });
+
+          const parent = document.getElementById("google-signin-button");
+          if (parent) {
+            parent.innerHTML = "";
+            g.accounts.id.renderButton(parent, {
+              theme: "filled_blue",
+              size: "large",
+              shape: "pill",
+              width: parent.clientWidth || 380,
+            });
           }
+        } catch (e) {
+          console.error("Error rendering GSI button:", e);
         }
-      })
-      .catch((err) => {
-        console.error("Google Redirect Result Error:", err);
-        setErrorMsg("Failed to recover login session from Google.");
-      });
+      } else {
+        timeoutId = setTimeout(renderGoogleBtn, 300);
+      }
+    };
+
+    timeoutId = setTimeout(renderGoogleBtn, 100);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -514,17 +543,12 @@ export default function AuthModal({
           <div className="flex-grow border-t border-[#1d2b52]"></div>
         </div>
 
-        {/* Google Authentication Button */}
-        <button
-          type="button"
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-          className={`relative w-full rounded-xl flex items-center justify-center bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#06b6d4] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_24px_rgba(147,51,234,0.35)] cursor-pointer disabled:opacity-50 ${
-            showEmailForm ? "h-[44px]" : "h-[50px]"
-          }`}
-        >
-          {/* Logo + Text centered */}
-          <div className="flex items-center gap-3">
+        {/* Google Authentication Button - Styled with vibrant gradient & transparent GSI layer */}
+        <div className={`relative w-full rounded-xl flex items-center justify-center bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#06b6d4] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_24px_rgba(147,51,234,0.35)] cursor-pointer overflow-hidden ${
+          showEmailForm ? "h-[44px]" : "h-[50px]"
+        }`}>
+          {/* Visual Layer: Custom Google Button UI (Matching Image 1) */}
+          <div className="flex items-center gap-3 pointer-events-none select-none">
             <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center p-1 shadow-sm shrink-0">
               <svg className="w-full h-full" viewBox="0 0 24 24">
                 <path
@@ -548,9 +572,9 @@ export default function AuthModal({
             <span className="font-bold text-white text-[14.5px]">Continue with Google</span>
           </div>
 
-          {/* Right Arrow pinned to right */}
+          {/* Right Arrow */}
           <svg
-            className="absolute right-4 sm:right-5 w-4 h-4 text-white"
+            className="absolute right-4 sm:right-5 w-4 h-4 text-white pointer-events-none"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -562,7 +586,13 @@ export default function AuthModal({
               d="M14 5l7 7m0 0l-7 7m7-7H3"
             />
           </svg>
-        </button>
+
+          {/* Functional Layer: Native Google GSI button with zero opacity overlay */}
+          <div
+            id="google-signin-button"
+            className="absolute inset-0 w-full h-full opacity-[0.001] cursor-pointer flex items-center justify-center scale-150"
+          ></div>
+        </div>
 
         {/* "or" Divider */}
         <div className={`relative flex items-center w-full ${showEmailForm ? "my-1.5" : "my-2.5"}`}>
