@@ -16,6 +16,8 @@ import {
 } from "../lib/attribution";
 import VideoSliderSection from "./VideoSliderSection";
 import SectionTrialCTA from "./SectionTrialCTA";
+const WhoItsFor = dynamic(() => import("./WhoItsFor"));
+const FeaturesList = dynamic(() => import("./FeaturesList"));
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
 const Footer = dynamic(() => import("./Footer"));
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
@@ -259,6 +261,21 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
+
+
+
+
+
+        {/* // image ganretion section added after oneplace section  */}
+
+
+        <FeaturesList onOpenAuth={() => setAuthOpen(true)} />
+
+
+
+
+
+
         <SectionTrialCTA
           sectionId="after_one_place"
           sectionLabel="One Place Section Divider"
@@ -270,6 +287,10 @@ export default function LandingPageClient() {
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
+
+
+
+        {/* // video ganration section add karva no  */}
 
         <SectionTrialCTA
           sectionId="after_all_the_best"
@@ -301,6 +322,11 @@ export default function LandingPageClient() {
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
+
+
+        {/* add section  */}
+
+        <WhoItsFor />
 
         <FAQAccordion
           onOpenAuth={() => handleOpenAuth("signup")}

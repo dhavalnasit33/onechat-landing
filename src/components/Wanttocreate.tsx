@@ -119,8 +119,8 @@ export default function Wanttocreate({ onOpenAuth, onCTA }: WanttocreateProps) {
           </p>
         </div>
 
-        {/* Cards Grid: 3 columns on mobile, 3 on sm, 4 on md, 6 on lg */}
-        <div className="w-full grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-4 lg:gap-4.5">
+        {/* Cards Grid: 2 columns on mobile, 2 on sm, 3 on md, 3 on lg */}
+        <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-4.5">
           {createItemsData.map((item, index) => (
             <div
               key={index}
