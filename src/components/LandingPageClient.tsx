@@ -261,24 +261,22 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-
-
-
-
-
-        {/* // image ganretion section added after oneplace section  */}
-
-
-        <FeaturesList onOpenAuth={() => setAuthOpen(true)} />
-
-
-
-
-
-
         <SectionTrialCTA
           sectionId="after_one_place"
           sectionLabel="One Place Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <FeaturesList
+          type="image"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_image_generation"
+          sectionLabel="Image Generation Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
@@ -288,13 +286,22 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-
-
-        {/* // video ganration section add karva no  */}
-
         <SectionTrialCTA
           sectionId="after_all_the_best"
           sectionLabel="All The Best AI Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <FeaturesList
+          type="video"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_video_generation"
+          sectionLabel="Video Generation Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
@@ -323,11 +330,14 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-
-        {/* add section  */}
-
         <WhoItsFor />
 
+        <SectionTrialCTA
+          sectionId="One_AI_Super_App"
+          sectionLabel="One AI Super App Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
         <FAQAccordion
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}

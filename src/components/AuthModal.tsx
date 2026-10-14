@@ -753,7 +753,7 @@ export default function AuthModal({
                     placeholder={isLoginTab ? "Enter your password" : "Create a password"}
                     disabled={loading}
                     required
-                    className="bg-transparent text-white placeholder-slate-500 text-[12.5px] w-full outline-none pr-6"
+                    className="email-autofill-fix bg-transparent text-white placeholder-slate-500 text-[12.5px] w-full outline-none pr-6"
                   />
                   <button
                     type="button"

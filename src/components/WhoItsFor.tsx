@@ -10,7 +10,7 @@ interface Audience {
 const audienceData: Audience[] = [
   {
     title: "Content Creators",
-    emoji: "✍️",
+    emoji: "✒️",
     desc: "Write, design, and publish more content in less time — across every platform, every format, every week.",
   },
   {
@@ -87,21 +87,21 @@ const audienceData: Audience[] = [
 
 export default function WhoItsFor() {
   return (
-    <section id="who-its-for" className="w-full py-20 md:py-32 bg-white px-4">
+    <section id="who-its-for" className="w-full py-12 md:py-16 bg-[#050711] px-4">
       <div className="max-w-[1440px] mx-auto">
         {/* Section Header */}
         <div className="text-center flex flex-col items-center">
           <div className="flex items-center gap-3">
             <div className="w-8 h-[2px] bg-brand-purple rounded" />
-            <span className="text-[11px] font-bold text-brand-purple tracking-[1.54px] uppercase font-sans">
+            <span className="text-[11px] font-bold text-brand-purple-light tracking-[1.54px] uppercase font-sans">
               WHO IT'S FOR
             </span>
             <div className="w-8 h-[2px] bg-brand-purple rounded" />
           </div>
 
-          <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-brand-dark tracking-tight leading-tight max-w-[850px]">
+          <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
             <span className=" inline">One AI Super App. {" "}</span>
-            <span className="text-brand-purple">Built for the Way You Work.</span>
+            <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">Built for the Way You Work.</span>
           </h2>
 
           {/* <p className="mt-4 font-sans text-sm sm:text-base text-brand-slate max-w-[600px] leading-relaxed">
@@ -119,7 +119,7 @@ export default function WhoItsFor() {
           {audienceData.map((data, index) => (
             <div
               key={index}
-              className={`flex flex-col items-center p-5 md:p-9 rounded-2xl bg-white border border-brand-border shadow-sm transition-all duration-300 transform hover:-translate-y-1 hover:border-brand-purple hover:shadow-[0_10px_30px_rgba(108,86,229,0.1)] cursor-default select-none text-center ${
+              className={`flex flex-col items-center p-5 md:p-9 rounded-2xl bg-[#0E132D] border border-white/10 shadow-sm transition-all duration-300 transform hover:-translate-y-1 hover:border-brand-purple-light hover:shadow-[0_10px_30px_rgba(108,86,229,0.25)] cursor-default select-none text-center ${
                 index === audienceData.length - 1
                   ? "col-span-2 md:col-span-1 w-full max-w-[calc(50%-6px)] md:max-w-none justify-self-center"
                   : ""
@@ -128,10 +128,10 @@ export default function WhoItsFor() {
               <span className="text-3xl sm:text-4xl md:text-5xl select-none leading-none">
                 {data.emoji}
               </span>
-              <h3 className="mt-4 font-poppins text-sm md:text-base font-bold text-brand-dark tracking-tight">
+              <h3 className="mt-4 font-poppins text-sm md:text-base font-bold text-white tracking-tight">
                 {data.title}
               </h3>
-              <p className="mt-2.5 font-sans text-[11px] sm:text-xs md:text-[13px] text-brand-slate leading-relaxed font-light line-clamp-3 md:line-clamp-none">
+              <p className="mt-2.5 font-sans text-[11px] sm:text-xs md:text-[13px] text-slate-300 leading-relaxed font-light line-clamp-3 md:line-clamp-none">
                 {data.desc}
               </p>
             </div>
