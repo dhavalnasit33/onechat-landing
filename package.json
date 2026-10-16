@@ -9,17 +9,29 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@crayonai/react-ui": "^0.9.16",
+    "@openuidev/lang-core": "^0.3.0",
+    "@openuidev/react-headless": "^0.14.0",
+    "@openuidev/react-lang": "^0.3.0",
+    "@openuidev/react-ui": "^0.14.0",
+    "@openuidev/thesys": "^0.14.0",
+    "@thesysai/genui-sdk": "^0.10.3",
     "firebase": "^12.14.0",
     "lucide-react": "^1.52.0",
     "next": "16.2.9",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.10.1",
+    "remark-gfm": "^4.0.1",
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/recharts": "^1.8.29",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",

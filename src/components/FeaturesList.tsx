@@ -122,15 +122,15 @@ export default function FeaturesList({ onOpenAuth, onCTA, type = "all" }: Featur
             return (
               <div
                 key={feature.section}
-                className={`flex flex-col lg:flex-row items-center gap-8 lg:gap-16 border-b border-white/10 last:border-0 ${isReversed ? "lg:flex-row-reverse" : ""
+                className={`flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 border-b border-white/10 last:border-0 ${isReversed ? "lg:flex-row-reverse" : ""
                   }`}
               >
-                <div className="w-full lg:w-1/2 flex items-center justify-center relative">
+                <div className={`w-full lg:w-1/2 flex items-center relative ${isReversed ? "lg:justify-end" : "lg:justify-start"}`}>
                   <div
                     className={`absolute inset-4 bg-gradient-to-br ${feature.gradientClass} rounded-2xl filter blur-3xl opacity-70 pointer-events-none scale-90`}
                   />
 
-                  <div className="relative z-10 w-full max-w-[550px] lg:max-w-none rounded-xl bg-[#0E0E24] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-8 border-brand-purple">
+                  <div className="relative z-10 w-full max-w-[550px] lg:max-w-[580px] rounded-xl bg-[#0E0E24] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-8 border-brand-purple">
                     <div className="overflow-hidden rounded-[5px] aspect-[16/10] bg-[#030614] flex items-center justify-center">
                       {feature.imagePath ? (
                         <Image
@@ -147,7 +147,7 @@ export default function FeaturesList({ onOpenAuth, onCTA, type = "all" }: Featur
                   </div>
                 </div>
 
-                <div className="w-full lg:w-1/2 flex flex-col justify-center items-start text-left max-w-[550px] lg:max-w-none mx-auto lg:mx-0">
+                <div className={`w-full lg:w-1/2 flex flex-col justify-center items-start text-left max-w-[550px] lg:max-w-[520px] mx-auto ${isReversed ? "lg:mr-auto lg:ml-0" : "lg:ml-auto lg:mr-0"}`}>
                   <h3 className="font-poppins text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight text-left">
                     {feature.title}
                   </h3>
