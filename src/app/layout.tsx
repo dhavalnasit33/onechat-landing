@@ -54,7 +54,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} ${poppins.variable} h-full antialiased`}
+      suppressHydrationWarning
+      /* --- 16-10 START --- */
+      // className={`${plusJakartaSans.variable} ${poppins.variable} h-full antialiased`}
+        className={`${plusJakartaSans.variable} ${poppins.variable} dark h-full antialiased`}
     >
       <head>
         {/* Google Identity Services */}
@@ -129,7 +132,10 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="min-h-full flex flex-col bg-[#050711] text-white font-sans">
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col bg-[#050711] text-white font-sans"
+      >
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

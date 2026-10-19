@@ -7,6 +7,7 @@ import ModelMarquee from "./ModelMarquee";
 import Wanttocreate from "./Wanttocreate";
 import CreateZeroSkillSection from "./Createzeroskillsection";
 import Oneplace from "./Oneplace";
+import AnalyzeSection from "./AnalyzeSection";
 import Allthebest from "./Allthebest";
 import Hastheskillsection from "./Hastheskillsection";
 import TemplatesShowcase from "./TemplatesShowcase";
@@ -268,6 +269,17 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
+<AnalyzeSection 
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_analyze"
+          sectionLabel="Analyze Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
         <FeaturesList
           type="image"
           onOpenAuth={() => handleOpenAuth("signup")}

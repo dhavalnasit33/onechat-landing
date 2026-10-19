@@ -78,3 +78,55 @@ video::-webkit-media-controls-overflow-button {
   transition: background-color 9999s ease-in-out 0s;
 }
 
+/* --- 16-10 START --- */
+/* Force dark theme globally for all Crayon & Thesys GenUI components */
+:root,
+body,
+.dark {
+  color-scheme: dark !important;
+
+  /* Crayon Theme Variables forced to Dark */
+  --crayon-background-fills: #070914 !important;
+  --crayon-container-fills: #0c1020 !important;
+  --crayon-chat-container-bg: #070914 !important;
+  --crayon-chat-assistant-response-bg: #0c1020 !important;
+  --crayon-primary-text: #ffffff !important;
+  --crayon-secondary-text: #94a3b8 !important;
+  --crayon-stroke-default: #242945 !important;
+  --crayon-stroke-interactive-el: #2f3557 !important;
+  --crayon-sunk-fills: #12162a !important;
+  --crayon-interactive-default: #151a30 !important;
+  --crayon-interactive-hover: #1e2442 !important;
+  --crayon-interactive-accent: #6c56e5 !important;
+  --crayon-accent-primary-text: #ffffff !important;
+}
+
+/* Ensure Crayon / Thesys generated cards are always dark */
+.crayon-card,
+.crayon-card-card,
+[class*="crayon-card"] {
+  background-color: #0c1020 !important;
+  border-color: #242945 !important;
+  color: #ffffff !important;
+}
+
+/* Ensure headings and text inside Crayon cards are white/bright */
+.crayon-card h1,
+.crayon-card h2,
+.crayon-card h3,
+.crayon-card h4,
+.crayon-card h5,
+.crayon-card h6,
+.crayon-card p,
+.crayon-card span,
+.crayon-card div,
+.crayon-card-card * {
+  color: inherit;
+}
+
+/* Ensure SVG text/axis in charts are clear and light */
+.crayon-card svg text,
+[data-c1-component] svg text {
+  fill: #94a3b8 !important;
+}
+
