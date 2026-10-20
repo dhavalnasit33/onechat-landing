@@ -228,7 +228,139 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     };
   };
 
-  // Handle Share for a specific section/chart
+
+  /**
+  * Captures the FULL chart (2026-01 → 2026-12), even if part of it is hidden
+  * inside a horizontal scroll container on screen.
+  */
+  const captureFullChart = async (
+    element: HTMLElement,
+    options: { pixelRatio?: number; padding?: number; borderRadius?: string } = {}
+  ): Promise<string> => {
+    const { pixelRatio = 2.5, padding = 24, borderRadius = "16px" } = options;
+    const { toPng } = await import("html-to-image");
+
+    // ---- helper: save/restore inline style of any element ----
+    const restores: Array<() => void> = [];
+    const saveStyle = (el: HTMLElement) => {
+      const prev = el.getAttribute("style");
+      restores.push(() => {
+        if (prev === null) el.removeAttribute("style");
+        else el.setAttribute("style", prev);
+      });
+    };
+
+    // ---- 1. Un-clip every ancestor ----
+    let p: HTMLElement | null = element.parentElement;
+    while (p && p !== document.body) {
+      saveStyle(p);
+      p.style.overflow = "visible";
+      p.style.maxHeight = "none";
+      p = p.parentElement;
+    }
+
+    // ---- 2. Find ALL horizontal scrollers inside the card (by computed style) ----
+    const allEls = Array.from(element.querySelectorAll<HTMLElement>("*"));
+    const scrollers = allEls.filter((el) => {
+      const ox = window.getComputedStyle(el).overflowX;
+      return (
+        (ox === "auto" || ox === "scroll" || ox === "hidden") &&
+        el.scrollWidth > el.clientWidth + 2
+      );
+    });
+
+    let extraWidth = 0;
+    scrollers.forEach((el) => {
+      extraWidth = Math.max(extraWidth, el.scrollWidth - el.clientWidth);
+    });
+
+    scrollers.forEach((el) => {
+      const full = el.scrollWidth;
+      saveStyle(el);
+      el.scrollLeft = 0;
+      el.style.overflow = "visible";
+      el.style.overflowX = "visible";
+      el.style.overflowY = "visible";
+      el.style.width = `${full}px`;
+      el.style.minWidth = `${full}px`;
+      el.style.maxWidth = "none";
+      el.style.flex = "none";
+    });
+
+    // un-clip other chart parts (legend, svg, wrapper)
+    element
+      .querySelectorAll<HTMLElement>(
+        ".recharts-wrapper, .recharts-legend-wrapper, svg, [class*='overflow']"
+      )
+      .forEach((el) => {
+        if (scrollers.includes(el)) return;
+        saveStyle(el);
+        el.style.overflow = "visible";
+      });
+
+    // grow the card itself so the extra width fits inside it
+    saveStyle(element);
+    const baseWidth = element.offsetWidth;
+    const fullCardWidth = baseWidth + extraWidth;
+    element.style.overflow = "visible";
+    element.style.maxWidth = "none";
+    element.style.width = `${fullCardWidth}px`;
+    element.style.minWidth = `${fullCardWidth}px`;
+
+    await new Promise((r) => setTimeout(r, 350)); 
+
+    // ---- 3. Measure TRUE bounds ----
+    const rootRect = element.getBoundingClientRect();
+    let minX = 0,
+      minY = 0;
+    let maxX = Math.max(element.scrollWidth, element.offsetWidth);
+    let maxY = Math.max(element.scrollHeight, element.offsetHeight);
+
+    element.querySelectorAll<Element>("*").forEach((child) => {
+      try {
+        const r = child.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) return;
+        minX = Math.min(minX, r.left - rootRect.left);
+        minY = Math.min(minY, r.top - rootRect.top);
+        maxX = Math.max(maxX, r.right - rootRect.left);
+        maxY = Math.max(maxY, r.bottom - rootRect.top);
+      } catch (_) { }
+    });
+
+    const leftOverflow = Math.abs(Math.min(minX, 0));
+    const topOverflow = Math.abs(Math.min(minY, 0));
+
+    const captureWidth = Math.ceil(maxX + leftOverflow + padding * 2);
+    const captureHeight = Math.ceil(maxY + topOverflow + padding * 2 + 20);
+
+    // ---- 4. Capture ----
+    const restoreSvg = applyBrightSvgStyles(element);
+    try {
+      return await toPng(element, {
+        backgroundColor: "#070914",
+        pixelRatio,
+        cacheBust: true,
+        filter: imageFilter as any,
+        width: captureWidth,
+        height: captureHeight,
+        style: {
+          transform: `translate(${padding + leftOverflow}px, ${padding + topOverflow}px)`,
+          transformOrigin: "top left",
+          width: `${Math.ceil(maxX)}px`,
+          height: `${Math.ceil(maxY)}px`,
+          borderRadius,
+          overflow: "visible",
+          margin: "0",
+          boxSizing: "content-box",
+        },
+      });
+    } finally {
+      restoreSvg();
+      restores.reverse().forEach((fn) => fn()); 
+    }
+  };
+
+  // ---------------- SHARE ----------------
   const handleShare = async (target: ChartItemTarget) => {
     if (sharingId) return;
     try {
@@ -236,20 +368,14 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       let capturedThumbnail: string | null = null;
 
       try {
-        const restoreStyles = applyBrightSvgStyles(target.element);
-        const { toPng } = await import("html-to-image");
-        capturedThumbnail = await toPng(target.element, {
-          backgroundColor: "#070914",
+        capturedThumbnail = await captureFullChart(target.element, {
           pixelRatio: 2,
-          cacheBust: true,
-          filter: imageFilter as any,
-          style: {
-            padding: "16px",
-            borderRadius: "16px",
-          },
+          padding: 24,
+          borderRadius: "16px",
         });
-        restoreStyles();
-      } catch (_) {}
+      } catch (e) {
+        console.error("Thumbnail capture failed:", e);
+      }
 
       const res = await fetch(`${apiBaseUrl}/api/analyze-files/share-item`, {
         method: "POST",
@@ -274,8 +400,34 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
 
       const shareUrl =
         data.shareUrl || `${window.location.origin}/analyze/share/${data.shareId}`;
-      await navigator.clipboard.writeText(shareUrl);
-      setToastMessage(`Share link for "${target.title}" copied to clipboard!`);
+
+      let copied = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          copied = true;
+        } catch (_) { }
+      }
+      if (!copied) {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = shareUrl;
+          ta.style.position = "fixed";
+          ta.style.top = "-9999px";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          copied = true;
+        } catch (_) { }
+      }
+      setToastMessage(
+        copied
+          ? `Share link for "${target.title}" copied to clipboard!`
+          : `Share link generated! Open: ${shareUrl}`
+      );
     } catch (err: any) {
       console.error("Error sharing:", err);
       alert(err.message || "Failed to share. Please try again.");
@@ -284,24 +436,15 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     }
   };
 
-  // Handle Download PNG
+  // ---------------- DOWNLOAD PNG ----------------
   const handleDownloadPNG = async (target: ChartItemTarget) => {
     try {
       setExportingId(target.id);
-      const restoreStyles = applyBrightSvgStyles(target.element);
-      const { toPng } = await import("html-to-image");
-      const dataUrl = await toPng(target.element, {
-        backgroundColor: "#070914",
+      const dataUrl = await captureFullChart(target.element, {
         pixelRatio: 2.5,
-        cacheBust: true,
-        filter: imageFilter as any,
-        style: {
-          padding: "20px",
-          borderRadius: "16px",
-        },
+        padding: 24,
+        borderRadius: "16px",
       });
-      restoreStyles();
-
       const link = document.createElement("a");
       link.download = `${(target.title || "chart").replace(/[^a-zA-Z0-9]/g, "_")}.png`;
       link.href = dataUrl;
@@ -316,30 +459,22 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     }
   };
 
-  // Handle Download PDF
+  // ---------------- DOWNLOAD PDF ----------------
   const handleDownloadPDF = async (target: ChartItemTarget) => {
     try {
       setExportingId(target.id);
-      const restoreStyles = applyBrightSvgStyles(target.element);
-      const { toPng } = await import("html-to-image");
       const { jsPDF } = await import("jspdf");
-
-      const dataUrl = await toPng(target.element, {
-        backgroundColor: "#070914",
+      const dataUrl = await captureFullChart(target.element, {
         pixelRatio: 2.5,
-        cacheBust: true,
-        filter: imageFilter as any,
-        style: {
-          padding: "20px",
-          borderRadius: "16px",
-        },
+        padding: 24,
+        borderRadius: "16px",
       });
-      restoreStyles();
 
       const img = new Image();
       img.src = dataUrl;
-      await new Promise((resolve) => {
+      await new Promise((resolve, reject) => {
         img.onload = resolve;
+        img.onerror = reject;
       });
 
       const pdf = new jsPDF({
@@ -347,7 +482,6 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         unit: "px",
         format: [img.width, img.height],
       });
-
       pdf.addImage(dataUrl, "PNG", 0, 0, img.width, img.height);
       pdf.save(`${(target.title || "chart").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`);
       setToastMessage(`"${target.title}" downloaded as PDF!`);
@@ -360,24 +494,16 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     }
   };
 
-
-  // Handle Download PPT (PowerPoint presentation)
+  // ---------------- DOWNLOAD PPT ----------------
   const handleDownloadPPT = async (target: ChartItemTarget) => {
     try {
       setExportingId(target.id);
-      const restoreStyles = applyBrightSvgStyles(target.element);
-      const { toPng } = await import("html-to-image");
-      const capturedImage = await toPng(target.element, {
-        backgroundColor: "#070914",
+
+      const capturedImage = await captureFullChart(target.element, {
         pixelRatio: 2,
-        cacheBust: true,
-        filter: imageFilter as any,
-        style: {
-          padding: "16px",
-          borderRadius: "16px",
-        },
+        padding: 24,
+        borderRadius: "16px",
       });
-      restoreStyles();
 
       const res = await fetch(`${apiBaseUrl}/api/analyze-files/export-ppt`, {
         method: "POST",
@@ -387,7 +513,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         },
         body: JSON.stringify({
           title: target.title || "AI Generated Analysis",
-          description: "", // Pass empty description so the captured visual card is displayed centered and large without overflowing text
+          description: "",
           imageUrl: capturedImage,
         }),
       });
@@ -414,6 +540,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       setActiveDropdownId(null);
     }
   };
+
 
   return (
     <div className="w-full min-w-0 max-w-full space-y-3 relative">
@@ -468,7 +595,6 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
 
                   <div className={"h-3 sm:h-3.5 w-px bg-[#292D49] shrink-0"} />
 
-                  {/* Download Button + Responsive Dropdown */}
                   <div className={"relative"}>
                     <button
                       type="button"
@@ -515,7 +641,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                     )}
                   </div>
                 </div>
-              , target.element);
+                , target.element);
             })}
 
           {isStreaming && (

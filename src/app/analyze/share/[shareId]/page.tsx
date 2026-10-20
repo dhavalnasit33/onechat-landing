@@ -100,29 +100,181 @@ export default function SharedReportPage() {
     };
   }, [shareId]);
 
+  // Copy link to clipboard with fallback for HTTP/permission denied errors
   const handleCopyLink = () => {
-    if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    // Try modern clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      }).catch(() => {
+        // Fallback: create a temporary textarea and use execCommand
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = url;
+          ta.style.position = "fixed";
+          ta.style.top = "-9999px";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2500);
+        } catch (_) {
+          alert("Could not copy link. Please copy it manually from the address bar.");
+        }
+      });
+    } else {
+      // No clipboard API — use execCommand directly
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.style.position = "fixed";
+        ta.style.top = "-9999px";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      } catch (_) {
+        alert("Could not copy link. Please copy it manually from the address bar.");
+      }
     }
+  };
+
+  // Imperatively force overflow:visible on ALL SVG / recharts elements after render.
+  // This is the only reliable way to prevent Recharts Y-axis labels being clipped —
+  // CSS stylesheets can be overridden by the Thesys SDK, but inline styles win.
+  useEffect(() => {
+    if (!item || !reportContainerRef.current) return;
+    const el = reportContainerRef.current;
+
+    const fixSvgOverflow = () => {
+      if (!el) return;
+      // Force overflow on SVG elements
+      el.querySelectorAll<SVGElement>("svg, .recharts-wrapper, .recharts-surface").forEach((svgEl) => {
+        (svgEl as unknown as HTMLElement).style.overflow = "visible";
+      });
+      // Also fix the recharts-wrapper divs
+      el.querySelectorAll<HTMLElement>(".recharts-wrapper").forEach((wrapper) => {
+        wrapper.style.overflow = "visible";
+      });
+    };
+
+    // Run at multiple intervals to catch delayed renders from the dynamic C1Component
+    const t1 = setTimeout(fixSvgOverflow, 300);
+    const t2 = setTimeout(fixSvgOverflow, 800);
+    const t3 = setTimeout(fixSvgOverflow, 2000);
+    const t4 = setTimeout(fixSvgOverflow, 4000);
+
+    // Also watch for DOM mutations (chart re-renders, streaming updates)
+    const observer = new MutationObserver(fixSvgOverflow);
+    observer.observe(el, { childList: true, subtree: true, attributes: true });
+
+    return () => {
+      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
+      observer.disconnect();
+    };
+  }, [item]);
+
+  // Captures the FULL element — handles horizontally/vertically overflowing content
+  // so no text or chart data is ever cut off in the download.
+  const captureFullElement = async (
+    element: HTMLElement,
+    bgColor = "#070914"
+  ): Promise<string> => {
+    const { toPng } = await import("html-to-image");
+
+    // --- Compute true full width from SVGs + scrollWidth ---
+    let trueFullWidth = Math.max(element.scrollWidth, element.offsetWidth);
+    const svgs = Array.from(element.querySelectorAll("svg.recharts-surface, svg")) as SVGSVGElement[];
+    svgs.forEach((svg) => {
+      const vb = svg.viewBox?.baseVal;
+      if (vb && vb.width > trueFullWidth) trueFullWidth = vb.width;
+      const wAttr = parseFloat(svg.getAttribute("width") || "0");
+      if (wAttr > trueFullWidth) trueFullWidth = wAttr;
+      try { const bb = svg.getBBox(); if (bb.width > trueFullWidth) trueFullWidth = bb.width; } catch (_) {}
+    });
+    const captureWidth = trueFullWidth + 60; // extra left+right buffer for Y-axis labels
+
+    // --- Compute true full height from all descendants ---
+    let trueFullHeight = Math.max(element.scrollHeight, element.offsetHeight);
+    const elemRect = element.getBoundingClientRect();
+    Array.from(element.querySelectorAll("*")).forEach((child) => {
+      try {
+        const rect = (child as HTMLElement).getBoundingClientRect();
+        const childBottom = rect.bottom - elemRect.top;
+        if (childBottom > trueFullHeight) trueFullHeight = childBottom;
+      } catch (_) {}
+    });
+    const captureHeight = trueFullHeight + 40; // bottom buffer so last line is never clipped
+
+    // --- Remove overflow clipping from all ancestors ---
+    const restores: Array<() => void> = [];
+    let node: HTMLElement | null = element.parentElement;
+    while (node && node !== document.body) {
+      const cs = window.getComputedStyle(node);
+      if (cs.overflow !== "visible" || cs.overflowX !== "visible" || cs.overflowY !== "visible") {
+        const pOv = node.style.overflow, pOvX = node.style.overflowX, pOvY = node.style.overflowY;
+        node.style.overflow = "visible"; node.style.overflowX = "visible"; node.style.overflowY = "visible";
+        const captured = node;
+        restores.push(() => { captured.style.overflow = pOv; captured.style.overflowX = pOvX; captured.style.overflowY = pOvY; });
+      }
+      node = node.parentElement;
+    }
+
+    // --- Force element to full size ---
+    const prev = { w: element.style.width, mw: element.style.minWidth, h: element.style.height, mh: element.style.minHeight, ov: element.style.overflow, ovx: element.style.overflowX, ovy: element.style.overflowY };
+    element.style.width = `${captureWidth}px`; element.style.minWidth = `${captureWidth}px`;
+    element.style.height = `${captureHeight}px`; element.style.minHeight = `${captureHeight}px`;
+    element.style.overflow = "visible"; element.style.overflowX = "visible"; element.style.overflowY = "visible";
+
+    // Brighten SVG text for the screenshot
+    const textNodes = element.querySelectorAll("text, tspan, .recharts-cartesian-axis-tick text, .recharts-text");
+    const svgRestores: { el: SVGTextElement; fill: string; styleFill: string; opacity: string }[] = [];
+    textNodes.forEach((t) => {
+      const el = t as SVGTextElement;
+      svgRestores.push({ el, fill: el.getAttribute("fill") || "", styleFill: el.style.fill || "", opacity: el.style.opacity || "" });
+      el.setAttribute("fill", "#F8FAFC"); el.style.fill = "#F8FAFC"; el.style.opacity = "1";
+    });
+
+    await new Promise((r) => setTimeout(r, 80));
+
+    let dataUrl: string;
+    try {
+      dataUrl = await toPng(element, {
+        backgroundColor: bgColor,
+        pixelRatio: 2.5,
+        cacheBust: true,
+        width: captureWidth,
+        height: captureHeight,
+        style: { padding: "24px", borderRadius: "16px", overflow: "visible", overflowY: "visible", boxSizing: "border-box" },
+      });
+    } finally {
+      svgRestores.forEach(({ el, fill, styleFill, opacity }) => {
+        if (fill) el.setAttribute("fill", fill); else el.removeAttribute("fill");
+        el.style.fill = styleFill; el.style.opacity = opacity;
+      });
+      element.style.width = prev.w; element.style.minWidth = prev.mw;
+      element.style.height = prev.h; element.style.minHeight = prev.mh;
+      element.style.overflow = prev.ov; element.style.overflowX = prev.ovx; element.style.overflowY = prev.ovy;
+      restores.forEach((fn) => fn());
+    }
+    return dataUrl!;
   };
 
   const handleDownloadPNG = async () => {
     if (!reportContainerRef.current) return;
     try {
       setDownloadingType("png");
-      const { toPng } = await import("html-to-image");
-      const dataUrl = await toPng(reportContainerRef.current, {
-        backgroundColor: "#0E1222",
-        pixelRatio: 2.5,
-        cacheBust: true,
-        style: {
-          padding: "16px",
-          borderRadius: "16px",
-        },
-      });
-
+      const dataUrl = await captureFullElement(reportContainerRef.current, "#070914");
       const link = document.createElement("a");
       link.download = `${(item?.title || "analysis-report").replace(/[^a-zA-Z0-9]/g, "_")}.png`;
       link.href = dataUrl;
@@ -140,27 +292,18 @@ export default function SharedReportPage() {
     if (!reportContainerRef.current) return;
     try {
       setDownloadingType("pdf");
-      const { toPng } = await import("html-to-image");
       const { jsPDF } = await import("jspdf");
-
-      const dataUrl = await toPng(reportContainerRef.current, {
-        backgroundColor: "#070914",
-        pixelRatio: 2,
-        cacheBust: true,
-      });
+      const dataUrl = await captureFullElement(reportContainerRef.current, "#070914");
 
       const img = new Image();
       img.src = dataUrl;
-      await new Promise((resolve) => {
-        img.onload = resolve;
-      });
+      await new Promise((resolve) => { img.onload = resolve; });
 
       const pdf = new jsPDF({
         orientation: img.width > img.height ? "landscape" : "portrait",
         unit: "px",
         format: [img.width, img.height],
       });
-
       pdf.addImage(dataUrl, "PNG", 0, 0, img.width, img.height);
       pdf.save(`${(item?.title || "analysis-report").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`);
     } catch (err) {
@@ -372,33 +515,55 @@ export default function SharedReportPage() {
             </div>
 
             {/* Thesys C1 Interactive Container */}
+            {/* Outer wrapper: scrolls horizontally if chart is wider than viewport */}
             <div
-              ref={reportContainerRef}
-              className="rounded-2xl border border-[#1E223D] bg-[#070914] p-4 sm:p-6 shadow-2xl relative"
+              style={{ overflowX: "auto", overflowY: "visible", borderRadius: "16px", border: "1px solid #1E223D", background: "#070914", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)" }}
             >
-              
-                <div
-                  suppressHydrationWarning
-                  className="dark space-y-4"
-                  style={{
-                    colorScheme: "dark",
-                    backgroundColor: "#070914",
-                    color: "#F8FAFC",
-                  }}
-                >
-                  {item.imageUrl ? (
-                    <div className="flex flex-col items-center">
-                      <img
-                        src={item.imageUrl}
-                        alt={item.title}
-                        className="rounded-xl max-w-full shadow-2xl border border-[#292D49]"
-                      />
-                    </div>
-                  ) : (
-                    <C1Component c1Response={item.c1Content} isStreaming={false} />
-                  )}
-                </div>
-              
+              {/*
+                Inner div has minWidth:900px so Recharts renders ALL months (Jan-Dec).
+                paddingLeft:60px gives the Y-axis labels (e.g. "2.2K") room on the left
+                so they are never clipped.
+              */}
+              <div
+                ref={reportContainerRef}
+                suppressHydrationWarning
+                className="dark space-y-4"
+                style={{
+                  colorScheme: "dark",
+                  backgroundColor: "#070914",
+                  color: "#F8FAFC",
+                  minWidth: "900px",
+                  paddingTop: "24px",
+                  paddingBottom: "32px",
+                  paddingLeft: "64px",
+                  paddingRight: "24px",
+                  /* SVG overflow fix: Recharts Y-axis text renders at negative x — must be visible */
+                  position: "relative",
+                }}
+              >
+                {/* Global style: force Recharts SVG elements to overflow:visible so axis labels are never clipped */}
+                <style>{`
+                  .recharts-wrapper, .recharts-wrapper svg, .recharts-surface {
+                    overflow: visible !important;
+                  }
+                  .recharts-cartesian-axis-tick text,
+                  .recharts-text,
+                  text {
+                    overflow: visible !important;
+                  }
+                `}</style>
+                {item.imageUrl ? (
+                  <div className="flex flex-col items-center">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="rounded-xl max-w-full shadow-2xl border border-[#292D49]"
+                    />
+                  </div>
+                ) : (
+                  <C1Component c1Response={item.c1Content} isStreaming={false} />
+                )}
+              </div>
             </div>
 
             {/* Footer Attribution Banner */}

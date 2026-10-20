@@ -146,7 +146,7 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
         {/* Video Card */}
         <div className="mt-12 sm:mt-16 md:mt-20 px-2 sm:px-6">
           <div className="relative w-full max-w-[1200px] mx-auto rounded-2xl md:rounded-3xl border border-white/20 shadow-[0_0_60px_rgba(108,86,229,0.35)] bg-[#0A0D1D]/80 backdrop-blur-sm p-1 sm:p-2">
-            <div className="overflow-hidden rounded-xl md:rounded-2xl aspect-[16/10] bg-[#0E1120]">
+            <div className="overflow-hidden rounded-xl md:rounded-2xl aspect-video bg-black">
               <video
                 ref={videoRef}
                 onClick={handleVideoClick}
@@ -160,7 +160,7 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
                 controlsList="nodownload noremoteplayback noplaybackrate"
                 disablePictureInPicture
                 disableRemotePlayback
-                className="w-full h-full object-cover cursor-pointer"
+                className="w-full h-full object-contain cursor-pointer"
               />
             </div>
           </div>
