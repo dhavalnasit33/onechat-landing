@@ -5,7 +5,7 @@ import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution"
 import { ArrowRight } from "lucide-react";
 
 const heroSectionVideo =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.onechatai.ai/uploads/Hero_section.mp4";
+  process.env.NEXT_PUBLIC_CDN_BASE_URL || "https://api.onechatai.ai";
 
 interface HeroProps {
   onOpenAuth?: () => void;
@@ -49,7 +49,7 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
 
     // Defer video loading to prioritize critical assets
     const videoTimer = setTimeout(() => {
-      setVideoSrc(heroSectionVideo || "");
+     setVideoSrc(`${heroSectionVideo}/uploads/Hero_section.mp4` || "");
     }, 1000);
 
     return () => {
