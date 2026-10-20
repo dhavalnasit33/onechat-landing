@@ -46,7 +46,8 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
 
     // Defer video loading to prioritize critical assets
     const videoTimer = setTimeout(() => {
-      setVideoSrc("/assets/landing-page/see-it-in-actions.mp4");
+      // setVideoSrc("/assets/landing-page/see-it-in-actions.mp4");
+      setVideoSrc("/assets/landing-page/Hero_section.mp4");
     }, 1000);
 
     return () => {

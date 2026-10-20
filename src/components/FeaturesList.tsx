@@ -83,7 +83,8 @@ const featuresData: Feature[] = [
       "Edit and enhance images — remove backgrounds, upscale resolution, and retouch with AI",
       "Design graphics — make logos, social posts, thumbnails, and ads in seconds",
     ],
-    videoPath: "/assets/landing-page/image-generation-section-5.mp4",
+    // videoPath: "/assets/landing-page/image-generation-section-5.mp4",
+    imagePath: "/assets/landing-page/image_generation.png",
     gradientClass: "from-[#EC4899]/30 to-[#8B5CF6]/30",
   },
   {

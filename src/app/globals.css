@@ -130,3 +130,29 @@ body,
   fill: #94a3b8 !important;
 }
 
+/* Thesys C1 Carousel and Slide Deck Overlap Fix */
+.dark [class*='carousel'], 
+.dark [class*='Carousel'], 
+.dark [class*='slider'] {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #292D49 transparent;
+}
+
+.dark [class*='carousel'] > div, 
+.dark [class*='Carousel'] > div {
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix overlapping slides */
+div:has(> button[aria-label*='previous' i], > button[aria-label*='next' i]) {
+  overflow: hidden !important;
+}
+
+/* Allow clean horizontal scrolling for multiple slides */
+div[class*='recharts-responsive-container'] {
+  min-width: 240px !important;
+}

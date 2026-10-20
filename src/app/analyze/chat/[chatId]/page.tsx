@@ -30,10 +30,9 @@ import {
   AlertTriangle,
   FileCode,
 } from "lucide-react";
-import "@crayonai/react-ui/styles/index.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import { ThemeProvider } from "@crayonai/react-ui";
+import { C1MessageItem } from "@/components/C1MessageItem";
 
 // 1. Dynamically import react-pdf components to prevent SSR 'document is not defined' errors
 const Document = dynamic(
@@ -1399,35 +1398,18 @@ export default function AnalyzeChatNextPage() {
                                 </div>
                               </div>
                             ) : message.content.trim().length > 0 ? (
-                              <ThemeProvider mode="dark">
-                                <div
-                                  suppressHydrationWarning
-                                  className="dark space-y-3"
-                                  style={{
-                                    colorScheme: "dark",
-                                    backgroundColor: "#070914",
-                                    color: "#F8FAFC",
-                                  }}
-                                >
-                                  <C1Component
-                                    c1Response={message.content}
-                                    isStreaming={customChatLoading}
-                                  />
-
-                                  {customChatLoading &&
-                                    customChatMessages[
-                                      customChatMessages.length - 1
-                                    ]?.id === message.id && (
-                                      <div className="flex w-fit items-center gap-2.5 rounded-full border border-[#292D49] bg-[#121424]/90 px-3.5 py-1.5 text-xs text-[#A78BFA] shadow-lg animate-pulse">
-                                        <Loader2 className="w-3.5 h-3.5 animate-spin text-[#6C56E5]" />
-                                        <span>
-                                          OneChat AI is generating insights &
-                                          charts...
-                                        </span>
-                                      </div>
-                                    )}
-                                </div>
-                              </ThemeProvider>
+                              <C1MessageItem
+                                message={message}
+                                chatId={chatId as string}
+                                isStreaming={
+                                  customChatLoading &&
+                                  customChatMessages[
+                                    customChatMessages.length - 1
+                                  ]?.id === message.id
+                                }
+                                apiBaseUrl={getApiServerBase()}
+                                authToken={getAuthToken()}
+                              />
                             ) : customChatLoading ? (
                               <div className="flex w-fit items-center gap-3 rounded-full border border-[#292D49] bg-[#121424] px-4 py-2.5 text-sm text-[#A78BFA]">
                                 <Loader2 className="h-4 w-4 animate-spin text-[#6C56E5]" />

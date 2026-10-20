@@ -17,6 +17,7 @@ import {
 } from "../lib/attribution";
 import VideoSliderSection from "./VideoSliderSection";
 import SectionTrialCTA from "./SectionTrialCTA";
+import AccessEveryMajorSection from "./Access_Every_major_section";
 const WhoItsFor = dynamic(() => import("./WhoItsFor"));
 const FeaturesList = dynamic(() => import("./FeaturesList"));
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
@@ -236,14 +237,13 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-        <Wanttocreate
-          onOpenAuth={() => handleOpenAuth("signup")}
-          onCTA={handleCTA}
-        />
+
+
+        <AccessEveryMajorSection />
 
         <SectionTrialCTA
-          sectionId="after_want_to_create"
-          sectionLabel="What Do You Want to Create Section Divider"
+          sectionId="after_access_every_model"
+          sectionLabel="Access Every Model Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
@@ -269,7 +269,7 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-<AnalyzeSection 
+        <AnalyzeSection
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
@@ -350,6 +350,19 @@ export default function LandingPageClient() {
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
+
+        <Wanttocreate
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_want_to_create"
+          sectionLabel="What Do You Want to Create Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
         <FAQAccordion
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
