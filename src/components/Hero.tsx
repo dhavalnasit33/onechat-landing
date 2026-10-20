@@ -5,7 +5,7 @@ import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution"
 import { ArrowRight } from "lucide-react";
 
 const heroSectionVideo =
-  process.env.NEXT_PUBLIC_HERO_SECTION_VIDEO_URL;
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.onechatai.ai/uploads/Hero_section.mp4";
 
 interface HeroProps {
   onOpenAuth?: () => void;
