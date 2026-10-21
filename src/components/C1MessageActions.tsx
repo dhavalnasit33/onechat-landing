@@ -81,21 +81,18 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
     if (typeof window === "undefined") return false;
 
     // 1. Explicit HTML/Body class override
+    if (document.documentElement.classList.contains("dark") && !document.documentElement.classList.contains("light")) {
+      return false;
+    }
     if (document.documentElement.classList.contains("light") || document.body.classList.contains("light")) {
       return true;
-    }
-    if (document.documentElement.classList.contains("dark") && !document.documentElement.classList.contains("light")) {
-      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const systemPrefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-      if (systemPrefersDark) return false;
-      if (systemPrefersLight) return true;
     }
 
     if (element) {
       let curr: HTMLElement | null = element;
       while (curr && curr !== document.body) {
-        if (curr.classList.contains("light")) return true;
         if (curr.classList.contains("dark")) return false;
+        if (curr.classList.contains("light")) return true;
         curr = curr.parentElement;
       }
       const bg = window.getComputedStyle(element).backgroundColor;
@@ -103,14 +100,21 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
         const rgb = bg.match(/\d+/g);
         if (rgb && rgb.length >= 3) {
           const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
-          return brightness > 128;
+          if (brightness < 80) return false;
+          if (brightness > 140) return true;
         }
       }
     }
 
-    if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-      return true;
+    if (typeof window.matchMedia === "function") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return false;
+      }
+      if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+        return true;
+      }
     }
+
     return false;
   };
 

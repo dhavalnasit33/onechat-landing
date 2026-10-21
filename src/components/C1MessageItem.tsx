@@ -215,18 +215,12 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     if (typeof window === "undefined") return false;
 
     // 1. Explicit HTML/Body class override
+    // If the document has 'dark' and not 'light', the app is in dark theme!
+    if (document.documentElement.classList.contains("dark") && !document.documentElement.classList.contains("light")) {
+      return false;
+    }
     if (document.documentElement.classList.contains("light") || document.body.classList.contains("light")) {
       return true;
-    }
-    if (document.documentElement.classList.contains("dark") && !document.documentElement.classList.contains("light")) {
-      // Check if computer setting is explicitly light or dark
-      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const systemPrefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-
-      // If computer/OS setting changed to dark, it's dark
-      if (systemPrefersDark) return false;
-      // If computer/OS setting changed to light, it's light
-      if (systemPrefersLight) return true;
     }
 
     // 2. Direct inspect element and its surroundings for computed colors
@@ -234,8 +228,8 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     if (target) {
       let curr: HTMLElement | null = target;
       while (curr && curr !== document.body) {
-        if (curr.classList.contains("light")) return true;
         if (curr.classList.contains("dark")) return false;
+        if (curr.classList.contains("light")) return true;
 
         const bg = window.getComputedStyle(curr).backgroundColor;
         if (bg && bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)") {
@@ -243,8 +237,8 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
           if (rgb && rgb.length >= 3) {
             const r = parseInt(rgb[0]), g = parseInt(rgb[1]), b = parseInt(rgb[2]);
             const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            if (brightness < 80) return false; // Dark background detected!
             if (brightness > 140) return true; // Light background detected!
-            if (brightness < 70) return false; // Dark background detected!
           }
         }
         curr = curr.parentElement;
@@ -260,17 +254,24 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
           if (rgb && rgb.length >= 3) {
             const r = parseInt(rgb[0]), g = parseInt(rgb[1]), b = parseInt(rgb[2]);
             const textBrightness = (r * 299 + g * 587 + b * 114) / 1000;
-            if (textBrightness < 120) return true; // Dark text = Light theme!
-            if (textBrightness > 200) return false; // Light text = Dark theme!
+            if (textBrightness > 190) return false; // Light text = Dark theme!
+            if (textBrightness < 90) return true; // Dark text = Light theme!
           }
         }
       }
     }
 
-    // 3. Fallback to OS/Computer theme preference
-    if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-      return true;
+    // 3. Check system/computer theme preference
+    if (typeof window.matchMedia === "function") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return false;
+      }
+      if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+        return true;
+      }
     }
+
+    // Default to dark theme for OneChat AI
     return false;
   };
 

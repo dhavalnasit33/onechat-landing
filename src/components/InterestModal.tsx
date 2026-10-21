@@ -374,11 +374,11 @@ export default function InterestModal({
                   </div>
 
                   {/* Title & Description Texts */}
-                  <div className="flex flex-col min-w-0 pr-1 sm:pr-2">
+                 <div className="flex flex-col min-w-0 pr-1 sm:pr-2">
                     <span className="font-semibold text-[#F4F6FF] text-[13px] sm:text-[15px] truncate">
                       {option.label}
                     </span>
-                    <span className="text-[#9AA3BF] text-[10px] sm:text-[12px] line-clamp-1 leading-snug mt-0.5">
+                    <span className="text-[#9AA3BF] text-[10px] sm:text-[12px] line-clamp-2 leading-snug mt-0.5">
                       {option.desc}
                     </span>
                   </div>
