@@ -1,15 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import {
   ArrowRight,
   BarChart2,
   FileText,
   LayoutGrid,
-  PieChart,
-  Zap,
-  Image as ImageIcon,
-  FileSearch,
-  MessageSquareText,
+  PieChart, 
 } from "lucide-react";
 import {
   RegistrationCTAInput,
@@ -21,41 +16,8 @@ interface AnalyzeSectionProps {
   onCTA?: (attribution: RegistrationCTAInput) => void;
 }
 
-type TabId = "charts" | "reports" | "cards" | "dashboards";
+const imageSrc="/assets/landing-page/File_Data_Section.png"
 
-interface TabConfig {
-  id: TabId;
-  label: string;
-  icon: React.ElementType;
-  imageSrc: string;
-}
-
-const TABS: TabConfig[] = [
-  {
-    id: "charts",
-    label: "Charts",
-    icon: BarChart2,
-    imageSrc: "/assets/landing-page/Charts.png",
-  },
-  {
-    id: "reports",
-    label: "Reports",
-    icon: FileText,
-    imageSrc: "/assets/landing-page/Reports.png",
-  },
-  {
-    id: "cards",
-    label: "Cards",
-    icon: LayoutGrid,
-    imageSrc: "/assets/landing-page/Cards.png",
-  },
-  {
-    id: "dashboards",
-    label: "Dashboards",
-    icon: PieChart,
-    imageSrc: "/assets/landing-page/Dashboard.png",
-  },
-];
 
 const FEATURES = [
   {
@@ -88,18 +50,6 @@ export default function AnalyzeSection({
   onOpenAuth,
   onCTA,
 }: AnalyzeSectionProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("charts");
-
-  const activeImage =
-    TABS.find((t) => t.id === activeTab)?.imageSrc || TABS[0].imageSrc;
-
-  // Preload all tab preview images on mount so tab switching is instantaneous
-  useEffect(() => {
-    TABS.forEach((tab) => {
-      const img = new Image();
-      img.src = tab.imageSrc;
-    });
-  }, []);
 
   const handleCTAClick = () => {
     const attribution: RegistrationCTAInput = {
@@ -152,51 +102,16 @@ export default function AnalyzeSection({
           </p>
         </div>
 
-        {/* Interactive Tabs */}
-        <div className="flex w-full sm:w-auto max-w-full bg-[#0C1126]/90 border border-white/10 rounded-full p-1 sm:p-1.5 mb-6 sm:mb-8 overflow-x-auto no-scrollbar items-center justify-start sm:justify-center gap-1 shadow-inner">
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                aria-pressed={isActive}
-                className={`cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap outline-none flex-1 sm:flex-none ${
-                  isActive
-                    ? "bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-[0_0_20px_rgba(139,92,246,0.5)] border border-indigo-400/30"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <Icon
-                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-colors ${
-                    isActive ? "text-white" : "text-slate-400"
-                  }`}
-                />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
+      
         {/* Dynamic Image Display Container */}
         <div className="w-full relative rounded-2xl sm:rounded-3xl bg-[#0E0E24] border border-indigo-500/25 p-2 sm:p-4 md:p-6 mb-8 sm:mb-10 shadow-[0_0_80px_rgba(59,130,246,0.18)] backdrop-blur-2xl">
           <div className="relative w-full aspect-[1760/894] bg-[#090C1A] rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center">
-            {TABS.map((tab) => (
               <img
-                key={tab.id}
-                src={tab.imageSrc}
-                alt={`${tab.label} preview`}
+                src={imageSrc}
+                alt="preview"
                 loading="eager"
-                className={`w-full h-full object-contain transition-opacity duration-300 ease-in-out ${
-                  activeTab === tab.id
-                    ? "opacity-100 relative z-10"
-                    : "opacity-0 absolute inset-0 pointer-events-none"
-                }`}
+                className={"w-full h-full object-contain transition-opacity duration-300 ease-in-out opacity-100 relative z-10"}
               />
-            ))}
           </div>
         </div>
 

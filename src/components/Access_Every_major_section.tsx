@@ -1,8 +1,9 @@
 export default function AccessEveryMajorSection() {
     return (
         <section className="w-full bg-[#050713] py-16 sm:py-20 lg:py-24">
-            <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-10 px-5 sm:px-8 lg:grid-cols-2 lg:gap-16 xl:gap-20">
-                <div className="relative aspect-[16/10] overflow-hidden rounded-[18px] bg-gradient-to-r from-[#007BFF] via-[#713BFF] to-[#E54BFF] p-[1px]">
+            <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1.5fr_1fr] lg:gap-12 xl:gap-16">
+                {/* <div className="relative aspect-[16/10] overflow-hidden rounded-[18px] bg-gradient-to-r from-[#007BFF] via-[#713BFF] to-[#E54BFF] p-[1px] "> */}
+                <div className="relative aspect-[16/10] overflow-hidden rounded-[18px] bg-gradient-to-r from-[#007BFF] via-[#713BFF] to-[#E54BFF] p-[1px] h-auto lg:h-[450px]">
                     <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[17px] bg-[#030614]">
                         <img
                             src="assets/landing-page/Access_Every_major_section.png"

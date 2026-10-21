@@ -3,21 +3,23 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Navbar from "./Navbar";
 import Hero from "./Hero";
-import ModelMarquee from "./ModelMarquee";
 import Wanttocreate from "./Wanttocreate";
-import CreateZeroSkillSection from "./Createzeroskillsection";
-import Oneplace from "./Oneplace";
-import AnalyzeSection from "./AnalyzeSection";
-import Allthebest from "./Allthebest";
-import Hastheskillsection from "./Hastheskillsection";
-import TemplatesShowcase from "./TemplatesShowcase";
 import {
   handleRegistrationCTA,
   RegistrationCTAInput,
 } from "../lib/attribution";
-import VideoSliderSection from "./VideoSliderSection";
 import SectionTrialCTA from "./SectionTrialCTA";
 import AccessEveryMajorSection from "./Access_Every_major_section";
+
+const CreateZeroSkillSection = dynamic(() => import("./Createzeroskillsection"));
+const ViralAiVideoSection = dynamic(() => import("./Viral_Ai_video_section"));
+const ModelMarquee = dynamic(() => import("./ModelMarquee"));
+const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
+const Oneplace = dynamic(() => import("./Oneplace"));
+const AnalyzeSection = dynamic(() => import("./AnalyzeSection"));
+const Hastheskillsection = dynamic(() => import("./Hastheskillsection"));
+const TemplatesShowcase = dynamic(() => import("./TemplatesShowcase"));
+const Allthebest = dynamic(() => import("./Allthebest"));
 const WhoItsFor = dynamic(() => import("./WhoItsFor"));
 const FeaturesList = dynamic(() => import("./FeaturesList"));
 const FAQAccordion = dynamic(() => import("./FAQAccordion"));
@@ -216,6 +218,15 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
+        <AccessEveryMajorSection />
+
+        <SectionTrialCTA
+          sectionId="after_access_every_model"
+          sectionLabel="Access Every Model Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
         <CreateZeroSkillSection
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
@@ -228,22 +239,20 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
+        <ViralAiVideoSection />
+
+        <SectionTrialCTA
+          sectionId="after_viral_video"
+          sectionLabel="Viral Video Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
         <ModelMarquee />
 
         <SectionTrialCTA
           sectionId="after_marquee"
           sectionLabel="Model Marquee Section Divider"
-          onOpenAuth={() => handleOpenAuth("signup")}
-          onCTA={handleCTA}
-        />
-
-
-
-        <AccessEveryMajorSection />
-
-        <SectionTrialCTA
-          sectionId="after_access_every_model"
-          sectionLabel="Access Every Model Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
