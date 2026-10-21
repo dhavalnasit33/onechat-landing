@@ -1,9 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { auth, googleProvider } from "../lib/firebase";
-import { getRedirectResult, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import {
+  getRedirectResult,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import apiService from "../lib/apiService";
-import { getRegistrationAttribution, clearRegistrationAttribution } from "../lib/attribution";
+import {
+  getRegistrationAttribution,
+  clearRegistrationAttribution,
+} from "../lib/attribution";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -42,33 +49,61 @@ interface UserResponse {
 
 const INTEREST_ICON_MAP: Record<string, string> = {
   "AI Chat": "/assets/landing-page/intrest_select/ai_chat_icon.png",
-  "Image Generation": "/assets/landing-page/intrest_select/image_genration_icon.png",
+  "Image Generation":
+    "/assets/landing-page/intrest_select/image_genration_icon.png",
+  "AI Image Generation":
+    "/assets/landing-page/intrest_select/image_genration_icon.png",
   "AI Images": "/assets/landing-page/intrest_select/image_genration_icon.png",
-  "Video Generation": "/assets/landing-page/intrest_select/video_genration_icon.png",
+  "Video Generation":
+    "/assets/landing-page/intrest_select/video_genration_icon.png",
+  "AI Video Generation":
+    "/assets/landing-page/intrest_select/video_genration_icon.png",
   "AI Video": "/assets/landing-page/intrest_select/video_genration_icon.png",
-  "Compare AI Models": "/assets/landing-page/intrest_select/compare_ai_model_icon.png",
-  "Writing & Content": "/assets/landing-page/intrest_select/writing_content_icon.png",
-  "Social Media AI Videos": "/assets/landing-page/intrest_select/social_media_ai_video_icon.png",
-  "Talking Pets AI Videos": "/assets/landing-page/intrest_select/talking_pet_ai_video_icon.png",
+  "Compare AI Models":
+    "/assets/landing-page/intrest_select/compare_ai_model_icon.png",
+  "Writing & Content":
+    "/assets/landing-page/intrest_select/writing_content_icon.png",
+  "AI Writing Assistant":
+    "/assets/landing-page/intrest_select/writing_content_icon.png",
+  "Social Media AI Videos":
+    "/assets/landing-page/intrest_select/social_media_ai_video_icon.png",
+  "Talking Pets AI Videos":
+    "/assets/landing-page/intrest_select/talking_pet_ai_video_icon.png",
   "Web Search": "/assets/landing-page/intrest_select/web_search_icon.png",
+  "AI Web Search": "/assets/landing-page/intrest_select/web_search_icon.png",
   "Deep Research": "/assets/landing-page/intrest_select/deep_research_icon.png",
-  "Chat with PDFs": "/assets/landing-page/intrest_select/chat_with_pdf_icon.png",
+  "Chat with PDFs":
+    "/assets/landing-page/intrest_select/chat_with_pdf_icon.png",
   "Notebook LM": "/assets/landing-page/intrest_select/notbook_lm_icon.png",
   "Social Media": "/assets/landing-page/intrest_select/social_media_icon.png",
-  "Graphic Design": "/assets/landing-page/intrest_select/graphic_design_icon.png",
+  "Social Media Content":
+    "/assets/landing-page/intrest_select/social_media_icon.png",
+  "Graphic Design":
+    "/assets/landing-page/intrest_select/graphic_design_icon.png",
   "Cloud Storage": "/assets/landing-page/intrest_select/cloud_storage_icon.png",
-  "Cover Letter Generator": "/assets/landing-page/intrest_select/cover_leter_ganreter_icon.png",
+  "Cover Letter Generator":
+    "/assets/landing-page/intrest_select/cover_leter_ganreter_icon.png",
   "Email Writer": "/assets/landing-page/intrest_select/email_write_icon.png",
-  "Grammar Checker": "/assets/landing-page/intrest_select/grammer_cheker_icon.png",
-  "History AI Videos": "/assets/landing-page/intrest_select/history_ai_video_icon.png",
-  "Viral AI Videos": "/assets/landing-page/intrest_select/viral_ai_video_icon.png",
+  "Grammar Checker":
+    "/assets/landing-page/intrest_select/grammer_cheker_icon.png",
+  "History AI Videos":
+    "/assets/landing-page/intrest_select/history_ai_video_icon.png",
+  "Viral AI Videos":
+    "/assets/landing-page/intrest_select/viral_ai_video_icon.png",
+  "File & Data Analysis":
+    "/assets/landing-page/intrest_select/files_analyze_icon.png",
+  "Marketing Tools":
+    "/assets/landing-page/intrest_select/marketing_tools_icon.png",
 };
 
 const getInterestBadgeIcon = (name: string): string => {
   if (INTEREST_ICON_MAP[name]) return INTEREST_ICON_MAP[name];
   const lower = name.toLowerCase();
   for (const [key, iconPath] of Object.entries(INTEREST_ICON_MAP)) {
-    if (lower.includes(key.toLowerCase()) || key.toLowerCase().includes(lower)) {
+    if (
+      lower.includes(key.toLowerCase()) ||
+      key.toLowerCase().includes(lower)
+    ) {
       return iconPath;
     }
   }
@@ -102,11 +137,13 @@ export default function AuthModal({
     selectedInterests && selectedInterests.length >= 3
       ? selectedInterests.slice(0, 3)
       : selectedInterests && selectedInterests.length > 0
-      ? [
-          ...selectedInterests,
-          ...["AI Chat", "AI Images", "AI Video"].filter((x) => !selectedInterests.includes(x)),
-        ].slice(0, 3)
-      : ["AI Chat", "AI Images", "AI Video"];
+        ? [
+            ...selectedInterests,
+            ...["AI Chat", "AI Images", "AI Video"].filter(
+              (x) => !selectedInterests.includes(x),
+            ),
+          ].slice(0, 3)
+        : ["AI Chat", "AI Images", "AI Video"];
 
   useEffect(() => {
     if (isOpen) {
@@ -181,47 +218,108 @@ export default function AuthModal({
 
   if (!isOpen) return null;
 
-  const saveAuthSession = (data: UserResponse, isNewSignup: boolean = false) => {
+  const saveAuthSession = (
+    data: UserResponse,
+    isNewSignup: boolean = false,
+  ) => {
     const { token, fb_session_token, user } = data;
 
     // Save tokens and login states for SharedPreferences compatibility in Flutter Web
     localStorage.setItem("flutter.user_token", JSON.stringify(token));
     localStorage.setItem("flutter.is_logged_in", JSON.stringify(true));
-    localStorage.setItem("flutter.user_interests", JSON.stringify(selectedInterests));
+    localStorage.setItem(
+      "flutter.user_interests",
+      JSON.stringify(selectedInterests),
+    );
     if (isNewSignup || !isLoginTab) {
       localStorage.setItem("flutter.is_new_registration", JSON.stringify(true));
-      localStorage.setItem("flutter.has_seen_welcome_popup", JSON.stringify(false));
+      localStorage.setItem(
+        "flutter.has_seen_welcome_popup",
+        JSON.stringify(false),
+      );
     }
 
     if (user) {
       const userId = user._id || user.id || "";
       localStorage.setItem("flutter.user_id", JSON.stringify(userId));
-      localStorage.setItem("flutter.user_name", JSON.stringify(user.name || ""));
-      localStorage.setItem("flutter.user_first_name", JSON.stringify(user.firstName || ""));
-      localStorage.setItem("flutter.user_last_name", JSON.stringify(user.lastName || ""));
-      localStorage.setItem("flutter.user_email", JSON.stringify(user.email || ""));
-      localStorage.setItem("flutter.user_age", JSON.stringify(String(user.age ?? "")));
-      localStorage.setItem("flutter.user_gender", JSON.stringify(user.gender || ""));
-      localStorage.setItem("flutter.user_country", JSON.stringify(user.region || ""));
-      localStorage.setItem("flutter.user_plan", JSON.stringify(user.plan || "basic"));
-      localStorage.setItem("flutter.user_remaining_tokens", JSON.stringify(user.remaining_tokens ?? 0));
-      localStorage.setItem("flutter.user_video_credits", JSON.stringify(user.video_credits ?? 0));
-      localStorage.setItem("flutter.user_image_credits", JSON.stringify(user.image_credits ?? 0));
+      localStorage.setItem(
+        "flutter.user_name",
+        JSON.stringify(user.name || ""),
+      );
+      localStorage.setItem(
+        "flutter.user_first_name",
+        JSON.stringify(user.firstName || ""),
+      );
+      localStorage.setItem(
+        "flutter.user_last_name",
+        JSON.stringify(user.lastName || ""),
+      );
+      localStorage.setItem(
+        "flutter.user_email",
+        JSON.stringify(user.email || ""),
+      );
+      localStorage.setItem(
+        "flutter.user_age",
+        JSON.stringify(String(user.age ?? "")),
+      );
+      localStorage.setItem(
+        "flutter.user_gender",
+        JSON.stringify(user.gender || ""),
+      );
+      localStorage.setItem(
+        "flutter.user_country",
+        JSON.stringify(user.region || ""),
+      );
+      localStorage.setItem(
+        "flutter.user_plan",
+        JSON.stringify(user.plan || "basic"),
+      );
+      localStorage.setItem(
+        "flutter.user_remaining_tokens",
+        JSON.stringify(user.remaining_tokens ?? 0),
+      );
+      localStorage.setItem(
+        "flutter.user_video_credits",
+        JSON.stringify(user.video_credits ?? 0),
+      );
+      localStorage.setItem(
+        "flutter.user_image_credits",
+        JSON.stringify(user.image_credits ?? 0),
+      );
       localStorage.setItem(
         "flutter.user_roles",
-        "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIGxpc3Qu" + JSON.stringify(user.roles || ["User"])
+        "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIGxpc3Qu" +
+          JSON.stringify(user.roles || ["User"]),
       );
-      localStorage.setItem("flutter.user_status", JSON.stringify(user.status || ""));
-      localStorage.setItem("flutter.user_profile_picture", JSON.stringify(user.profile_picture || ""));
-      localStorage.setItem("flutter.user_auth_provider", JSON.stringify(user.authProvider || ""));
+      localStorage.setItem(
+        "flutter.user_status",
+        JSON.stringify(user.status || ""),
+      );
+      localStorage.setItem(
+        "flutter.user_profile_picture",
+        JSON.stringify(user.profile_picture || ""),
+      );
+      localStorage.setItem(
+        "flutter.user_auth_provider",
+        JSON.stringify(user.authProvider || ""),
+      );
       if (!isNewSignup && isLoginTab) {
-        localStorage.setItem("flutter.has_seen_welcome_popup", JSON.stringify(user.hasSeenWelcomePopup ?? true));
+        localStorage.setItem(
+          "flutter.has_seen_welcome_popup",
+          JSON.stringify(user.hasSeenWelcomePopup ?? true),
+        );
       }
-      localStorage.setItem("flutter.user_created_at", JSON.stringify(user.createdAt || ""));
+      localStorage.setItem(
+        "flutter.user_created_at",
+        JSON.stringify(user.createdAt || ""),
+      );
     }
 
     if (fb_session_token) {
-      localStorage.setItem("flutter.fb_session_token", JSON.stringify(fb_session_token));
+      localStorage.setItem(
+        "flutter.fb_session_token",
+        JSON.stringify(fb_session_token),
+      );
 
       const currentDomain = window.location.hostname;
       const isSecure = window.location.protocol === "https:";
@@ -231,9 +329,13 @@ export default function AuthModal({
       // Set on current domain
       document.cookie = cookieStr;
 
-      if (!currentDomain.includes("localhost") && !currentDomain.includes("127.0.0.1")) {
+      if (
+        !currentDomain.includes("localhost") &&
+        !currentDomain.includes("127.0.0.1")
+      ) {
         const hostParts = currentDomain.split(".");
-        const rootDomain = hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
+        const rootDomain =
+          hostParts.length > 2 ? hostParts.slice(-2).join(".") : currentDomain;
         document.cookie = `${cookieStr}; domain=.${rootDomain}`;
       }
     }
@@ -248,7 +350,8 @@ export default function AuthModal({
     if (typeof document === "undefined") return null;
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return decodeURIComponent(parts.pop()?.split(";").shift() || "");
+    if (parts.length === 2)
+      return decodeURIComponent(parts.pop()?.split(";").shift() || "");
     return null;
   };
 
@@ -297,11 +400,15 @@ export default function AuthModal({
       if (result && result.user) {
         // Extract Google OAuth ID Token using credentialFromResult
         const credential = GoogleAuthProvider.credentialFromResult(result);
-        const googleIdToken = credential?.idToken || (await result.user.getIdToken());
+        const googleIdToken =
+          credential?.idToken || (await result.user.getIdToken());
         await handleBackendGoogleLogin(googleIdToken);
       }
     } catch (err: any) {
-      if (err?.code !== "auth/popup-closed-by-user" && err?.code !== "auth/cancelled-popup-request") {
+      if (
+        err?.code !== "auth/popup-closed-by-user" &&
+        err?.code !== "auth/cancelled-popup-request"
+      ) {
         setErrorMsg(err.message || "Google Authentication failed.");
       }
       setLoading(false);
@@ -367,7 +474,9 @@ export default function AuthModal({
         }
       }
     } catch (err: any) {
-      setErrorMsg(err.message || "Authentication failed. Please check your credentials.");
+      setErrorMsg(
+        err.message || "Authentication failed. Please check your credentials.",
+      );
       setLoading(false);
     }
   };
@@ -386,15 +495,31 @@ export default function AuthModal({
           aria-label="Close modal"
           className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer z-10"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
         {/* Top Header: Sparkle Logo + Brand Name */}
-        <div className={`flex items-center gap-2.5 ${showEmailForm ? "mb-2" : "mb-3.5"}`}>
+        <div
+          className={`flex items-center gap-2.5 ${showEmailForm ? "mb-2" : "mb-3.5"}`}
+        >
           <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#6366f1] via-[#8b5cf6] to-[#d946ef] flex items-center justify-center shadow-[0_0_12px_rgba(139,92,246,0.5)]">
-            <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <svg
+              className="w-4 h-4 text-white"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
               <path d="M12 2L14.4 8.6L21 11L14.4 13.4L12 20L9.6 13.4L3 11L9.6 8.6L12 2Z" />
             </svg>
           </div>
@@ -414,14 +539,18 @@ export default function AuthModal({
               <div className="flex-1 h-[7px] bg-[#141d36] rounded-full overflow-hidden">
                 <div className="w-[66%] h-full bg-gradient-to-r from-[#8b5cf6] via-[#3b82f6] to-[#38bdf8] rounded-full shadow-[0_0_10px_rgba(56,189,248,0.5)]"></div>
               </div>
-              <span className="font-bold text-[#818cf8] text-xs shrink-0">66%</span>
+              <span className="font-bold text-[#818cf8] text-xs shrink-0">
+                66%
+              </span>
             </div>
           </div>
         )}
 
         {/* Status / Checkmark Graphic with Sparkles */}
         {!isLoginTab && (
-          <div className={`relative flex flex-col items-center ${showEmailForm ? "mt-0.5 mb-1" : "mt-1 mb-1.5"}`}>
+          <div
+            className={`relative flex flex-col items-center ${showEmailForm ? "mt-0.5 mb-1" : "mt-1 mb-1.5"}`}
+          >
             {/* Sparkle decorative icons */}
             <div className="relative flex items-center justify-center">
               {/* Top-left small sparkle */}
@@ -457,7 +586,12 @@ export default function AuthModal({
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
             </div>
@@ -484,11 +618,14 @@ export default function AuthModal({
                   : "text-[12.5px] sm:text-[13px] max-w-[340px] mt-1.5"
               }`}
             >
-              You're one step closer to exploring the AI tools you're excited about.
+              You're one step closer to exploring the AI tools you're excited
+              about.
             </p>
 
             {/* 3 Selected Interests Badges */}
-            <div className={`grid grid-cols-3 gap-2 w-full ${showEmailForm ? "mt-2" : "mt-4"}`}>
+            <div
+              className={`grid grid-cols-3 gap-2 w-full ${showEmailForm ? "mt-2" : "mt-4"}`}
+            >
               {displayInterests.map((interestName, i) => {
                 const iconSrc = getInterestBadgeIcon(interestName);
                 return (
@@ -498,7 +635,9 @@ export default function AuthModal({
                       showEmailForm ? "px-2 py-1.5" : "px-2.5 py-2"
                     }`}
                   >
-                    <div className={`${showEmailForm ? "w-4 h-4" : "w-5 h-5"} rounded-md flex items-center justify-center shrink-0`}>
+                    <div
+                      className={`${showEmailForm ? "w-4 h-4" : "w-5 h-5"} rounded-md flex items-center justify-center shrink-0`}
+                    >
                       <img
                         src={iconSrc}
                         alt={interestName}
@@ -535,7 +674,9 @@ export default function AuthModal({
         )}
 
         {/* Continue With Divider */}
-        <div className={`relative flex items-center w-full ${showEmailForm ? "mt-2.5 mb-2" : "mt-4 mb-3"}`}>
+        <div
+          className={`relative flex items-center w-full ${showEmailForm ? "mt-2.5 mb-2" : "mt-4 mb-3"}`}
+        >
           <div className="flex-grow border-t border-[#1d2b52]"></div>
           <span className="flex-shrink mx-3 text-slate-400 text-[11px] font-medium tracking-wide">
             Continue with
@@ -544,9 +685,11 @@ export default function AuthModal({
         </div>
 
         {/* Google Authentication Button - Styled with vibrant gradient & transparent GSI layer */}
-        <div className={`relative w-full rounded-xl flex items-center justify-center bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#06b6d4] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_24px_rgba(147,51,234,0.35)] cursor-pointer overflow-hidden ${
-          showEmailForm ? "h-[44px]" : "h-[50px]"
-        }`}>
+        <div
+          className={`relative w-full rounded-xl flex items-center justify-center bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#06b6d4] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_24px_rgba(147,51,234,0.35)] cursor-pointer overflow-hidden ${
+            showEmailForm ? "h-[44px]" : "h-[50px]"
+          }`}
+        >
           {/* Visual Layer: Custom Google Button UI (Matching Image 1) */}
           <div className="flex items-center gap-3 pointer-events-none select-none">
             <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center p-1 shadow-sm shrink-0">
@@ -569,7 +712,9 @@ export default function AuthModal({
                 />
               </svg>
             </div>
-            <span className="font-bold text-white text-[14.5px]">Continue with Google</span>
+            <span className="font-bold text-white text-[14.5px]">
+              Continue with Google
+            </span>
           </div>
 
           {/* Right Arrow */}
@@ -595,7 +740,9 @@ export default function AuthModal({
         </div>
 
         {/* "or" Divider */}
-        <div className={`relative flex items-center w-full ${showEmailForm ? "my-1.5" : "my-2.5"}`}>
+        <div
+          className={`relative flex items-center w-full ${showEmailForm ? "my-1.5" : "my-2.5"}`}
+        >
           <div className="flex-grow border-t border-[#1d2b52]"></div>
           <span className="flex-shrink mx-3 text-slate-500 text-[11px] font-medium">
             or
@@ -627,7 +774,9 @@ export default function AuthModal({
                   d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                 />
               </svg>
-              <span className="font-semibold text-white text-[14px]">Continue with Email</span>
+              <span className="font-semibold text-white text-[14px]">
+                Continue with Email
+              </span>
             </div>
 
             {/* Right Icon (Arrow or Chevron) pinned to right */}
@@ -671,7 +820,9 @@ export default function AuthModal({
             {/* Header of email section */}
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-white text-[13.5px]">
-                {isLoginTab ? "Log in with email" : "Create your account with email"}
+                {isLoginTab
+                  ? "Log in with email"
+                  : "Create your account with email"}
               </h3>
               <button
                 type="button"
@@ -750,7 +901,9 @@ export default function AuthModal({
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={isLoginTab ? "Enter your password" : "Create a password"}
+                    placeholder={
+                      isLoginTab ? "Enter your password" : "Create a password"
+                    }
                     disabled={loading}
                     required
                     className="email-autofill-fix bg-transparent text-white placeholder-slate-500 text-[12.5px] w-full outline-none pr-6"
@@ -806,15 +959,40 @@ export default function AuthModal({
                 className="w-full h-[42px] rounded-xl font-bold text-white text-[13.5px] bg-gradient-to-r from-[#d946ef] via-[#7c3aed] to-[#38bdf8] hover:opacity-95 active:scale-[0.99] transition-all shadow-[0_0_18px_rgba(124,58,237,0.35)] flex items-center justify-center gap-2 cursor-pointer mt-0.5 disabled:opacity-50"
               >
                 {loading ? (
-                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
                 ) : (
                   <>
                     <span>{isLoginTab ? "Sign In" : "Create My Account"}</span>
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    <svg
+                      className="w-3.5 h-3.5 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                      />
                     </svg>
                   </>
                 )}
@@ -864,7 +1042,9 @@ export default function AuthModal({
           </p>
 
           {/* Privacy Policy & Terms */}
-          <p className={`text-slate-400 text-center leading-normal px-1 max-w-[370px] mx-auto ${showEmailForm ? "text-[10px] mt-1.5" : "text-[10.5px] sm:text-[11px] mt-2.5"}`}>
+          <p
+            className={`text-slate-400 text-center leading-normal px-1 max-w-[370px] mx-auto ${showEmailForm ? "text-[10px] mt-1.5" : "text-[10.5px] sm:text-[11px] mt-2.5"}`}
+          >
             By continuing, you agree to our{" "}
             <a
               href="/terms-of-service"
@@ -882,7 +1062,6 @@ export default function AuthModal({
             .
           </p>
         </div>
-
       </div>
     </div>
   );

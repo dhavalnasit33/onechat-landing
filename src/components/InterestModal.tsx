@@ -1,5 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { Outfit } from "next/font/google";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
+  display: "swap",
+});
 
 export interface InterestOption {
   id: string;
@@ -16,25 +23,25 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "ai_chat",
     label: "AI Chat",
     shortLabel: "AI Chat",
-    desc: "Chat with the world's leading AI models.",
+    desc: "Chat with all major models",
     iconAsset: "/assets/landing-page/intrest_select/ai_chat_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/ai_chat_image.png",
     gradient: ["#3B82F6", "#6366F1"],
   },
   {
     id: "image_gen",
-    label: "Image Generation",
+    label: "AI Image Generation",
     shortLabel: "AI Images",
-    desc: "Create stunning images with leading AI models.",
+    desc: "Create stunning AI images",
     iconAsset: "/assets/landing-page/intrest_select/image_genration_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/image_genration_image.png",
     gradient: ["#0284C7", "#0D9488"],
   },
   {
     id: "video_gen",
-    label: "Video Generation",
+    label: "AI Video Generation",
     shortLabel: "AI Video",
-    desc: "Create high-quality videos from text or images.",
+    desc: "Create stunning AI videos",
     iconAsset: "/assets/landing-page/intrest_select/video_genration_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/video_genration_image.png",
     gradient: ["#DB2777", "#9333EA"],
@@ -43,7 +50,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "compare_models",
     label: "Compare AI Models",
     shortLabel: "Compare Models",
-    desc: "Compare responses from multiple AI models side by side.",
+    desc: "Compare AI responses",
     iconAsset: "/assets/landing-page/intrest_select/compare_ai_model_icon.png",
     imageAsset:
       "/assets/landing-page/intrest_select/compare_ai_model_image.png",
@@ -51,9 +58,9 @@ export const INTEREST_OPTIONS: InterestOption[] = [
   },
   {
     id: "writing_content",
-    label: "Writing & Content",
+    label: "AI Writing Assistant",
     shortLabel: "Writing",
-    desc: "Generate articles, blog posts, captions and more.",
+    desc: "Write better, faster",
     iconAsset: "/assets/landing-page/intrest_select/writing_content_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/writing_content_image.png",
     gradient: ["#2563EB", "#06B6D4"],
@@ -62,7 +69,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "social_media_video",
     label: "Social Media AI Videos",
     shortLabel: "Social Videos",
-    desc: "Create engaging videos for TikTok, Instagram, YouTube and more.",
+    desc: "Create engaging social videos",
     iconAsset:
       "/assets/landing-page/intrest_select/social_media_ai_video_icon.png",
     imageAsset:
@@ -73,7 +80,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "talking_pets",
     label: "Talking Pets AI Videos",
     shortLabel: "Talking Pets",
-    desc: "Create fun and realistic talking pet videos with AI.",
+    desc: "Make your pets talk",
     iconAsset:
       "/assets/landing-page/intrest_select/talking_pet_ai_video_icon.png",
     imageAsset:
@@ -82,9 +89,9 @@ export const INTEREST_OPTIONS: InterestOption[] = [
   },
   {
     id: "web_search",
-    label: "Web Search",
+    label: "AI Web Search",
     shortLabel: "Web Search",
-    desc: "Get real-time information from the web with AI.",
+    desc: "Search the web with AI",
     iconAsset: "/assets/landing-page/intrest_select/web_search_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/web_search_image.png",
     gradient: ["#0284C7", "#06B6D4"],
@@ -93,7 +100,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "deep_research",
     label: "Deep Research",
     shortLabel: "Deep Research",
-    desc: "Get in-depth research and comprehensive analysis.",
+    desc: "Research any topic",
     iconAsset: "/assets/landing-page/intrest_select/deep_research_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/deep_research_image.png",
     gradient: ["#7C3AED", "#C026D3"],
@@ -102,7 +109,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "chat_pdf",
     label: "Chat with PDFs",
     shortLabel: "Chat PDFs",
-    desc: "Upload and chat with your PDF documents.",
+    desc: "Ask your PDFs questions",
     iconAsset: "/assets/landing-page/intrest_select/chat_with_pdf_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/chat_with_pdf_image.png",
     gradient: ["#DC2626", "#F97316"],
@@ -111,16 +118,16 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "notebook_lm",
     label: "Notebook LM",
     shortLabel: "Notebook LM",
-    desc: "Organize, summarize and work with your knowledge.",
+    desc: "Organize and explore knowledge",
     iconAsset: "/assets/landing-page/intrest_select/notbook_lm_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/notbook_lm_image.png",
     gradient: ["#6366F1", "#3B82F6"],
   },
   {
     id: "social_media",
-    label: "Social Media",
+    label: "Social Media Content",
     shortLabel: "Social Media",
-    desc: "Create, plan and optimize your social media content.",
+    desc: "Create social media content",
     iconAsset: "/assets/landing-page/intrest_select/social_media_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/social_media_image.png",
     gradient: ["#9333EA", "#DB2777"],
@@ -129,7 +136,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "graphic_design",
     label: "Graphic Design",
     shortLabel: "Design",
-    desc: "Create stunning visuals, logos, and graphics.",
+    desc: "Design beautiful graphics",
     iconAsset: "/assets/landing-page/intrest_select/graphic_design_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/graphic_design_image.png",
     gradient: ["#0D9488", "#06B6D4"],
@@ -138,7 +145,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "cloud_storage",
     label: "Cloud Storage",
     shortLabel: "Storage",
-    desc: "Store and manage your generated content.",
+    desc: "Store your AI creations",
     iconAsset: "/assets/landing-page/intrest_select/cloud_storage_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/cloud_storage_image.png",
     gradient: ["#3B82F6", "#60A5FA"],
@@ -147,7 +154,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "cover_letter",
     label: "Cover Letter Generator",
     shortLabel: "Cover Letters",
-    desc: "Create professional cover letters with AI.",
+    desc: "Write professional cover letters",
     iconAsset:
       "/assets/landing-page/intrest_select/cover_leter_ganreter_icon.png",
     imageAsset:
@@ -158,7 +165,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "email_writer",
     label: "Email Writer",
     shortLabel: "Email Writer",
-    desc: "Write professional emails in seconds.",
+    desc: "Write better emails",
     iconAsset: "/assets/landing-page/intrest_select/email_write_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/email_write_image.png",
     gradient: ["#7C3AED", "#6366F1"],
@@ -167,7 +174,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "grammar_checker",
     label: "Grammar Checker",
     shortLabel: "Grammar",
-    desc: "Check and improve your grammar and writing.",
+    desc: "Fix grammar mistakes",
     iconAsset: "/assets/landing-page/intrest_select/grammer_cheker_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/grammer_cheker_image.png",
     gradient: ["#6366F1", "#8B5CF6"],
@@ -176,7 +183,7 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "history_video",
     label: "History AI Videos",
     shortLabel: "History Videos",
-    desc: "Bring history to life with AI-generated videos.",
+    desc: "Bring history to life",
     iconAsset: "/assets/landing-page/intrest_select/history_ai_video_icon.png",
     imageAsset:
       "/assets/landing-page/intrest_select/history_ai_video_image.png",
@@ -186,10 +193,28 @@ export const INTEREST_OPTIONS: InterestOption[] = [
     id: "viral_video",
     label: "Viral AI Videos",
     shortLabel: "Viral Videos",
-    desc: "Create viral and trending videos with AI.",
+    desc: "Create trending AI videos",
     iconAsset: "/assets/landing-page/intrest_select/viral_ai_video_icon.png",
     imageAsset: "/assets/landing-page/intrest_select/viral_ai_video_image.png",
     gradient: ["#C026D3", "#E11D48"],
+  },
+  {
+    id: "file_data_analysis",
+    label: "File & Data Analysis",
+    shortLabel: "Data Analysis",
+    desc: "Analyze files and data",
+    iconAsset: "/assets/landing-page/intrest_select/files_analyze_icon.png",
+    imageAsset: "/assets/landing-page/intrest_select/files_analyze_image.png",
+    gradient: ["#3B82F6", "#0284C7"],
+  },
+  {
+    id: "marketing_tools",
+    label: "Marketing Tools",
+    shortLabel: "Marketing",
+    desc: "Create better marketing campaigns",
+    iconAsset: "/assets/landing-page/intrest_select/marketing_tools_icon.png",
+    imageAsset: "/assets/landing-page/intrest_select/marketing_tools_image.png",
+    gradient: ["#9333EA", "#DB2777"],
   },
 ];
 
@@ -304,12 +329,11 @@ export default function InterestModal({
 
         {/* Headline & Subtitle */}
         <div className="text-center mb-2 sm:mb-3.5 shrink-0 order-2">
-          <h2 className="text-[19px] sm:text-2xl md:text-[32px] font-bold text-white tracking-tight leading-tight">
-            Which{" "}
-            <span className="bg-gradient-to-r from-[#60A5FA] via-[#818CF8] to-[#A855F7] bg-clip-text text-transparent">
-              features
-            </span>{" "}
-            are you most interested in?
+          <h2 className={`${outfit.className} text-[22px] sm:text-2xl md:text-[32px] font-extrabold text-white tracking-[-0.5px] leading-tight`}>
+            Get Started. Select Your{" "}
+            <span className="bg-gradient-to-r from-[#60A5FA] via-[#818CF8] to-[#A855F7] bg-clip-text text-transparent font-extrabold">
+              Interests.
+            </span>
           </h2>
           <p className="text-[#94A3B8] text-[10.5px] sm:text-[13px] max-w-[340px] md:max-w-[720px] mx-auto mt-1 leading-snug sm:leading-relaxed">
             Select the features you're most excited to use (choose at least 3).
