@@ -17,6 +17,8 @@ import {
   Loader2,
   AlertCircle,
   ExternalLink,
+  Maximize2,
+  X,
 } from "lucide-react";
 
 const C1Component = dynamic(
@@ -61,8 +63,12 @@ export default function SharedReportPage() {
   const [downloadDropdownOpen, setDownloadDropdownOpen] = useState(false);
   const [downloadingType, setDownloadingType] = useState<"png" | "pdf" | "ppt" | null>(null);
   const [copied, setCopied] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImageSrc, setLightboxImageSrc] = useState<string | null>(null);
+  const [lightboxLoading, setLightboxLoading] = useState(false);
 
   const reportContainerRef = useRef<HTMLDivElement>(null);
+  const downloadDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!shareId) return;
@@ -184,6 +190,64 @@ export default function SharedReportPage() {
     };
   }, [item]);
 
+  // Helper to convert SVG <foreignObject> category labels to native SVG <text> elements
+  // because canvas/image renderers drop nested foreignObjects inside SVG image data URLs
+  const convertForeignObjectsForCapture = (element: HTMLElement) => {
+    const foreignObjects = Array.from(element.querySelectorAll<SVGForeignObjectElement>("foreignObject"));
+    const createdSvgTexts: SVGTextElement[] = [];
+
+    foreignObjects.forEach((fo) => {
+      const text = fo.textContent?.trim();
+      if (!text) return;
+
+      const foX = parseFloat(fo.getAttribute("x") || "0");
+      const foY = parseFloat(fo.getAttribute("y") || "0");
+      const foHeight = parseFloat(fo.getAttribute("height") || "20");
+
+      const innerDiv = fo.querySelector<HTMLElement>(".crayon-horizontal-bar-chart-category-label, div, span") || (fo.firstElementChild as HTMLElement | null);
+      let padLeft = 14;
+      let fontSize = "11px";
+      let fontFamily = "var(--font-sans), system-ui, sans-serif";
+      let fontWeight = "500";
+
+      if (innerDiv) {
+        try {
+          const comp = window.getComputedStyle(innerDiv);
+          const parsedPad = parseFloat(comp.paddingLeft);
+          if (!isNaN(parsedPad) && parsedPad > 0) padLeft = parsedPad;
+          if (comp.fontSize) fontSize = comp.fontSize;
+          if (comp.fontFamily) fontFamily = comp.fontFamily;
+          if (comp.fontWeight) fontWeight = comp.fontWeight;
+        } catch (_) { }
+      }
+
+      const svgText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      svgText.setAttribute("x", String(foX + padLeft));
+      svgText.setAttribute("y", String(foY + foHeight * 0.72));
+      svgText.setAttribute("dominant-baseline", "middle");
+      svgText.setAttribute("fill", "#94A3B8");
+      svgText.setAttribute("font-size", fontSize);
+      svgText.setAttribute("font-family", fontFamily);
+      svgText.setAttribute("font-weight", fontWeight);
+      svgText.setAttribute("class", "crayon-converted-category-label");
+      svgText.textContent = text;
+
+      if (fo.parentElement) {
+        fo.parentElement.appendChild(svgText);
+        createdSvgTexts.push(svgText);
+      }
+
+      fo.style.opacity = "0";
+    });
+
+    return () => {
+      createdSvgTexts.forEach((el) => el.remove());
+      foreignObjects.forEach((fo) => {
+        fo.style.opacity = "";
+      });
+    };
+  };
+
   // Captures the FULL element — handles horizontally/vertically overflowing content
   // so no text or chart data is ever cut off in the download.
   const captureFullElement = async (
@@ -200,7 +264,7 @@ export default function SharedReportPage() {
       if (vb && vb.width > trueFullWidth) trueFullWidth = vb.width;
       const wAttr = parseFloat(svg.getAttribute("width") || "0");
       if (wAttr > trueFullWidth) trueFullWidth = wAttr;
-      try { const bb = svg.getBBox(); if (bb.width > trueFullWidth) trueFullWidth = bb.width; } catch (_) {}
+      try { const bb = svg.getBBox(); if (bb.width > trueFullWidth) trueFullWidth = bb.width; } catch (_) { }
     });
     const captureWidth = trueFullWidth + 60; // extra left+right buffer for Y-axis labels
 
@@ -212,7 +276,7 @@ export default function SharedReportPage() {
         const rect = (child as HTMLElement).getBoundingClientRect();
         const childBottom = rect.bottom - elemRect.top;
         if (childBottom > trueFullHeight) trueFullHeight = childBottom;
-      } catch (_) {}
+      } catch (_) { }
     });
     const captureHeight = trueFullHeight + 40; // bottom buffer so last line is never clipped
 
@@ -245,6 +309,8 @@ export default function SharedReportPage() {
       el.setAttribute("fill", "#F8FAFC"); el.style.fill = "#F8FAFC"; el.style.opacity = "1";
     });
 
+    const restoreForeign = convertForeignObjectsForCapture(element);
+
     await new Promise((r) => setTimeout(r, 80));
 
     let dataUrl: string;
@@ -255,9 +321,16 @@ export default function SharedReportPage() {
         cacheBust: true,
         width: captureWidth,
         height: captureHeight,
+        filter: (node: HTMLElement) => {
+          if (!node.classList) return true;
+          if (node.classList.contains("crayon-chart-vertical-scroll-buttons-container")) return false;
+          if (node.classList.contains("crayon-chart-vertical-scroll-button")) return false;
+          return true;
+        },
         style: { padding: "24px", borderRadius: "16px", overflow: "visible", overflowY: "visible", boxSizing: "border-box" },
       });
     } finally {
+      restoreForeign();
       svgRestores.forEach(({ el, fill, styleFill, opacity }) => {
         if (fill) el.setAttribute("fill", fill); else el.removeAttribute("fill");
         el.style.fill = styleFill; el.style.opacity = opacity;
@@ -269,6 +342,54 @@ export default function SharedReportPage() {
     }
     return dataUrl!;
   };
+
+  // ---------------- FULL VIEW / LIGHTBOX ----------------
+  const handleOpenFullView = async () => {
+    if (!reportContainerRef.current) return;
+    try {
+      setLightboxOpen(true);
+      setLightboxImageSrc(null);
+      setLightboxLoading(true);
+      const dataUrl = await captureFullElement(reportContainerRef.current, "#070914");
+      setLightboxImageSrc(dataUrl);
+    } catch (err) {
+      console.error("Error generating lightbox preview:", err);
+    } finally {
+      setLightboxLoading(false);
+    }
+  };
+
+  const handleCloseLightbox = () => {
+    setLightboxOpen(false);
+    setLightboxImageSrc(null);
+    setLightboxLoading(false);
+  };
+
+  // Close Lightbox on Esc key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && lightboxOpen) {
+        handleCloseLightbox();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxOpen]);
+
+  // Close download dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (downloadDropdownRef.current && !downloadDropdownRef.current.contains(event.target as Node)) {
+        setDownloadDropdownOpen(false);
+      }
+    }
+    if (downloadDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [downloadDropdownOpen]);
 
   const handleDownloadPNG = async () => {
     if (!reportContainerRef.current) return;
@@ -328,7 +449,60 @@ export default function SharedReportPage() {
             backgroundColor: "#070914",
             pixelRatio: 1.5,
           });
-        } catch (_) {}
+        } catch (_) { }
+      }
+
+      // Fit captured image onto PowerPoint slide placeholder aspect ratio (~2.3:1)
+      // to prevent the PPT template from stretching the image horizontally and distorting text/spacing
+      let finalImageForPPT = capturedImage || item?.imageUrl || null;
+      if (finalImageForPPT) {
+        try {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = finalImageForPPT;
+          await new Promise<void>((resolve, reject) => {
+            if (img.complete) resolve();
+            else {
+              img.onload = () => resolve();
+              img.onerror = () => reject(new Error("Image load failed for PPT fit"));
+            }
+          });
+
+          const targetAspect = 2.3; // Target ratio for slide content area (~10in / ~4.35in)
+          const imgAspect = img.width / img.height;
+
+          let canvasW = img.width;
+          let canvasH = img.height;
+          let drawX = 0;
+          let drawY = 0;
+
+          if (imgAspect < targetAspect) {
+            // Card is taller/square: expand canvas width with background color so text never stretches horizontally
+            canvasW = Math.round(img.height * targetAspect);
+            canvasH = img.height;
+            drawX = Math.round((canvasW - img.width) / 2);
+            drawY = 0;
+          } else if (imgAspect > targetAspect) {
+            // Card is wider: expand canvas height with background color so text never squashes vertically
+            canvasW = img.width;
+            canvasH = Math.round(img.width / targetAspect);
+            drawX = 0;
+            drawY = Math.round((canvasH - img.height) / 2);
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = canvasW;
+          canvas.height = canvasH;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.fillStyle = "#070914";
+            ctx.fillRect(0, 0, canvasW, canvasH);
+            ctx.drawImage(img, drawX, drawY, img.width, img.height);
+            finalImageForPPT = canvas.toDataURL("image/png");
+          }
+        } catch (fitErr) {
+          console.warn("PPT aspect ratio fitting fallback:", fitErr);
+        }
       }
 
       let token = "";
@@ -338,7 +512,7 @@ export default function SharedReportPage() {
           if (raw) {
             token = raw.replace(/^"+|"+$/g, "").trim();
           }
-        } catch (_) {}
+        } catch (_) { }
       }
 
       const res = await fetch(`${apiBase}/api/analyze-files/export-ppt`, {
@@ -351,7 +525,7 @@ export default function SharedReportPage() {
           title: item?.title || "AI Analysis Report",
           description: "", // Keep clean so the presentation slide highlights the card image cleanly centered
           chartData: item?.chartData || null,
-          imageUrl: capturedImage || item?.imageUrl || null,
+          imageUrl: finalImageForPPT,
         }),
       });
 
@@ -399,32 +573,70 @@ export default function SharedReportPage() {
             </div>
           </div>
 
-          {/* Action Buttons: Share & Download */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button onClick={handleCopyLink}
-              type="button"
-              className="flex items-center gap-1.5 rounded-lg border border-[#292D49] bg-[#121424] px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-[#7564F6] hover:bg-[#7564F6]/10 active:scale-95 cursor-pointer"
-            >
-              {copied ? (
-                <>
-                  <Check className="h-3.5 w-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Share2 className="h-3.5 w-3.5 text-slate-400" />
-                  <span className="hidden sm:inline">Share</span>
-                </>
-              )}
-            </button>
+          {/* Action Buttons: Full View, Share & Download */}
+          <div className="flex items-center gap-1 sm:gap-1.5 rounded-lg border border-[#292D49] bg-[#0E1222]/95 px-2 py-1 shadow-2xl backdrop-blur-md transition-all hover:border-[#7564F6]">
+            {/* Full View Button */}
+            <div className="relative group/fv">
+              <button
+                type="button"
+                onClick={handleOpenFullView}
+                disabled={!item || lightboxLoading}
+                className="flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"
+                aria-label="Full View"
+              >
+                {lightboxLoading ? (
+                  <Loader2 className="h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0" />
+                ) : (
+                  <>
+                    <Maximize2 className="h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/fv:text-white transition-colors shrink-0" />
+                    <span className="hidden sm:inline">Full View</span>
+                  </>
+                )}
+              </button>
+              {/* Tooltip: displays downward to avoid being clipped by top boundary */}
+              <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/fv:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                Full View
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+              </div>
+            </div>
+
+            <div className="h-4 w-px bg-[#292D49] shrink-0" />
+
+            {/* Share Button */}
+            <div className="relative group/share">
+              <button
+                onClick={handleCopyLink}
+                type="button"
+                className="flex items-center gap-1.5 rounded-lg border border-[#292D49] bg-[#121424] px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-[#7564F6] hover:bg-[#7564F6]/10 active:scale-95 cursor-pointer"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-400" />
+                    <span className="text-emerald-400">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="hidden sm:inline">Share</span>
+                  </>
+                )}
+              </button>
+              {/* Tooltip: Share Report - displays downward */}
+              <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                Share Chart
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+              </div>
+            </div>
+
+            <div className="h-4 w-px bg-[#292D49] shrink-0" />
 
             {/* Download Dropdown */}
-            <div className="relative">
+            <div className="relative group/dl" ref={downloadDropdownRef}>
               <button
                 type="button"
                 onClick={() => setDownloadDropdownOpen(!downloadDropdownOpen)}
                 disabled={!item || downloadingType !== null}
-                className="flex items-center gap-1.5 rounded-lg bg-[#6C56E5] px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-[#6C56E5]/20 transition hover:bg-[#7965F0] disabled:opacity-50 active:scale-95"
+                className="flex items-center gap-1.5 rounded-lg bg-[#6C56E5] px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-[#6C56E5]/20 transition hover:bg-[#7965F0] disabled:opacity-50 active:scale-95 cursor-pointer"
               >
                 {downloadingType ? (
                   <>
@@ -438,7 +650,13 @@ export default function SharedReportPage() {
                   </>
                 )}
               </button>
-
+              {/* Tooltip: Download Report (hidden if dropdown is open) */}
+              {!downloadDropdownOpen && (
+                <div className="pointer-events-none absolute top-full right-0 mt-2 hidden group-hover/dl:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                  Download Chart
+                  <div className="absolute bottom-full right-3 -mb-px border-4 border-transparent border-b-[#181B34]" />
+                </div>
+              )}
               {downloadDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-44 rounded-xl border border-[#292D49] bg-[#0E1222] p-1.5 shadow-2xl z-50">
                   <button onClick={handleDownloadPNG}
@@ -587,6 +805,59 @@ export default function SharedReportPage() {
           </div>
         )}
       </main>
+
+      {/* Lightbox Popup */}
+      {lightboxOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 sm:p-6 md:p-8 animate-in fade-in duration-200"
+          onClick={handleCloseLightbox}
+        >
+          <div
+            className="relative flex flex-col max-h-[92vh] max-w-5xl w-full rounded-2xl border border-[#292D49] bg-[#0E1222] text-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Lightbox Header */}
+            <div className="flex items-center justify-between border-b border-[#1E223D] bg-[#070914]/80 px-5 py-3.5 text-white">
+              <div className="flex items-center gap-2 min-w-0 pr-4">
+                <Sparkles className="h-4 w-4 text-[#7564F6] shrink-0" />
+                <h3 className="text-sm sm:text-base font-semibold truncate">
+                  {item?.title || "Full View"}
+                </h3>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleCloseLightbox}
+                  title="Close (Esc)"
+                  className="rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Lightbox Body / Content */}
+            <div className="flex-1 overflow-auto p-4 sm:p-6 flex items-center justify-center min-h-[300px] bg-[#070914]">
+              {lightboxLoading ? (
+                <div className="flex flex-col items-center gap-3 py-12 text-slate-400">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#7564F6]" />
+                  <span className="text-sm font-medium">Generating high-resolution view...</span>
+                </div>
+              ) : lightboxImageSrc ? (
+                <img
+                  src={lightboxImageSrc}
+                  alt={item?.title || "Full View Chart"}
+                  className="max-h-[76vh] w-auto max-w-full rounded-xl object-contain border border-[#1E223D] bg-[#070914] shadow-2xl"
+                />
+              ) : (
+                <div className="text-slate-400 text-sm">Failed to render chart image</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

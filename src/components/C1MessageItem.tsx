@@ -204,7 +204,10 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   // Helper filter to exclude action buttons overlay when taking screenshot
   const imageFilter = (node: HTMLElement) => {
     if (!node.classList) return true;
-    return !node.classList.contains("chart-action-overlay");
+    if (node.classList.contains("chart-action-overlay")) return false;
+    if (node.classList.contains("crayon-chart-vertical-scroll-buttons-container")) return false;
+    if (node.classList.contains("crayon-chart-vertical-scroll-button")) return false;
+    return true;
   };
 
   // Helper to detect if current theme or element is light mode (including computer/OS theme setting)
@@ -298,10 +301,68 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     };
   };
 
+  // Helper to convert SVG <foreignObject> category labels (used by HorizontalBarChart / vertical scroll charts)
+  // to native SVG <text> elements because canvas renderers drop nested foreignObjects inside SVG image data URLs
+  const convertForeignObjectsForCapture = (element: HTMLElement, light: boolean) => {
+    const foreignObjects = Array.from(element.querySelectorAll<SVGForeignObjectElement>("foreignObject"));
+    const createdSvgTexts: SVGTextElement[] = [];
+    const targetColor = light ? "#475569" : "#94A3B8";
+
+    foreignObjects.forEach((fo) => {
+      const text = fo.textContent?.trim();
+      if (!text) return;
+
+      const foX = parseFloat(fo.getAttribute("x") || "0");
+      const foY = parseFloat(fo.getAttribute("y") || "0");
+      const foHeight = parseFloat(fo.getAttribute("height") || "20");
+
+      const innerDiv = fo.querySelector<HTMLElement>(".crayon-horizontal-bar-chart-category-label, div, span") || (fo.firstElementChild as HTMLElement | null);
+      let padLeft = 14;
+      let fontSize = "11px";
+      let fontFamily = "var(--font-sans), system-ui, sans-serif";
+      let fontWeight = "500";
+
+      if (innerDiv) {
+        try {
+          const comp = window.getComputedStyle(innerDiv);
+          const parsedPad = parseFloat(comp.paddingLeft);
+          if (!isNaN(parsedPad) && parsedPad > 0) padLeft = parsedPad;
+          if (comp.fontSize) fontSize = comp.fontSize;
+          if (comp.fontFamily) fontFamily = comp.fontFamily;
+          if (comp.fontWeight) fontWeight = comp.fontWeight;
+        } catch (_) {}
+      }
+
+      const svgText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      svgText.setAttribute("x", String(foX + padLeft));
+      svgText.setAttribute("y", String(foY + foHeight * 0.72));
+      svgText.setAttribute("dominant-baseline", "middle");
+      svgText.setAttribute("fill", targetColor);
+      svgText.setAttribute("font-size", fontSize);
+      svgText.setAttribute("font-family", fontFamily);
+      svgText.setAttribute("font-weight", fontWeight);
+      svgText.setAttribute("class", "crayon-converted-category-label");
+      svgText.textContent = text;
+
+      if (fo.parentElement) {
+        fo.parentElement.appendChild(svgText);
+        createdSvgTexts.push(svgText);
+      }
+
+      fo.style.opacity = "0";
+    });
+
+    return () => {
+      createdSvgTexts.forEach((el) => el.remove());
+      foreignObjects.forEach((fo) => {
+        fo.style.opacity = "";
+      });
+    };
+  };
 
   /**
-  * Captures the FULL chart (2026-01 → 2026-12), even if part of it is hidden
-  * inside a horizontal scroll container on screen.
+  * Captures the FULL chart (including horizontal and vertical scrolling charts),
+  * ensuring all categories, bars, and texts are rendered without being clipped.
   */
   const captureFullChart = async (
     element: HTMLElement,
@@ -331,7 +392,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
 
     // ---- 2. Find ALL horizontal scrollers inside the card (by computed style) ----
     const allEls = Array.from(element.querySelectorAll<HTMLElement>("*"));
-    const scrollers = allEls.filter((el) => {
+    const hScrollers = allEls.filter((el) => {
       const ox = window.getComputedStyle(el).overflowX;
       return (
         (ox === "auto" || ox === "scroll" || ox === "hidden") &&
@@ -339,12 +400,25 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       );
     });
 
+    const vScrollers = allEls.filter((el) => {
+      const oy = window.getComputedStyle(el).overflowY;
+      return (
+        (oy === "auto" || oy === "scroll" || oy === "hidden" || el.classList.contains("crayon-horizontal-bar-chart-main-container")) &&
+        el.scrollHeight > el.clientHeight + 2
+      );
+    });
+
     let extraWidth = 0;
-    scrollers.forEach((el) => {
+    hScrollers.forEach((el) => {
       extraWidth = Math.max(extraWidth, el.scrollWidth - el.clientWidth);
     });
 
-    scrollers.forEach((el) => {
+    let extraHeight = 0;
+    vScrollers.forEach((el) => {
+      extraHeight = Math.max(extraHeight, el.scrollHeight - el.clientHeight);
+    });
+
+    hScrollers.forEach((el) => {
       const full = el.scrollWidth;
       saveStyle(el);
       el.scrollLeft = 0;
@@ -357,15 +431,36 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       el.style.flex = "none";
     });
 
-    // un-clip other chart parts (legend, svg, wrapper)
+    vScrollers.forEach((el) => {
+      const fullHeight = el.scrollHeight;
+      saveStyle(el);
+      el.scrollTop = 0;
+      el.style.overflow = "visible";
+      el.style.overflowX = "visible";
+      el.style.overflowY = "visible";
+      el.style.height = `${fullHeight}px`;
+      el.style.minHeight = `${fullHeight}px`;
+      el.style.maxHeight = "none";
+      el.style.flex = "none";
+    });
+
+    // un-clip other chart parts (legend, svg, wrapper, HorizontalBarChart wrappers)
     element
       .querySelectorAll<HTMLElement>(
-        ".recharts-wrapper, .recharts-legend-wrapper, svg, [class*='overflow']"
+        ".recharts-wrapper, .recharts-legend-wrapper, svg, [class*='overflow'], .crayon-horizontal-bar-chart-container-inner-wrapper, .crayon-horizontal-bar-chart-container-inner, .crayon-horizontal-bar-chart-main-container, .crayon-horizontal-bar-chart-container"
       )
       .forEach((el) => {
-        if (scrollers.includes(el)) return;
+        if (hScrollers.includes(el) || vScrollers.includes(el)) return;
         saveStyle(el);
         el.style.overflow = "visible";
+        el.style.maxHeight = "none";
+        if (
+          el.classList.contains("crayon-horizontal-bar-chart-container-inner-wrapper") ||
+          el.classList.contains("crayon-horizontal-bar-chart-container-inner")
+        ) {
+          el.style.height = "auto";
+          el.style.minHeight = "auto";
+        }
       });
 
     // grow the card itself so the extra width fits inside it
@@ -376,6 +471,14 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     element.style.maxWidth = "none";
     element.style.width = `${fullCardWidth}px`;
     element.style.minWidth = `${fullCardWidth}px`;
+
+    const baseHeight = element.offsetHeight;
+    const fullCardHeight = baseHeight + extraHeight;
+    element.style.maxHeight = "none";
+    if (extraHeight > 0) {
+      element.style.height = `${fullCardHeight}px`;
+      element.style.minHeight = `${fullCardHeight}px`;
+    }
 
     await new Promise((r) => setTimeout(r, 350)); 
 
@@ -407,6 +510,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     const light = isLightMode(element);
     const bgColor = light ? "#FFFFFF" : "#070914";
     const restoreSvg = applySvgStylesForCapture(element, light);
+    const restoreForeignObjects = convertForeignObjectsForCapture(element, light);
     try {
       return await toPng(element, {
         backgroundColor: bgColor,
@@ -427,6 +531,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         },
       });
     } finally {
+      restoreForeignObjects();
       restoreSvg();
       restores.reverse().forEach((fn) => fn()); 
     }
@@ -622,10 +727,63 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       const isSafari = typeof navigator !== "undefined" && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
       const capturedImage = await captureFullChart(target.element, {
-        pixelRatio: isSafari ? 1.5 : 2,
+        pixelRatio: isSafari ? 2 : 2.5,
         padding: 24,
         borderRadius: "16px",
       });
+
+      // Fit captured image onto PowerPoint slide placeholder aspect ratio (~2.3:1)
+      // to prevent the PPT template from stretching the image horizontally and distorting text/spacing
+      let finalImageForPPT = capturedImage;
+      try {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = capturedImage;
+        await new Promise<void>((resolve, reject) => {
+          if (img.complete) resolve();
+          else {
+            img.onload = () => resolve();
+            img.onerror = () => reject(new Error("Image load failed for PPT fit"));
+          }
+        });
+
+        const light = isLightMode(target.element);
+        const bgColor = light ? "#FFFFFF" : "#070914";
+        const targetAspect = 2.3; // Target ratio for slide content area (~10in / ~4.35in)
+        const imgAspect = img.width / img.height;
+
+        let canvasW = img.width;
+        let canvasH = img.height;
+        let drawX = 0;
+        let drawY = 0;
+
+        if (imgAspect < targetAspect) {
+          // Card is taller/square: expand canvas width with background color so text never stretches horizontally
+          canvasW = Math.round(img.height * targetAspect);
+          canvasH = img.height;
+          drawX = Math.round((canvasW - img.width) / 2);
+          drawY = 0;
+        } else if (imgAspect > targetAspect) {
+          // Card is wider: expand canvas height with background color so text never squashes vertically
+          canvasW = img.width;
+          canvasH = Math.round(img.width / targetAspect);
+          drawX = 0;
+          drawY = Math.round((canvasH - img.height) / 2);
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = canvasW;
+        canvas.height = canvasH;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, canvasW, canvasH);
+          ctx.drawImage(img, drawX, drawY, img.width, img.height);
+          finalImageForPPT = canvas.toDataURL("image/png");
+        }
+      } catch (fitErr) {
+        console.warn("PPT aspect ratio fitting fallback:", fitErr);
+      }
 
       const res = await fetch(`${apiBaseUrl}/api/analyze-files/export-ppt`, {
         method: "POST",
@@ -636,7 +794,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         body: JSON.stringify({
           title: target.title || "AI Generated Analysis",
           description: "",
-          imageUrl: capturedImage,
+          imageUrl: finalImageForPPT,
         }),
       });
 
