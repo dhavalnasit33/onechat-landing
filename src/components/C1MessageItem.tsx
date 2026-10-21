@@ -12,6 +12,8 @@ import {
   Check,
   Loader2,
   Sparkles,
+  Maximize2,
+  X,
 } from "lucide-react";
 
 const C1Component = dynamic(
@@ -51,6 +53,9 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   const [exportingId, setExportingId] = useState<string | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [lightboxTarget, setLightboxTarget] = useState<ChartItemTarget | null>(null);
+  const [lightboxImageSrc, setLightboxImageSrc] = useState<string | null>(null);
+  const [lightboxLoading, setLightboxLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (toastMessage) {
@@ -202,10 +207,75 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     return !node.classList.contains("chart-action-overlay");
   };
 
-  // Helper to ensure all Recharts SVG texts (Y-axis numbers, etc.) are bright light slate
-  const applyBrightSvgStyles = (element: HTMLElement) => {
+  // Helper to detect if current theme or element is light mode (including computer/OS theme setting)
+  const isLightMode = (element?: HTMLElement | null): boolean => {
+    if (typeof window === "undefined") return false;
+
+    // 1. Explicit HTML/Body class override
+    if (document.documentElement.classList.contains("light") || document.body.classList.contains("light")) {
+      return true;
+    }
+    if (document.documentElement.classList.contains("dark") && !document.documentElement.classList.contains("light")) {
+      // Check if computer setting is explicitly light or dark
+      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const systemPrefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+
+      // If computer/OS setting changed to dark, it's dark
+      if (systemPrefersDark) return false;
+      // If computer/OS setting changed to light, it's light
+      if (systemPrefersLight) return true;
+    }
+
+    // 2. Direct inspect element and its surroundings for computed colors
+    const target = element || containerRef.current;
+    if (target) {
+      let curr: HTMLElement | null = target;
+      while (curr && curr !== document.body) {
+        if (curr.classList.contains("light")) return true;
+        if (curr.classList.contains("dark")) return false;
+
+        const bg = window.getComputedStyle(curr).backgroundColor;
+        if (bg && bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)") {
+          const rgb = bg.match(/\d+/g);
+          if (rgb && rgb.length >= 3) {
+            const r = parseInt(rgb[0]), g = parseInt(rgb[1]), b = parseInt(rgb[2]);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            if (brightness > 140) return true; // Light background detected!
+            if (brightness < 70) return false; // Dark background detected!
+          }
+        }
+        curr = curr.parentElement;
+      }
+
+      // Check text nodes inside the chart
+      const allTextNodes = target.querySelectorAll("text, tspan, p, span, h1, h2, h3, h4, strong");
+      for (let i = 0; i < Math.min(allTextNodes.length, 15); i++) {
+        const t = allTextNodes[i] as HTMLElement;
+        const fill = t.getAttribute?.("fill") || window.getComputedStyle(t).fill || window.getComputedStyle(t).color;
+        if (fill) {
+          const rgb = fill.match(/\d+/g);
+          if (rgb && rgb.length >= 3) {
+            const r = parseInt(rgb[0]), g = parseInt(rgb[1]), b = parseInt(rgb[2]);
+            const textBrightness = (r * 299 + g * 587 + b * 114) / 1000;
+            if (textBrightness < 120) return true; // Dark text = Light theme!
+            if (textBrightness > 200) return false; // Light text = Dark theme!
+          }
+        }
+      }
+    }
+
+    // 3. Fallback to OS/Computer theme preference
+    if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+      return true;
+    }
+    return false;
+  };
+
+  // Helper to ensure all Recharts SVG texts are legible depending on theme
+  const applySvgStylesForCapture = (element: HTMLElement, light: boolean) => {
     const textNodes = element.querySelectorAll("text, tspan, .recharts-cartesian-axis-tick text, .recharts-text");
     const originalFills: { el: SVGTextElement; fill: string; styleFill: string; opacity: string }[] = [];
+    const targetColor = light ? "#1E293B" : "#F8FAFC";
     textNodes.forEach((t) => {
       const el = t as SVGTextElement;
       originalFills.push({
@@ -214,8 +284,8 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         styleFill: el.style.fill || "",
         opacity: el.style.opacity || "",
       });
-      el.setAttribute("fill", "#F8FAFC");
-      el.style.fill = "#F8FAFC";
+      el.setAttribute("fill", targetColor);
+      el.style.fill = targetColor;
       el.style.opacity = "1";
     });
     return () => {
@@ -334,10 +404,12 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     const captureHeight = Math.ceil(maxY + topOverflow + padding * 2 + 20);
 
     // ---- 4. Capture ----
-    const restoreSvg = applyBrightSvgStyles(element);
+    const light = isLightMode(element);
+    const bgColor = light ? "#FFFFFF" : "#070914";
+    const restoreSvg = applySvgStylesForCapture(element, light);
     try {
       return await toPng(element, {
-        backgroundColor: "#070914",
+        backgroundColor: bgColor,
         pixelRatio,
         cacheBust: true,
         filter: imageFilter as any,
@@ -436,6 +508,31 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     }
   };
 
+  // ---------------- FULL VIEW / LIGHTBOX ----------------
+  const handleOpenFullView = async (target: ChartItemTarget) => {
+    try {
+      setLightboxTarget(target);
+      setLightboxImageSrc(null);
+      setLightboxLoading(true);
+      const dataUrl = await captureFullChart(target.element, {
+        pixelRatio: 2.5,
+        padding: 24,
+        borderRadius: "16px",
+      });
+      setLightboxImageSrc(dataUrl);
+    } catch (err) {
+      console.error("Error generating lightbox preview:", err);
+    } finally {
+      setLightboxLoading(false);
+    }
+  };
+
+  const handleCloseLightbox = () => {
+    setLightboxTarget(null);
+    setLightboxImageSrc(null);
+    setLightboxLoading(false);
+  };
+
   // ---------------- DOWNLOAD PNG ----------------
   const handleDownloadPNG = async (target: ChartItemTarget) => {
     try {
@@ -448,7 +545,9 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       const link = document.createElement("a");
       link.download = `${(target.title || "chart").replace(/[^a-zA-Z0-9]/g, "_")}.png`;
       link.href = dataUrl;
+      document.body.appendChild(link);
       link.click();
+      link.remove();
       setToastMessage(`"${target.title}" downloaded as PNG!`);
     } catch (err) {
       console.error("Error exporting PNG:", err);
@@ -463,18 +562,24 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   const handleDownloadPDF = async (target: ChartItemTarget) => {
     try {
       setExportingId(target.id);
+      const isSafari = typeof navigator !== "undefined" && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
       const { jsPDF } = await import("jspdf");
       const dataUrl = await captureFullChart(target.element, {
-        pixelRatio: 2.5,
+        pixelRatio: isSafari ? 2 : 2.5,
         padding: 24,
         borderRadius: "16px",
       });
 
       const img = new Image();
+      img.crossOrigin = "anonymous";
       img.src = dataUrl;
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
+      await new Promise<void>((resolve, reject) => {
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error("Image failed to load for PDF"));
+        }
       });
 
       const pdf = new jsPDF({
@@ -483,11 +588,27 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         format: [img.width, img.height],
       });
       pdf.addImage(dataUrl, "PNG", 0, 0, img.width, img.height);
-      pdf.save(`${(target.title || "chart").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`);
+      const filename = `${(target.title || "chart").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+
+      // Safari-safe file download trigger using blob output
+      try {
+        const blob = pdf.output("blob");
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+      } catch (_) {
+        pdf.save(filename);
+      }
+
       setToastMessage(`"${target.title}" downloaded as PDF!`);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error exporting PDF:", err);
-      alert("Failed to export PDF. Please try again.");
+      alert(err?.message || "Failed to export PDF. Please try again.");
     } finally {
       setExportingId(null);
       setActiveDropdownId(null);
@@ -498,9 +619,10 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   const handleDownloadPPT = async (target: ChartItemTarget) => {
     try {
       setExportingId(target.id);
+      const isSafari = typeof navigator !== "undefined" && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
       const capturedImage = await captureFullChart(target.element, {
-        pixelRatio: 2,
+        pixelRatio: isSafari ? 1.5 : 2,
         padding: 24,
         borderRadius: "16px",
       });
@@ -519,18 +641,29 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       });
 
       if (!res.ok) {
-        throw new Error("Failed to generate PowerPoint slide");
+        let errorText = "";
+        try {
+          const errJson = await res.json();
+          errorText = errJson.message || "";
+        } catch (_) {}
+        throw new Error(errorText || `Server returned ${res.status}: Failed to generate PowerPoint slide`);
       }
 
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
+      const rawBlob = await res.blob();
+      // Ensure proper PPTX MIME type for Safari
+      const pptxBlob = new Blob([rawBlob], {
+        type: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      });
+      const url = window.URL.createObjectURL(pptxBlob);
       const link = document.createElement("a");
       link.href = url;
       link.download = `${(target.title || "slide").replace(/[^a-zA-Z0-9]/g, "_")}.pptx`;
+      link.target = "_self";
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
+      // Safari requires delaying URL revocation so the download pipeline can consume it
+      setTimeout(() => window.URL.revokeObjectURL(url), 10000);
       setToastMessage(`PowerPoint Slide (.pptx) downloaded for "${target.title}"!`);
     } catch (err: any) {
       console.error("Error exporting PPT:", err);
@@ -555,16 +688,11 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       {/* Rendered Container */}
       <div
         ref={containerRef}
-        className="rounded-2xl border border-[#1E223D] bg-[#070914] p-3 sm:p-5 shadow-lg relative"
+        className="rounded-2xl border border-slate-200/20 dark:border-[#1E223D] bg-white dark:bg-[#070914] text-slate-900 dark:text-[#F8FAFC] p-3 sm:p-5 shadow-lg relative"
       >
         <div
           suppressHydrationWarning
-          className="dark space-y-3"
-          style={{
-            colorScheme: "dark",
-            backgroundColor: "#070914",
-            color: "#F8FAFC",
-          }}
+          className="space-y-3"
         >
           <C1Component c1Response={message.content} isStreaming={isStreaming} />
           {!isStreaming &&
@@ -577,39 +705,75 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                   className={"chart-action-overlay absolute z-30 flex items-center gap-1 sm:gap-1.5 rounded-lg border border-[#292D49] bg-[#0E1222]/95 px-2 py-1 shadow-2xl backdrop-blur-md transition-all hover:border-[#7564F6]"}
                   style={{ top: '8px', right: '12px' }}
                 >
+                  {/* Full View Button */}
+                  <div className="relative group/fv">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenFullView(target)}
+                      className={"flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95"}
+                      aria-label="Full View"
+                    >
+                      <Maximize2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/fv:text-white transition-colors shrink-0"} />
+                      <span className="hidden xs:inline">Full View</span>
+                    </button>
+                    {/* Tooltip: displays downward to avoid being clipped by top boundary */}
+                    <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/fv:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                      Full View
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+                    </div>
+                  </div>
+
+                  <div className={"h-4 w-px bg-[#292D49] shrink-0"} />
+
                   {/* Share Button */}
-                  <button
-                    type="button"
-                    onClick={() => handleShare(target)}
-                    disabled={sharingId === target.id}
-                    title={"Share " + target.title}
-                    className={"flex items-center gap-1 sm:gap-1.5 rounded-md px-2 py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95"}
-                  >
-                    {sharingId === target.id ? (
-                      <Loader2 className={"h-3 w-3 animate-spin text-[#7564F6] shrink-0"} />
-                    ) : (
-                      <Share2 className={"h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400 shrink-0"} />
-                    )}
-                    <span className="hidden xs:inline">Share</span>
-                  </button>
+                  <div className="relative group/share">
+                    <button
+                      type="button"
+                      onClick={() => handleShare(target)}
+                      disabled={sharingId === target.id}
+                      className={"flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"}
+                      aria-label="Share Chart"
+                    >
+                      {sharingId === target.id ? (
+                        <Loader2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0"} />
+                      ) : (
+                        <Share2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/share:text-white transition-colors shrink-0"} />
+                      )}
+                      <span className="hidden xs:inline">Share</span>
+                    </button>
+                    {/* Tooltip: Share Chart - displays downward */}
+                    <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                      Share Chart
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+                    </div>
+                  </div>
 
-                  <div className={"h-3 sm:h-3.5 w-px bg-[#292D49] shrink-0"} />
+                  <div className={"h-4 w-px bg-[#292D49] shrink-0"} />
 
-                  <div className={"relative"}>
+                  {/* Download Dropdown */}
+                  <div className={"relative group/dl"}>
                     <button
                       type="button"
                       onClick={() => setActiveDropdownId(activeDropdownId === target.id ? null : target.id)}
                       disabled={exportingId === target.id}
-                      title={"Download " + target.title}
-                      className={"flex items-center gap-1 sm:gap-1.5 rounded-md px-2 py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95"}
+                      className={"flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"}
+                      aria-label="Download Chart"
                     >
                       {exportingId === target.id ? (
-                        <Loader2 className={"h-3 w-3 animate-spin text-[#7564F6] shrink-0"} />
+                        <Loader2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0"} />
                       ) : (
-                        <Download className={"h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400 shrink-0"} />
+                        <Download className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/dl:text-white transition-colors shrink-0"} />
                       )}
                       <span className="hidden xs:inline">Download</span>
                     </button>
+
+                    {/* Tooltip: Download Chart (hidden if dropdown is open) - aligned to right edge so it never overflows */}
+                    {activeDropdownId !== target.id && (
+                      <div className="pointer-events-none absolute top-full right-0 mt-2 hidden group-hover/dl:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                        Download Chart
+                        <div className="absolute bottom-full right-3 -mb-px border-4 border-transparent border-b-[#181B34]" />
+                      </div>
+                    )}
 
                     {activeDropdownId === target.id && (
                       <div className={"absolute right-0 top-full mt-1.5 w-36 sm:w-40 rounded-xl border border-[#292D49] bg-[#0E1222] p-1.5 shadow-2xl z-50 animate-in fade-in zoom-in-95"}>
@@ -618,7 +782,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                           onClick={() => handleDownloadPNG(target)}
                           className={"flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-slate-200 hover:bg-[#6C56E5]/20 hover:text-white transition cursor-pointer"}
                         >
-                          <ImageIcon className={"h-3.5 w-3.5 text-[#A78BFA] shrink-0"} />
+                          <ImageIcon className={"h-4 w-4 text-[#A78BFA] shrink-0"} />
                           <span>PNG Image</span>
                         </button>
                         <button
@@ -626,7 +790,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                           onClick={() => handleDownloadPDF(target)}
                           className={"flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-slate-200 hover:bg-[#6C56E5]/20 hover:text-white transition cursor-pointer"}
                         >
-                          <FileText className={"h-3.5 w-3.5 text-[#F43F5E] shrink-0"} />
+                          <FileText className={"h-4 w-4 text-[#F43F5E] shrink-0"} />
                           <span>PDF Document</span>
                         </button>
                         <button
@@ -634,7 +798,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                           onClick={() => handleDownloadPPT(target)}
                           className={"flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-slate-200 hover:bg-[#6C56E5]/20 hover:text-white transition cursor-pointer"}
                         >
-                          <Presentation className={"h-3.5 w-3.5 text-[#F97316] shrink-0"} />
+                          <Presentation className={"h-4 w-4 text-[#F97316] shrink-0"} />
                           <span>PPT (Slide)</span>
                         </button>
                       </div>
@@ -652,6 +816,88 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
           )}
         </div>
       </div>
+
+      {/* Lightbox Popup */}
+      {lightboxTarget && (() => {
+        const light = isLightMode(lightboxTarget.element);
+        return (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 sm:p-6 md:p-8 animate-in fade-in duration-200"
+            onClick={handleCloseLightbox}
+          >
+            <div
+              className={`relative flex flex-col max-h-[92vh] max-w-5xl w-full rounded-2xl border shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ${
+                light
+                  ? "border-slate-200 bg-white text-slate-900"
+                  : "border-[#292D49] bg-[#0E1222] text-white"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Lightbox Header */}
+              <div
+                className={`flex items-center justify-between border-b px-5 py-3.5 ${
+                  light
+                    ? "border-slate-200 bg-slate-50/90 text-slate-800"
+                    : "border-[#1E223D] bg-[#070914]/80 text-white"
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-0 pr-4">
+                  <Sparkles className="h-4 w-4 text-[#7564F6] shrink-0" />
+                  <h3 className="text-sm sm:text-base font-semibold truncate">
+                    {lightboxTarget.title || "Full View"}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleCloseLightbox}
+                    title="Close (Esc)"
+                    className={`rounded-lg p-1.5 transition cursor-pointer ${
+                      light
+                        ? "text-slate-500 hover:text-slate-900 hover:bg-slate-200/60"
+                        : "text-slate-400 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Lightbox Body / Content */}
+              <div
+                className={`flex-1 overflow-auto p-4 sm:p-6 flex items-center justify-center min-h-[300px] ${
+                  light ? "bg-slate-50/50" : "bg-[#070914]"
+                }`}
+              >
+                {lightboxLoading ? (
+                  <div
+                    className={`flex flex-col items-center gap-3 py-12 ${
+                      light ? "text-slate-600" : "text-slate-400"
+                    }`}
+                  >
+                    <Loader2 className="h-8 w-8 animate-spin text-[#7564F6]" />
+                    <span className="text-sm font-medium">Generating high-resolution view...</span>
+                  </div>
+                ) : lightboxImageSrc ? (
+                  <img
+                    src={lightboxImageSrc}
+                    alt={lightboxTarget.title || "Full View Chart"}
+                    className={`max-h-[76vh] w-auto max-w-full rounded-xl object-contain border shadow-2xl ${
+                      light ? "border-slate-200 bg-white" : "border-[#1E223D] bg-[#070914]"
+                    }`}
+                  />
+                ) : (
+                  <div className={light ? "text-slate-500 text-sm" : "text-slate-400 text-sm"}>
+                    Failed to render chart image
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );
