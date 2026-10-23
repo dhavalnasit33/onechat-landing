@@ -201,12 +201,41 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     };
   }, [isStreaming, message.content, message.id]);
 
-  // Helper filter to exclude action buttons overlay when taking screenshot
+  // Helper filter to exclude action buttons overlay and scroll navigation buttons when taking screenshot
   const imageFilter = (node: HTMLElement) => {
-    if (!node.classList) return true;
-    if (node.classList.contains("chart-action-overlay")) return false;
-    if (node.classList.contains("crayon-chart-vertical-scroll-buttons-container")) return false;
-    if (node.classList.contains("crayon-chart-vertical-scroll-button")) return false;
+    if (!node) return true;
+    if (node.classList) {
+      if (node.classList.contains("chart-action-overlay")) return false;
+      if (
+        node.classList.contains("crayon-chart-vertical-scroll-buttons-container") ||
+        node.classList.contains("crayon-chart-vertical-scroll-button") ||
+        node.classList.contains("openui-chart-vertical-scroll-buttons-container") ||
+        node.classList.contains("openui-chart-vertical-scroll-button") ||
+        node.classList.contains("crayon-chart-horizontal-scroll-buttons-container") ||
+        node.classList.contains("crayon-chart-horizontal-scroll-button") ||
+        node.classList.contains("openui-chart-horizontal-scroll-buttons-container") ||
+        node.classList.contains("openui-chart-horizontal-scroll-button")
+      ) {
+        return false;
+      }
+    }
+    const className = typeof node.className === "string" ? node.className : (node.getAttribute?.("class") || "");
+    if (className) {
+      if (
+        className.includes("chart-action-overlay") ||
+        className.includes("scroll-button") ||
+        className.includes("scroll-buttons") ||
+        className.includes("scroll-arrow") ||
+        className.includes("scroll-control") ||
+        /scroll.*button/i.test(className)
+      ) {
+        return false;
+      }
+    }
+    const ariaLabel = node.getAttribute?.("aria-label")?.toLowerCase() || "";
+    if (ariaLabel.includes("scroll") || ariaLabel.includes("next page") || ariaLabel.includes("previous page")) {
+      return false;
+    }
     return true;
   };
 
@@ -391,13 +420,17 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       p = p.parentElement;
     }
 
-    // ---- 2. Find ALL horizontal scrollers inside the card (by computed style) ----
-    const allEls = Array.from(element.querySelectorAll<HTMLElement>("*"));
+    // ---- 2. Find ALL horizontal scrollers inside the card ----
+    const allEls = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
     const hScrollers = allEls.filter((el) => {
       const ox = window.getComputedStyle(el).overflowX;
+      const isKnown =
+        el.classList.contains("openui-bar-chart-main-container") ||
+        el.classList.contains("crayon-bar-chart-main-container") ||
+        /bar-chart-main-container/.test(el.className || "");
       return (
-        (ox === "auto" || ox === "scroll" || ox === "hidden") &&
-        el.scrollWidth > el.clientWidth + 2
+        ((ox === "auto" || ox === "scroll" || ox === "hidden") && el.scrollWidth > el.clientWidth + 2) ||
+        (isKnown && (el.scrollWidth > el.clientWidth || !!el.querySelector("svg, .recharts-wrapper")))
       );
     });
 
@@ -411,7 +444,74 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
 
     let extraWidth = 0;
     hScrollers.forEach((el) => {
-      extraWidth = Math.max(extraWidth, el.scrollWidth - el.clientWidth);
+      let full = el.scrollWidth;
+      el.querySelectorAll<SVGSVGElement>("svg").forEach((svg) => {
+        const wAttr = parseFloat(svg.getAttribute("width") || "0");
+        if (wAttr > full) full = wAttr;
+        const vb = (svg as SVGSVGElement).viewBox?.baseVal;
+        if (vb && vb.width > full) full = vb.width;
+        try {
+          const bb = (svg as any).getBBox?.();
+          if (bb && bb.width > full) full = bb.width;
+        } catch (_) {}
+      });
+      el.querySelectorAll<HTMLElement>(".recharts-wrapper, [class*='recharts-wrapper']").forEach((rw) => {
+        const w = parseFloat(rw.style.width || "0") || rw.scrollWidth || rw.offsetWidth;
+        if (w > full) full = w;
+      });
+
+      const diff = Math.max(0, full - el.clientWidth);
+      extraWidth = Math.max(extraWidth, diff);
+
+      saveStyle(el);
+      el.scrollLeft = 0;
+      el.style.setProperty("overflow", "visible", "important");
+      el.style.setProperty("overflow-x", "visible", "important");
+      el.style.setProperty("overflow-y", "visible", "important");
+      el.style.setProperty("width", `${full}px`, "important");
+      el.style.setProperty("min-width", `${full}px`, "important");
+      el.style.setProperty("max-width", "none", "important");
+      el.style.setProperty("flex", "none", "important");
+
+      el.querySelectorAll<HTMLElement>(".recharts-wrapper, svg").forEach((inner) => {
+        saveStyle(inner);
+        inner.style.setProperty("max-width", "none", "important");
+        inner.style.setProperty("overflow", "visible", "important");
+      });
+
+      // Expand all intermediate wrapper elements up to the card layout
+      let curr = el.parentElement;
+      while (curr && curr !== element) {
+        saveStyle(curr);
+        curr.style.setProperty("overflow", "visible", "important");
+        curr.style.setProperty("max-width", "none", "important");
+        if (
+          curr.classList.contains("c1-layout-row-ls-large-container") ||
+          curr.classList.contains("c1-layout-row-sl-large-container") ||
+          curr.classList.contains("c1-layout-row-mm-medium-left-container") ||
+          curr.classList.contains("c1-layout-row-mm-medium-right-container")
+        ) {
+          const currentColWidth = curr.offsetWidth || 500;
+          const targetWidth = Math.max(currentColWidth + diff, full + 60);
+          curr.style.setProperty("flex", "none", "important");
+          curr.style.setProperty("width", `${targetWidth}px`, "important");
+          curr.style.setProperty("min-width", `${targetWidth}px`, "important");
+          curr.style.setProperty("max-width", "none", "important");
+        } else if (
+          curr.classList.contains("c1-layout-row-ls-container") ||
+          curr.classList.contains("c1-layout-row-sl-container") ||
+          curr.classList.contains("c1-layout-row-mm-container")
+        ) {
+          curr.style.setProperty("flex-wrap", "nowrap", "important");
+          curr.style.setProperty("width", "auto", "important");
+          curr.style.setProperty("min-width", `${full + 380}px`, "important");
+          curr.style.setProperty("max-width", "none", "important");
+        } else {
+          curr.style.setProperty("width", "auto", "important");
+          curr.style.setProperty("min-width", `${full}px`, "important");
+        }
+        curr = curr.parentElement;
+      }
     });
 
     let extraHeight = 0;
@@ -419,76 +519,71 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       extraHeight = Math.max(extraHeight, el.scrollHeight - el.clientHeight);
     });
 
-    hScrollers.forEach((el) => {
-      const full = el.scrollWidth;
-      saveStyle(el);
-      el.scrollLeft = 0;
-      el.style.overflow = "visible";
-      el.style.overflowX = "visible";
-      el.style.overflowY = "visible";
-      el.style.width = `${full}px`;
-      el.style.minWidth = `${full}px`;
-      el.style.maxWidth = "none";
-      el.style.flex = "none";
-    });
-
     vScrollers.forEach((el) => {
       const fullHeight = el.scrollHeight;
       saveStyle(el);
       el.scrollTop = 0;
-      el.style.overflow = "visible";
-      el.style.overflowX = "visible";
-      el.style.overflowY = "visible";
-      el.style.height = `${fullHeight}px`;
-      el.style.minHeight = `${fullHeight}px`;
-      el.style.maxHeight = "none";
-      el.style.flex = "none";
+      el.style.setProperty("overflow", "visible", "important");
+      el.style.setProperty("overflow-x", "visible", "important");
+      el.style.setProperty("overflow-y", "visible", "important");
+      el.style.setProperty("height", `${fullHeight}px`, "important");
+      el.style.setProperty("min-height", `${fullHeight}px`, "important");
+      el.style.setProperty("max-height", "none", "important");
+      el.style.setProperty("flex", "none", "important");
     });
 
     // un-clip other chart parts (legend, svg, wrapper, HorizontalBarChart wrappers)
     element
       .querySelectorAll<HTMLElement>(
-        ".recharts-wrapper, .recharts-legend-wrapper, svg, [class*='overflow'], .crayon-horizontal-bar-chart-container-inner-wrapper, .crayon-horizontal-bar-chart-container-inner, .crayon-horizontal-bar-chart-main-container, .crayon-horizontal-bar-chart-container"
+        ".recharts-wrapper, .recharts-legend-wrapper, svg, [class*='overflow'], .crayon-horizontal-bar-chart-container-inner-wrapper, .crayon-horizontal-bar-chart-container-inner, .crayon-horizontal-bar-chart-main-container, .crayon-horizontal-bar-chart-container, [class*='chart-container']"
       )
       .forEach((el) => {
         if (hScrollers.includes(el) || vScrollers.includes(el)) return;
         saveStyle(el);
-        el.style.overflow = "visible";
-        el.style.maxHeight = "none";
+        el.style.setProperty("overflow", "visible", "important");
+        el.style.setProperty("max-height", "none", "important");
         if (
           el.classList.contains("crayon-horizontal-bar-chart-container-inner-wrapper") ||
           el.classList.contains("crayon-horizontal-bar-chart-container-inner")
         ) {
-          el.style.height = "auto";
-          el.style.minHeight = "auto";
+          el.style.setProperty("height", "auto", "important");
+          el.style.setProperty("min-height", "auto", "important");
         }
       });
 
     // grow the card itself so the extra width fits inside it
     saveStyle(element);
     const baseWidth = element.offsetWidth;
-    const fullCardWidth = baseWidth + extraWidth;
-    element.style.overflow = "visible";
-    element.style.maxWidth = "none";
-    element.style.width = `${fullCardWidth}px`;
-    element.style.minWidth = `${fullCardWidth}px`;
+    const fullCardWidth = Math.max(baseWidth + extraWidth, extraWidth > 0 ? baseWidth + extraWidth + 20 : baseWidth);
+    element.style.setProperty("overflow", "visible", "important");
+    element.style.setProperty("max-width", "none", "important");
+    element.style.setProperty("width", `${fullCardWidth}px`, "important");
+    element.style.setProperty("min-width", `${fullCardWidth}px`, "important");
 
     const baseHeight = element.offsetHeight;
     const fullCardHeight = baseHeight + extraHeight;
-    element.style.maxHeight = "none";
+    element.style.setProperty("max-height", "none", "important");
     if (extraHeight > 0) {
-      element.style.height = `${fullCardHeight}px`;
-      element.style.minHeight = `${fullCardHeight}px`;
+      element.style.setProperty("height", `${fullCardHeight}px`, "important");
+      element.style.setProperty("min-height", `${fullCardHeight}px`, "important");
     }
+
+    element.classList.add("c1-chart-capturing");
 
     await new Promise((r) => setTimeout(r, 350)); 
 
-    // ---- 3. Measure TRUE bounds ----
+    // ---- 3. Apply SVG styles & conversions before measuring bounds ----
+    const light = isLightMode(element);
+    const bgColor = light ? "#FFFFFF" : "#070914";
+    const restoreSvg = applySvgStylesForCapture(element, light);
+    const restoreForeignObjects = convertForeignObjectsForCapture(element, light);
+
+    // Measure TRUE bounds (with widened Y-axis included)
     const rootRect = element.getBoundingClientRect();
     let minX = 0,
       minY = 0;
-    let maxX = Math.max(element.scrollWidth, element.offsetWidth);
-    let maxY = Math.max(element.scrollHeight, element.offsetHeight);
+    let maxX = Math.max(element.scrollWidth, element.offsetWidth, fullCardWidth);
+    let maxY = Math.max(element.scrollHeight, element.offsetHeight, fullCardHeight);
 
     element.querySelectorAll<Element>("*").forEach((child) => {
       try {
@@ -508,10 +603,6 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     const captureHeight = Math.ceil(maxY + topOverflow + padding * 2 + 20);
 
     // ---- 4. Capture ----
-    const light = isLightMode(element);
-    const bgColor = light ? "#FFFFFF" : "#070914";
-    const restoreSvg = applySvgStylesForCapture(element, light);
-    const restoreForeignObjects = convertForeignObjectsForCapture(element, light);
     try {
       return await toPng(element, {
         backgroundColor: bgColor,
@@ -532,6 +623,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         },
       });
     } finally {
+      element.classList.remove("c1-chart-capturing");
       restoreForeignObjects();
       restoreSvg();
       restores.reverse().forEach((fn) => fn()); 

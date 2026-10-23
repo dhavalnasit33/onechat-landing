@@ -313,6 +313,8 @@ export default function SharedReportPage() {
 
     await new Promise((r) => setTimeout(r, 80));
 
+    element.classList.add("c1-chart-capturing");
+
     let dataUrl: string;
     try {
       dataUrl = await toPng(element, {
@@ -322,14 +324,30 @@ export default function SharedReportPage() {
         width: captureWidth,
         height: captureHeight,
         filter: (node: HTMLElement) => {
-          if (!node.classList) return true;
-          if (node.classList.contains("crayon-chart-vertical-scroll-buttons-container")) return false;
-          if (node.classList.contains("crayon-chart-vertical-scroll-button")) return false;
+          if (!node) return true;
+          const className = typeof node.className === "string" ? node.className : (node.getAttribute?.("class") || "");
+          if (className) {
+            if (
+              className.includes("chart-action-overlay") ||
+              className.includes("scroll-button") ||
+              className.includes("scroll-buttons") ||
+              className.includes("scroll-arrow") ||
+              className.includes("scroll-control") ||
+              /scroll.*button/i.test(className)
+            ) {
+              return false;
+            }
+          }
+          const ariaLabel = node.getAttribute?.("aria-label")?.toLowerCase() || "";
+          if (ariaLabel.includes("scroll") || ariaLabel.includes("next page") || ariaLabel.includes("previous page")) {
+            return false;
+          }
           return true;
         },
         style: { padding: "24px", borderRadius: "16px", overflow: "visible", overflowY: "visible", boxSizing: "border-box" },
       });
     } finally {
+      element.classList.remove("c1-chart-capturing");
       restoreForeign();
       svgRestores.forEach(({ el, fill, styleFill, opacity }) => {
         if (fill) el.setAttribute("fill", fill); else el.removeAttribute("fill");

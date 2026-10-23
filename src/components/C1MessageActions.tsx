@@ -145,6 +145,159 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
     };
   };
 
+  // Helper filter to exclude action buttons overlay and scroll navigation buttons when taking screenshot
+  const imageFilter = (node: HTMLElement) => {
+    if (!node) return true;
+    if (node.classList) {
+      if (node.classList.contains("chart-action-overlay")) return false;
+      if (
+        node.classList.contains("crayon-chart-vertical-scroll-buttons-container") ||
+        node.classList.contains("crayon-chart-vertical-scroll-button") ||
+        node.classList.contains("openui-chart-vertical-scroll-buttons-container") ||
+        node.classList.contains("openui-chart-vertical-scroll-button") ||
+        node.classList.contains("crayon-chart-horizontal-scroll-buttons-container") ||
+        node.classList.contains("crayon-chart-horizontal-scroll-button") ||
+        node.classList.contains("openui-chart-horizontal-scroll-buttons-container") ||
+        node.classList.contains("openui-chart-horizontal-scroll-button")
+      ) {
+        return false;
+      }
+    }
+    const className = typeof node.className === "string" ? node.className : (node.getAttribute?.("class") || "");
+    if (className) {
+      if (
+        className.includes("chart-action-overlay") ||
+        className.includes("scroll-button") ||
+        className.includes("scroll-buttons") ||
+        className.includes("scroll-arrow") ||
+        className.includes("scroll-control") ||
+        /scroll.*button/i.test(className)
+      ) {
+        return false;
+      }
+    }
+    const ariaLabel = node.getAttribute?.("aria-label")?.toLowerCase() || "";
+    if (ariaLabel.includes("scroll") || ariaLabel.includes("next page") || ariaLabel.includes("previous page")) {
+      return false;
+    }
+    return true;
+  };
+
+  // Helper to expand all horizontal scrollers inside container so no chart is cut off
+  const expandContainerForCapture = (element: HTMLElement) => {
+    const restores: Array<() => void> = [];
+    const saveStyle = (el: HTMLElement) => {
+      const prev = el.getAttribute("style");
+      restores.push(() => {
+        if (prev === null) el.removeAttribute("style");
+        else el.setAttribute("style", prev);
+      });
+    };
+
+    element.classList.add("c1-chart-capturing");
+    restores.push(() => element.classList.remove("c1-chart-capturing"));
+
+    let p: HTMLElement | null = element.parentElement;
+    while (p && p !== document.body) {
+      saveStyle(p);
+      p.style.overflow = "visible";
+      p.style.maxHeight = "none";
+      p = p.parentElement;
+    }
+
+    const allEls = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
+    const hScrollers = allEls.filter((el) => {
+      const ox = window.getComputedStyle(el).overflowX;
+      const isKnown =
+        el.classList.contains("openui-bar-chart-main-container") ||
+        el.classList.contains("crayon-bar-chart-main-container") ||
+        /bar-chart-main-container/.test(el.className || "");
+      return (
+        ((ox === "auto" || ox === "scroll" || ox === "hidden") && el.scrollWidth > el.clientWidth + 2) ||
+        (isKnown && (el.scrollWidth > el.clientWidth || !!el.querySelector("svg, .recharts-wrapper")))
+      );
+    });
+
+    let maxExtraWidth = 0;
+    hScrollers.forEach((el) => {
+      let full = el.scrollWidth;
+      el.querySelectorAll<SVGSVGElement>("svg").forEach((svg) => {
+        const wAttr = parseFloat(svg.getAttribute("width") || "0");
+        if (wAttr > full) full = wAttr;
+        const vb = (svg as SVGSVGElement).viewBox?.baseVal;
+        if (vb && vb.width > full) full = vb.width;
+      });
+      el.querySelectorAll<HTMLElement>(".recharts-wrapper, [class*='recharts-wrapper']").forEach((rw) => {
+        const w = parseFloat(rw.style.width || "0") || rw.scrollWidth || rw.offsetWidth;
+        if (w > full) full = w;
+      });
+
+      const diff = Math.max(0, full - el.clientWidth);
+      maxExtraWidth = Math.max(maxExtraWidth, diff);
+
+      saveStyle(el);
+      el.scrollLeft = 0;
+      el.style.setProperty("overflow", "visible", "important");
+      el.style.setProperty("overflow-x", "visible", "important");
+      el.style.setProperty("overflow-y", "visible", "important");
+      el.style.setProperty("width", `${full}px`, "important");
+      el.style.setProperty("min-width", `${full}px`, "important");
+      el.style.setProperty("max-width", "none", "important");
+      el.style.setProperty("flex", "none", "important");
+
+      el.querySelectorAll<HTMLElement>(".recharts-wrapper, svg").forEach((inner) => {
+        saveStyle(inner);
+        inner.style.setProperty("max-width", "none", "important");
+        inner.style.setProperty("overflow", "visible", "important");
+      });
+
+      let curr = el.parentElement;
+      while (curr && curr !== element) {
+        saveStyle(curr);
+        curr.style.setProperty("overflow", "visible", "important");
+        curr.style.setProperty("max-width", "none", "important");
+
+        if (
+          curr.classList.contains("c1-layout-row-ls-large-container") ||
+          curr.classList.contains("c1-layout-row-sl-large-container") ||
+          curr.classList.contains("c1-layout-row-mm-medium-left-container") ||
+          curr.classList.contains("c1-layout-row-mm-medium-right-container")
+        ) {
+          const currentColWidth = curr.offsetWidth || 500;
+          const targetWidth = Math.max(currentColWidth + diff, full + 60);
+          curr.style.setProperty("flex", "none", "important");
+          curr.style.setProperty("width", `${targetWidth}px`, "important");
+          curr.style.setProperty("min-width", `${targetWidth}px`, "important");
+          curr.style.setProperty("max-width", "none", "important");
+        } else if (
+          curr.classList.contains("c1-layout-row-ls-container") ||
+          curr.classList.contains("c1-layout-row-sl-container") ||
+          curr.classList.contains("c1-layout-row-mm-container")
+        ) {
+          curr.style.setProperty("flex-wrap", "nowrap", "important");
+          curr.style.setProperty("width", "auto", "important");
+          curr.style.setProperty("min-width", `${full + 380}px`, "important");
+          curr.style.setProperty("max-width", "none", "important");
+        } else {
+          curr.style.setProperty("width", "auto", "important");
+          curr.style.setProperty("min-width", `${full}px`, "important");
+        }
+        curr = curr.parentElement;
+      }
+    });
+
+    if (maxExtraWidth > 0) {
+      saveStyle(element);
+      const baseWidth = element.offsetWidth;
+      element.style.setProperty("overflow", "visible", "important");
+      element.style.setProperty("max-width", "none", "important");
+      element.style.setProperty("width", `${baseWidth + maxExtraWidth + 20}px`, "important");
+      element.style.setProperty("min-width", `${baseWidth + maxExtraWidth + 20}px`, "important");
+    }
+
+    return () => restores.reverse().forEach((fn) => fn());
+  };
+
   // 1. Share Individual Report / Graph
   const handleShare = async () => {
     if (sharing) return;
@@ -157,15 +310,18 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
       if (targetRef.current) {
         try {
           const { toPng } = await import("html-to-image");
+          const restoreExpansion = expandContainerForCapture(targetRef.current);
           const light = isLightMode(targetRef.current);
           const restoreSvg = applySvgStylesForCapture(targetRef.current, light);
           try {
             capturedThumbnail = await toPng(targetRef.current, {
               backgroundColor: light ? "#FFFFFF" : "#070914",
               pixelRatio: 1,
+              filter: imageFilter as any,
             });
           } finally {
             restoreSvg();
+            restoreExpansion();
           }
         } catch (_) {}
       }
@@ -215,6 +371,7 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
       setDownloading("png");
       const { toPng } = await import("html-to-image");
       const title = extractTitle(content);
+      const restoreExpansion = expandContainerForCapture(targetRef.current);
       const light = isLightMode(targetRef.current);
       const restoreSvg = applySvgStylesForCapture(targetRef.current, light);
       let dataUrl: string;
@@ -223,9 +380,11 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
           backgroundColor: light ? "#FFFFFF" : "#070914",
           pixelRatio: 2,
           cacheBust: true,
+          filter: imageFilter as any,
         });
       } finally {
         restoreSvg();
+        restoreExpansion();
       }
 
       const link = document.createElement("a");
@@ -253,6 +412,7 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
       const { toPng } = await import("html-to-image");
       const { jsPDF } = await import("jspdf");
       const title = extractTitle(content);
+      const restoreExpansion = expandContainerForCapture(targetRef.current);
       const light = isLightMode(targetRef.current);
       const restoreSvg = applySvgStylesForCapture(targetRef.current, light);
       let dataUrl: string;
@@ -261,9 +421,11 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
           backgroundColor: light ? "#FFFFFF" : "#070914",
           pixelRatio: isSafari ? 2 : 2.5,
           cacheBust: true,
+          filter: imageFilter as any,
         });
       } finally {
         restoreSvg();
+        restoreExpansion();
       }
 
       const img = new Image();
@@ -322,15 +484,18 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
       if (targetRef.current) {
         try {
           const { toPng } = await import("html-to-image");
+          const restoreExpansion = expandContainerForCapture(targetRef.current);
           const light = isLightMode(targetRef.current);
           const restoreSvg = applySvgStylesForCapture(targetRef.current, light);
           try {
             capturedImage = await toPng(targetRef.current, {
               backgroundColor: light ? "#FFFFFF" : "#070914",
               pixelRatio: isSafari ? 1.5 : 2,
+              filter: imageFilter as any,
             });
           } finally {
             restoreSvg();
+            restoreExpansion();
           }
         } catch (_) {}
       }
@@ -388,6 +553,7 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
       setLightboxLoading(true);
       if (targetRef.current) {
         const { toPng } = await import("html-to-image");
+        const restoreExpansion = expandContainerForCapture(targetRef.current);
         const light = isLightMode(targetRef.current);
         const restoreSvg = applySvgStylesForCapture(targetRef.current, light);
         let dataUrl: string;
@@ -395,9 +561,11 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
           dataUrl = await toPng(targetRef.current, {
             backgroundColor: light ? "#FFFFFF" : "#070914",
             pixelRatio: 2.5,
+            filter: imageFilter as any,
           });
         } finally {
           restoreSvg();
+          restoreExpansion();
         }
         setLightboxImageSrc(dataUrl);
       }

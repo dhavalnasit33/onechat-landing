@@ -152,7 +152,216 @@ div:has(> button[aria-label*='previous' i], > button[aria-label*='next' i]) {
   overflow: hidden !important;
 }
 
-/* Allow clean horizontal scrolling for multiple slides */
-div[class*='recharts-responsive-container'] {
-  min-width: 240px !important;
+/* Allow clean horizontal scrolling for multiple slides while strictly capping width */
+div[class*='recharts-responsive-container'],
+.recharts-responsive-container {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* ==========================================================================
+   C1 / Thesys Multi-Column Layout & Chart Overlap Immunity
+   Prevents text blocks (e.g. Key Insights) and charts from overlapping
+   across all cards, dashboards, reports, and exported captures.
+   ========================================================================== */
+
+/* 1. Layout Container Rows: Ensure clean horizontal flex without accidental wrap or overflow */
+.c1-layout-row-ls-container,
+.c1-layout-row-sl-container,
+.c1-layout-row-mm-container {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  gap: var(--openui-space-xl, 24px) !important;
+  align-items: stretch !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+}
+
+/* 2. L-S Layout: Large Left (Chart / Content), Small Right (Key Insights / Text) */
+.c1-layout-row-ls-large-container {
+  flex: 1 1 65% !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: calc(68% - 12px) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+}
+
+.c1-layout-row-ls-small-container {
+  flex: 0 0 32% !important;
+  min-width: 250px !important;
+  max-width: calc(32% - 12px) !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* 3. S-L Layout: Small Left (Key Insights / Text), Large Right (Chart / Content) */
+.c1-layout-row-sl-small-container {
+  flex: 0 0 32% !important;
+  min-width: 250px !important;
+  max-width: calc(32% - 12px) !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.c1-layout-row-sl-large-container {
+  flex: 1 1 65% !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: calc(68% - 12px) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+}
+
+/* 4. M-M Layout: Medium Left, Medium Right (50% / 50%) */
+.c1-layout-row-mm-medium-left-container,
+.c1-layout-row-mm-medium-right-container {
+  flex: 1 1 48% !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: calc(50% - 12px) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+}
+
+/* Vertical Separator between columns */
+.c1-layout-row-separator {
+  flex-shrink: 0 !important;
+  width: 1px !important;
+  background-color: var(--openui-border-default, #242945) !important;
+  align-self: stretch !important;
+}
+
+/* 5. Responsive Stacking on Mobile & Small Tablets (< 860px) */
+@media (max-width: 860px) {
+  .c1-layout-row-ls-container,
+  .c1-layout-row-sl-container,
+  .c1-layout-row-mm-container {
+    flex-direction: column !important;
+    gap: var(--openui-space-l, 20px) !important;
+  }
+
+  .c1-layout-row-ls-large-container,
+  .c1-layout-row-ls-small-container,
+  .c1-layout-row-sl-large-container,
+  .c1-layout-row-sl-small-container,
+  .c1-layout-row-mm-medium-left-container,
+  .c1-layout-row-mm-medium-right-container {
+    flex: 1 1 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .c1-layout-row-separator {
+    display: none !important;
+  }
+}
+
+/* 6. Chart Containment & Natural Y-Axis Rendering */
+.c1-chart-wrapper,
+.crayon-bar-chart-container,
+.openui-bar-chart-container,
+.crayon-line-chart-container,
+.openui-line-chart-container,
+.crayon-area-chart-container,
+.openui-area-chart-container,
+.crayon-scatter-chart-container,
+.openui-scatter-chart-container,
+[class*='bar-chart-container'],
+[class*='line-chart-container'],
+[class*='area-chart-container'],
+[class*='scatter-chart-container'],
+[class*='chart-wrapper'] {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+}
+
+.crayon-bar-chart-container-inner,
+.openui-bar-chart-container-inner,
+[class*='bar-chart-container-inner'] {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure Y-Axis container and text are fully visible, exactly as originally intended */
+.openui-bar-chart-y-axis-container,
+.crayon-bar-chart-y-axis-container,
+.openui-line-chart-y-axis-container,
+.crayon-line-chart-y-axis-container,
+.openui-area-chart-y-axis-container,
+.crayon-area-chart-y-axis-container,
+[class*='y-axis-container'] {
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.openui-chart-y-axis-tick,
+.crayon-chart-y-axis-tick,
+.recharts-yAxis text,
+.recharts-cartesian-axis-tick text,
+[class*='chart-y-axis-tick'] {
+  overflow: visible !important;
+}
+
+/* Internal horizontal scrolling for wide charts without spilling out into sibling columns */
+.crayon-bar-chart-main-container,
+.openui-bar-chart-main-container,
+[class*='bar-chart-main-container'] {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  box-sizing: border-box !important;
+}
+
+.crayon-bar-chart-main-container::-webkit-scrollbar,
+.openui-bar-chart-main-container::-webkit-scrollbar,
+[class*='bar-chart-main-container']::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Ensure all scroll buttons & overlay controls are completely hidden when exporting / capturing */
+.c1-chart-capturing .crayon-chart-horizontal-scroll-buttons-container,
+.c1-chart-capturing .openui-chart-horizontal-scroll-buttons-container,
+.c1-chart-capturing .crayon-chart-horizontal-scroll-button,
+.c1-chart-capturing .openui-chart-horizontal-scroll-button,
+.c1-chart-capturing .crayon-chart-vertical-scroll-buttons-container,
+.c1-chart-capturing .openui-chart-vertical-scroll-buttons-container,
+.c1-chart-capturing .crayon-chart-vertical-scroll-button,
+.c1-chart-capturing .openui-chart-vertical-scroll-button,
+.c1-chart-capturing [class*="scroll-button"],
+.c1-chart-capturing [class*="scroll-buttons"],
+.c1-chart-capturing [class*="scroll-arrow"],
+.c1-chart-capturing [class*="scroll-control"],
+.c1-chart-capturing .chart-action-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
