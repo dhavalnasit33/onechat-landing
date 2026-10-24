@@ -312,9 +312,9 @@ export default function AccessEveryMajorSection() {
     return (
         <section className="relative w-full bg-[#050711] py-14 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden text-white">
             <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-[650px] bg-[radial-gradient(ellipse_75%_55%_at_50%_45%,rgba(108,86,229,0.18),rgba(0,163,255,0.08),transparent)] pointer-events-none" />
-            <div className="absolute top-16 left-6 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute top-1/2 right-6 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-16 left-1/3 w-80 h-80 bg-fuchsia-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-16 left-6 w-100 h-100 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-1/2 right-6 w-100 h-100 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-80 left-[20%] w-150 h-80 bg-fuchsia-600/15 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative max-w-[1380px] mx-auto flex flex-col items-center z-10">
                 <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
@@ -332,7 +332,7 @@ export default function AccessEveryMajorSection() {
                     </p>
                 </div>
 
-                <div className="w-full max-w-[1020px] mx-auto rounded-2xl sm:rounded-3xl border border-indigo-500/30 bg-[#0B0F24]/60 p-1 sm:p-1.5 md:p-2 shadow-[0_0_60px_rgba(108,86,229,0.22)] backdrop-blur-xl mb-12 sm:mb-16">
+                <div className="w-full mx-auto rounded-2xl sm:rounded-3xl border border-indigo-500/30 bg-[#0B0F24]/60 p-1 sm:p-1.5 md:p-2 shadow-[0_0_60px_rgba(108,86,229,0.22)] backdrop-blur-xl mb-12 sm:mb-16">
                     <div className="relative w-full rounded-xl sm:rounded-2xl overflow-hidden bg-[#030614]">
                         <img
                             src="/assets/landing-page/Access_Every_major_section.png"
