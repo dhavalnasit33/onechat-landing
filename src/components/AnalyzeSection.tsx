@@ -110,7 +110,7 @@ export default function AnalyzeSection({
                 src={imageSrc}
                 alt="preview"
                 loading="eager"
-                className={"w-full h-full object-contain transition-opacity duration-300 ease-in-out opacity-100 relative z-10"}
+                className={"w-full h-full object-cover transition-opacity duration-300 ease-in-out opacity-100 relative z-10"}
               />
           </div>
         </div>

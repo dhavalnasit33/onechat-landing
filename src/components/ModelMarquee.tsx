@@ -47,11 +47,6 @@ const row1Models: AIModel[] = [
     isLarge: false,
   },
   {
-    name: "Photoshop",
-    asset: "/assets/landing-page/section-2-adobe-photoshop.png",
-    isLarge: false,
-  },
-  {
     name: "Grok",
     asset: "/assets/landing-page/section-2-grok.png",
     isLarge: false,
@@ -74,11 +69,6 @@ const row1Models: AIModel[] = [
   {
     name: "Remove.bg",
     asset: "/assets/landing-page/section-2-remove-bg.png",
-    isLarge: false,
-  },
-  {
-    name: "Asana",
-    asset: "/assets/landing-page/section-2-asana.png",
     isLarge: false,
   },
 ];
@@ -130,11 +120,6 @@ const row2Models: AIModel[] = [
     isLarge: false,
   },
   {
-    name: "ClickUp",
-    asset: "/assets/landing-page/section-2-clickup.png",
-    isLarge: false,
-  },
-  {
     name: "Nano Banana",
     asset: "/assets/landing-page/section-2-nano-banana.png",
     isLarge: false,
@@ -149,29 +134,9 @@ const row2Models: AIModel[] = [
     asset: "/assets/landing-page/section-2-mistral.png",
     isLarge: false,
   },
-  {
-    name: "Mailchimp",
-    asset: "/assets/landing-page/section-2-mailchimp.png",
-    isLarge: false,
-  },
-  {
-    name: "Wix",
-    asset: "/assets/landing-page/section-2-wix.png",
-    isLarge: false,
-  },
 ];
 
 const row3Models: AIModel[] = [
-  {
-    name: "WordPress",
-    asset: "/assets/landing-page/section-2-wordpresss.png",
-    isLarge: false,
-  },
-  {
-    name: "Squarespace",
-    asset: "/assets/landing-page/section-2-squarespace.png",
-    isLarge: false,
-  },
   {
     name: "Wordtune",
     asset: "/assets/landing-page/section-2-wordtune.png",
@@ -190,11 +155,6 @@ const row3Models: AIModel[] = [
   {
     name: "Monica AI",
     asset: "/assets/landing-page/section-2-monica-ai.png",
-    isLarge: false,
-  },
-  {
-    name: "Monday.com",
-    asset: "/assets/landing-page/section-2-monday.com.png",
     isLarge: false,
   },
   {
@@ -220,11 +180,6 @@ const row3Models: AIModel[] = [
   {
     name: "Veo",
     asset: "/assets/landing-page/section-2-veo.png",
-    isLarge: false,
-  },
-  {
-    name: "Sora",
-    asset: "/assets/landing-page/section-2-sora.png",
     isLarge: false,
   },
   {
