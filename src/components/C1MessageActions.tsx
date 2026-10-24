@@ -80,18 +80,26 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
   const isLightMode = (element?: HTMLElement | null): boolean => {
     if (typeof window === "undefined") return false;
 
-    // 1. Explicit HTML/Body class override
-    if (document.documentElement.classList.contains("dark") && !document.documentElement.classList.contains("light")) {
-      return false;
-    }
+    // 1. Explicit light class override
     if (document.documentElement.classList.contains("light") || document.body.classList.contains("light")) {
       return true;
     }
 
+    // 2. Check system/computer theme preference (OS Light / Dark theme)
+    // Note: <html className="... dark"> is hardcoded in layout.tsx, so we must check system matchMedia directly!
+    if (typeof window.matchMedia === "function") {
+      if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+        return true;
+      }
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return false;
+      }
+    }
+
+    // 3. Fallback: inspect element and parent background
     if (element) {
       let curr: HTMLElement | null = element;
       while (curr && curr !== document.body) {
-        if (curr.classList.contains("dark")) return false;
         if (curr.classList.contains("light")) return true;
         curr = curr.parentElement;
       }
@@ -100,18 +108,9 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
         const rgb = bg.match(/\d+/g);
         if (rgb && rgb.length >= 3) {
           const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
-          if (brightness < 80) return false;
           if (brightness > 140) return true;
+          if (brightness < 80) return false;
         }
-      }
-    }
-
-    if (typeof window.matchMedia === "function") {
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return false;
-      }
-      if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-        return true;
       }
     }
 

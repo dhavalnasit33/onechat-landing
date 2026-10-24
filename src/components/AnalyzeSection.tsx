@@ -104,13 +104,13 @@ export default function AnalyzeSection({
 
       
         {/* Dynamic Image Display Container */}
-        <div className="w-full relative rounded-2xl sm:rounded-3xl bg-[#0E0E24] border border-indigo-500/25 p-2 sm:p-4 md:p-6 mb-8 sm:mb-10 shadow-[0_0_80px_rgba(59,130,246,0.18)] backdrop-blur-2xl">
-          <div className="relative w-full aspect-[1760/894] bg-[#090C1A] rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center">
+        <div className="w-full mx-auto rounded-2xl sm:rounded-3xl border border-indigo-500/30 bg-[#0B0F24]/60 p-1 sm:p-1.5 md:p-2 shadow-[0_0_60px_rgba(108,86,229,0.22)] backdrop-blur-xl mb-12 sm:mb-16">
+          <div className="relative w-full rounded-xl sm:rounded-2xl overflow-hidden bg-[#030614]">
               <img
                 src={imageSrc}
                 alt="preview"
                 loading="eager"
-                className={"w-full h-full object-cover transition-opacity duration-300 ease-in-out opacity-100 relative z-10"}
+                className="w-full h-auto block object-cover"
               />
           </div>
         </div>

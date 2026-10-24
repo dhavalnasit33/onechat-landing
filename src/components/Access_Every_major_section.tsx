@@ -282,25 +282,37 @@ export default function AccessEveryMajorSection() {
                 className="group flex flex-col items-center justify-center cursor-pointer select-none"
             >
                 <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-[74px] md:h-[74px] lg:w-[82px] lg:h-[82px] rounded-2xl bg-[#0B1024]/90 border border-white/10 p-2.5 sm:p-3 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:border-purple-500/60 group-hover:scale-105 group-hover:shadow-[0_0_22px_rgba(147,51,234,0.35)] shadow-md">
-                    <img
-                        src={model.asset}
-                        alt={model.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
-                        onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = "flex";
-                        }}
-                    />
-                    <div className="absolute inset-0 hidden items-center justify-center p-2 bg-[#0B1024]">
-                        {model.fallbackIcon || (
-                            <span className="font-bold text-sm text-purple-300">
-                                {model.name[0]}
-                            </span>
-                        )}
-                    </div>
+                    {model.asset ? (
+                        <>
+                            <img
+                                src={model.asset}
+                                alt={model.name}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                                onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = "flex";
+                                }}
+                            />
+                            <div className="absolute inset-0 hidden items-center justify-center p-2 bg-[#0B1024]">
+                                {model.fallbackIcon || (
+                                    <span className="font-bold text-sm text-purple-300">
+                                        {model.name[0]}
+                                    </span>
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex items-center justify-center p-2">
+                            {model.fallbackIcon || (
+                                <span className="font-bold text-sm text-purple-300">
+                                    {model.name[0]}
+                                </span>
+                            )}
+                        </div>
+                    )}
                 </div>
                 <span className="mt-2 text-[11px] sm:text-xs md:text-[13px] font-medium text-slate-300 group-hover:text-white transition-colors text-center whitespace-nowrap">
                     {model.name}
@@ -355,22 +367,22 @@ export default function AccessEveryMajorSection() {
                     </div>
                 </div>
 
-                <div className="relative w-full max-w-[1240px] mx-auto rounded-2xl sm:rounded-3xl border border-purple-500/30 overflow-hidden bg-gradient-to-b from-[#1C0E38]/90 via-[#0E0C26]/90 to-[#070918]/95 shadow-[0_0_60px_rgba(147,51,234,0.18)] p-6 sm:p-8 md:p-10 backdrop-blur-xl">
+                <div className="relative w-full max-w-[1240px] mx-auto rounded-2xl sm:rounded-3xl border border-purple-500/30 overflow-hidden bg-gradient-to-b from-[#1C0E38]/90 via-[#0E0C26]/90 to-[#070918]/95 shadow-[0_0_60px_rgba(147,51,234,0.18)] p-4 sm:p-8 md:p-10 backdrop-blur-xl">
                     <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-44 bg-purple-600/30 blur-[75px] pointer-events-none rounded-full" />
 
-                    <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-white/10">
+                    <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-x-2 sm:gap-x-6 gap-y-6 sm:gap-y-8 lg:gap-y-0 lg:divide-x lg:divide-white/10">
                         {FEATURES_DATA.map((item, idx) => (
                             <div
                                 key={idx}
-                                className="flex flex-col items-center text-center px-4 sm:px-6"
+                                className="flex flex-col items-center text-center px-1 sm:px-6"
                             >
-                                <div className="mb-3.5 flex items-center justify-center p-2 rounded-xl bg-purple-950/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                                <div className="mb-2.5 sm:mb-3.5 flex items-center justify-center p-2 rounded-xl bg-purple-950/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
                                     {item.icon}
                                 </div>
-                                <h3 className="font-poppins text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 leading-snug">
+                                <h3 className="font-poppins text-xs sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-1.5 leading-snug">
                                     {item.title}
                                 </h3>
-                                <p className="text-xs sm:text-[13px] text-slate-400 leading-relaxed max-w-[220px]">
+                                <p className="text-[11px] sm:text-[13px] text-slate-400 leading-relaxed w-full max-w-[240px]">
                                     {item.description}
                                 </p>
                             </div>

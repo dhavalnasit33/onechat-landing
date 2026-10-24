@@ -243,21 +243,27 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   const isLightMode = (element?: HTMLElement | null): boolean => {
     if (typeof window === "undefined") return false;
 
-    // 1. Explicit HTML/Body class override
-    // If the document has 'dark' and not 'light', the app is in dark theme!
-    if (document.documentElement.classList.contains("dark") && !document.documentElement.classList.contains("light")) {
-      return false;
-    }
+    // 1. Explicit light class override
     if (document.documentElement.classList.contains("light") || document.body.classList.contains("light")) {
       return true;
     }
 
-    // 2. Direct inspect element and its surroundings for computed colors
+    // 2. Check system/computer theme preference (OS Light / Dark theme)
+    // Note: <html className="... dark"> is hardcoded in layout.tsx, so we must check system matchMedia directly!
+    if (typeof window.matchMedia === "function") {
+      if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+        return true;
+      }
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return false;
+      }
+    }
+
+    // 3. Fallback: inspect parent container and surroundings for computed background colors
     const target = element || containerRef.current;
     if (target) {
       let curr: HTMLElement | null = target;
       while (curr && curr !== document.body) {
-        if (curr.classList.contains("dark")) return false;
         if (curr.classList.contains("light")) return true;
 
         const bg = window.getComputedStyle(curr).backgroundColor;
@@ -266,37 +272,11 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
           if (rgb && rgb.length >= 3) {
             const r = parseInt(rgb[0]), g = parseInt(rgb[1]), b = parseInt(rgb[2]);
             const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-            if (brightness < 80) return false; // Dark background detected!
             if (brightness > 140) return true; // Light background detected!
+            if (brightness < 80) return false; // Dark background detected!
           }
         }
         curr = curr.parentElement;
-      }
-
-      // Check text nodes inside the chart
-      const allTextNodes = target.querySelectorAll("text, tspan, p, span, h1, h2, h3, h4, strong");
-      for (let i = 0; i < Math.min(allTextNodes.length, 15); i++) {
-        const t = allTextNodes[i] as HTMLElement;
-        const fill = t.getAttribute?.("fill") || window.getComputedStyle(t).fill || window.getComputedStyle(t).color;
-        if (fill) {
-          const rgb = fill.match(/\d+/g);
-          if (rgb && rgb.length >= 3) {
-            const r = parseInt(rgb[0]), g = parseInt(rgb[1]), b = parseInt(rgb[2]);
-            const textBrightness = (r * 299 + g * 587 + b * 114) / 1000;
-            if (textBrightness > 190) return false; // Light text = Dark theme!
-            if (textBrightness < 90) return true; // Dark text = Light theme!
-          }
-        }
-      }
-    }
-
-    // 3. Check system/computer theme preference
-    if (typeof window.matchMedia === "function") {
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return false;
-      }
-      if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-        return true;
       }
     }
 
