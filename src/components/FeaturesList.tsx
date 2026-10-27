@@ -118,7 +118,7 @@ export default function FeaturesList({ onOpenAuth, onCTA, type = "all" }: Featur
           {displayFeatures.map((feature, idx) => {
             // Image section (section 2): text on left, video/image on right (isReversed: true -> lg:flex-row-reverse)
             // Video section (section 3): video on left, text on right (isReversed: false -> lg:flex-row)
-            const isReversed = feature.section === 2;
+            const isReversed = feature.section === 3;
 
             return (
               <div
