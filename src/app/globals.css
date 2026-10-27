@@ -365,3 +365,75 @@ div[class*='recharts-responsive-container'],
   visibility: hidden !important;
   opacity: 0 !important;
 }
+
+/* ==========================================================================
+   Thesys Demo-Level Clean Dashboard & Compact Layout Styling
+   ========================================================================== */
+
+/* 1. Eliminate massive vertical gaps and collapse empty card spacing */
+[data-c1-component],
+.c1-component-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+/* 2. Responsive 2-column or 3-column Grid for KPI Metric Cards */
+.c1-component-container > div:has([class*='metric'], [class*='Metric'], [class*='card-root']) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+/* 3. Recharts Height & Axis formatting - Professional Thesys sizing */
+.recharts-responsive-container {
+  height: 320px !important;
+  max-height: 360px !important;
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+/* Fix X-Axis & Y-Axis text clipping */
+.recharts-cartesian-axis-tick text {
+  font-size: 11px !important;
+  fill: #94a3b8 !important;
+}
+
+.recharts-legend-wrapper {
+  padding-top: 8px !important;
+}
+
+/* 4. Action / Follow-up Suggestion Buttons (Like Thesys Live Demo) */
+.c1-component-container button,
+[data-c1-component] button {
+  transition: all 0.2s ease-in-out !important;
+  border-radius: 9999px !important;
+}
+
+.c1-component-container button:hover,
+[data-c1-component] button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(108, 86, 229, 0.25) !important;
+}
+/* 5. Tooltip & Card Sub-item Styling for Thesys */
+.recharts-default-tooltip {
+  background-color: #0f1422 !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Rounded sub-item boxes inside Driver Cards */
+[data-c1-component] [class*="rounded"] {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Mobile responsive container constraint */
+@media (max-width: 768px) {
+  .recharts-responsive-container {
+    height: 240px !important;
+  }
+}

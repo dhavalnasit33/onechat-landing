@@ -119,9 +119,9 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
           curr = curr.parentElement;
         }
 
-        if (bestCard && bestCard.offsetHeight > 50) {
-          candidateCards.push(bestCard);
-        }
+       if (bestCard && bestCard.offsetHeight > 180 && !bestCard.querySelector("[class*='metric']")) {
+  candidateCards.push(bestCard);
+}
       });
 
       // Step 3: Strictly deduplicate candidate cards (if card A contains card B, keep only the outer card A)

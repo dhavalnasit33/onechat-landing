@@ -786,6 +786,41 @@ export default function AnalyzeChatNextPage() {
     }
   };
 
+   useEffect(() => {
+    const handleThesysActionClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      // Check if clicked element or its parent is a button or suggestion pill inside Thesys
+      const button = target.closest("button, [data-action], .thesys-action-btn, [role='button']");
+      if (!button) return;
+      // Extract prompt text from button
+      const actionText =
+        button.getAttribute("data-prompt") ||
+        button.getAttribute("data-action") ||
+        button.textContent?.trim();
+      // Only trigger if valid prompt and not currently loading
+      if (
+        actionText &&
+        actionText.length > 3 &&
+        actionText.length < 120 &&
+        !button.closest("nav") &&
+        !button.closest("header") &&
+        !button.classList.contains("close-btn")
+      ) {
+        if (button.tagName === "A" || button.getAttribute("role") === "button") {
+          e.preventDefault();
+        }
+        if (!customChatLoading) {
+          sendCustomChatMessage(actionText);
+        }
+      }
+    };
+    window.addEventListener("click", handleThesysActionClick);
+    return () => {
+      window.removeEventListener("click", handleThesysActionClick);
+    };
+  }, [customChatLoading]);
+
   return (
     <div className="flex flex-col h-screen w-screen bg-[#070914] text-slate-100 overflow-hidden font-sans select-text">
       <header className="h-16 px-3.5 md:px-5 flex items-center justify-between bg-[#0F1123] border-b border-[#1E223D] shrink-0 z-20">
