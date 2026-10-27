@@ -11,7 +11,9 @@ import {
 import SectionTrialCTA from "./SectionTrialCTA";
 import AccessEveryMajorSection from "./Access_Every_major_section";
 
-const CreateZeroSkillSection = dynamic(() => import("./Createzeroskillsection"));
+const CreateZeroSkillSection = dynamic(
+  () => import("./Createzeroskillsection"),
+);
 const ViralAiVideoSection = dynamic(() => import("./Viral_Ai_video_section"));
 const ModelMarquee = dynamic(() => import("./ModelMarquee"));
 const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
@@ -266,7 +268,7 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-        <Oneplace
+        {/* <Oneplace
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
@@ -276,7 +278,7 @@ export default function LandingPageClient() {
           sectionLabel="One Place Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
-        />
+        /> */}
 
         <AnalyzeSection
           onOpenAuth={() => handleOpenAuth("signup")}
@@ -314,7 +316,7 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-        <FeaturesList
+        {/* <FeaturesList
           type="video"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
@@ -325,9 +327,9 @@ export default function LandingPageClient() {
           sectionLabel="Video Generation Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
-        />
+        /> */}
 
-        <Hastheskillsection
+        {/* <Hastheskillsection
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
@@ -337,7 +339,7 @@ export default function LandingPageClient() {
           sectionLabel="AI Has The Skill Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
-        />
+        /> */}
 
         <TemplatesShowcase
           onOpenAuth={() => handleOpenAuth("signup")}
