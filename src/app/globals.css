@@ -437,3 +437,32 @@ div[class*='recharts-responsive-container'],
     height: 240px !important;
   }
 }
+
+/* 6. Clean Table & Status Pill Badges (Like Thesys Live Demo) */
+.c1-component-container table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background-color: #0b0e1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.c1-component-container table th {
+  background-color: #121629 !important;
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 10px 14px !important;
+}
+
+.c1-component-container table td {
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+
+
+
+

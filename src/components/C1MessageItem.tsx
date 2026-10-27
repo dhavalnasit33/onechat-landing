@@ -107,21 +107,28 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
 
           bestCard = curr;
 
+          // Check if parent has a heading or title (e.g. h1, h2, h3, h4, or [class*='title'])
+          const hasTitle = curr.querySelector("h1, h2, h3, h4, [class*='title' i], [class*='header' i]");
+          if (hasTitle) {
+            bestCard = curr;
+          }
+
           // If we hit a bordered / rounded card, that's the section
           if (
             curr.classList.contains("border") ||
             curr.classList.contains("rounded-2xl") ||
             curr.classList.contains("rounded-xl")
           ) {
+            bestCard = curr;
             break;
           }
 
           curr = curr.parentElement;
         }
 
-       if (bestCard && bestCard.offsetHeight > 180 && !bestCard.querySelector("[class*='metric']")) {
-  candidateCards.push(bestCard);
-}
+        if (bestCard && bestCard.offsetHeight > 140 && !bestCard.querySelector("[class*='metric']")) {
+          candidateCards.push(bestCard);
+        }
       });
 
       // Step 3: Strictly deduplicate candidate cards (if card A contains card B, keep only the outer card A)
@@ -286,7 +293,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
 
   // Helper to ensure all Recharts SVG texts are legible depending on theme
   const applySvgStylesForCapture = (element: HTMLElement, light: boolean) => {
-    const textNodes = element.querySelectorAll("text, tspan, .recharts-cartesian-axis-tick text, .recharts-text");
+    const textNodes = element.querySelectorAll("text, tspan, .recharts-cartesian-axis-tick text, .recharts-text, [class*='axis'] text, [class*='legend'] text");
     const originalFills: { el: SVGTextElement; fill: string; styleFill: string; opacity: string }[] = [];
     const targetColor = light ? "#1E293B" : "#F8FAFC";
     textNodes.forEach((t) => {
@@ -300,13 +307,30 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       el.setAttribute("fill", targetColor);
       el.style.fill = targetColor;
       el.style.opacity = "1";
+      el.style.visibility = "visible";
     });
+
+    // Also ensure HTML titles, subtitles, and legends inside the captured card are visible
+    const htmlTexts = element.querySelectorAll<HTMLElement>("h1, h2, h3, h4, p, span, div, [class*='legend'], [class*='axis']");
+    const originalHtmlColors: { el: HTMLElement; color: string }[] = [];
+    htmlTexts.forEach((el) => {
+      const comp = window.getComputedStyle(el);
+      if (comp.color === "rgba(0, 0, 0, 0)" || comp.opacity === "0") {
+        originalHtmlColors.push({ el, color: el.style.color });
+        el.style.color = targetColor;
+        el.style.opacity = "1";
+      }
+    });
+
     return () => {
       originalFills.forEach(({ el, fill, styleFill, opacity }) => {
         if (fill) el.setAttribute("fill", fill);
         else el.removeAttribute("fill");
         el.style.fill = styleFill;
         el.style.opacity = opacity;
+      });
+      originalHtmlColors.forEach(({ el, color }) => {
+        el.style.color = color;
       });
     };
   };

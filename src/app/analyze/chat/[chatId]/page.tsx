@@ -692,9 +692,16 @@ export default function AnalyzeChatNextPage() {
     }
   };
 
+  const customChatMessagesRef = useRef(customChatMessages);
+  customChatMessagesRef.current = customChatMessages;
+  const customChatLoadingRef = useRef(customChatLoading);
+  customChatLoadingRef.current = customChatLoading;
+
+  const sendCustomChatMessageRef = useRef<(promptText?: string) => Promise<void>>(async () => {});
+
   const sendCustomChatMessage = async (rawPrompt?: string) => {
     const prompt = (rawPrompt ?? customChatInput).trim();
-    if (!prompt || !chatId || customChatLoading) return;
+    if (!prompt || !chatId || customChatLoadingRef.current) return;
 
     const userMessage = {
       id: `${Date.now()}-user`,
@@ -706,7 +713,8 @@ export default function AnalyzeChatNextPage() {
       role: "assistant" as const,
       content: "",
     };
-    const requestMessages = [...customChatMessages, userMessage];
+    const currentMsgs = customChatMessagesRef.current;
+    const requestMessages = [...currentMsgs, userMessage];
 
     setCustomChatMessages([...requestMessages, assistantMessage]);
     setCustomChatInput("");
@@ -785,41 +793,112 @@ export default function AnalyzeChatNextPage() {
       setCustomChatLoading(false);
     }
   };
+  sendCustomChatMessageRef.current = sendCustomChatMessage;
 
-   useEffect(() => {
+  useEffect(() => {
     const handleThesysActionClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      // Check if clicked element or its parent is a button or suggestion pill inside Thesys
-      const button = target.closest("button, [data-action], .thesys-action-btn, [role='button']");
-      if (!button) return;
-      // Extract prompt text from button
-      const actionText =
-        button.getAttribute("data-prompt") ||
-        button.getAttribute("data-action") ||
-        button.textContent?.trim();
-      // Only trigger if valid prompt and not currently loading
+
+      // 1. Never trigger on chart overlays (Download, Share, Full View) or dialogs, nav, headers
       if (
-        actionText &&
-        actionText.length > 3 &&
-        actionText.length < 120 &&
-        !button.closest("nav") &&
-        !button.closest("header") &&
-        !button.classList.contains("close-btn")
+        target.closest(
+          ".chart-action-overlay, [role='dialog'], .crayon-modal, [class*='dialog'], nav, header"
+        )
       ) {
-        if (button.tagName === "A" || button.getAttribute("role") === "button") {
+        return;
+      }
+
+      // 2. Click must be inside a message or follow-up container
+      const messageContainer = target.closest(
+        ".c1-component-container, [data-c1-component], .openui-markdown-renderer, .openui-follow-up-block, .openui-follow-up-item"
+      );
+
+      // 3. Check if user clicked directly on an OpenUI follow-up item (Related Queries)
+      const followUpItem = target.closest(".openui-follow-up-item, [data-followup], .followup-item");
+      if (followUpItem) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const textEl = followUpItem.querySelector(".openui-follow-up-item-text") || followUpItem;
+        let queryText = textEl.textContent?.trim() || "";
+        queryText = queryText.replace(/^[\+\-\s*•·›»\u2022\u25B6\u25BC]+/, "").trim();
+
+        if (queryText && queryText.length > 5 && !customChatLoadingRef.current) {
+          void sendCustomChatMessageRef.current(queryText);
+        }
+        return;
+      }
+
+      if (!messageContainer) return;
+
+      // 4. Find if user clicked a suggestion button, link, or bullet item
+      const clickable = target.closest("button, [role='button'], a, li");
+      if (!clickable) return;
+
+      // Strictly ignore:
+      // - Accordion headers / expansion controls
+      // - Filter tabs / category pills / pagination / table controls
+      // - Chart overlays / close buttons
+      if (
+        clickable.hasAttribute("aria-expanded") ||
+        clickable.hasAttribute("data-radix-collection-item") ||
+        clickable.classList.contains("openui-accordion-trigger") ||
+        clickable.getAttribute("role") === "tab" ||
+        clickable.getAttribute("role") === "tablist" ||
+        clickable.classList.contains("close-btn") ||
+        clickable.closest("[data-state='closed']") ||
+        clickable.closest("table, thead, tbody, [role='table']")
+      ) {
+        return;
+      }
+
+      // Check if inside a Related Queries container or accordion content
+      const isInsideRelatedQueries = Boolean(
+        clickable.closest(".openui-follow-up-block, .related-query, .thesys-action-btn") ||
+        clickable.closest("[class*='accordion-content'], [data-state='open']") ||
+        clickable.closest("section, div")?.textContent?.includes("Related Queries") ||
+        clickable.closest("section, div")?.textContent?.includes("Related Questions")
+      );
+
+      // Extract prompt text
+      let actionText =
+        clickable.getAttribute("data-prompt") ||
+        clickable.getAttribute("data-action") ||
+        clickable.textContent?.trim() ||
+        "";
+
+      actionText = actionText.replace(/^[\+\-\s*•·›»\u2022\u25B6\u25BC]+/, "").trim();
+
+      // Ensure it is ONLY submitted if it's within Related Queries / Follow-up suggestions
+      // OR it's an actual analytical question
+      const isActualQuestion =
+        actionText.endsWith("?") ||
+        /^(how|what|why|can|are|is|show|compare|analyze|explain|which|where|when|could|would)\b/i.test(actionText);
+
+      if (
+        (isInsideRelatedQueries || isActualQuestion) &&
+        actionText.length > 8 &&
+        actionText.length < 160 &&
+        !["Download", "Share", "Full View", "PNG Image", "PDF Document", "PPT (Slide)"].includes(actionText) &&
+        !actionText.toLowerCase().includes("related quer") &&
+        !actionText.toLowerCase().includes("key driver") &&
+        !actionText.toLowerCase().includes("channel breakdown")
+      ) {
+        if (clickable.tagName === "A" || clickable.getAttribute("role") === "button") {
           e.preventDefault();
         }
-        if (!customChatLoading) {
-          sendCustomChatMessage(actionText);
+        if (!customChatLoadingRef.current) {
+          void sendCustomChatMessageRef.current(actionText);
         }
       }
     };
-    window.addEventListener("click", handleThesysActionClick);
+
+    window.addEventListener("click", handleThesysActionClick, true);
     return () => {
-      window.removeEventListener("click", handleThesysActionClick);
+      window.removeEventListener("click", handleThesysActionClick, true);
     };
-  }, [customChatLoading]);
+  }, []);
 
   return (
     <div className="flex flex-col h-screen w-screen bg-[#070914] text-slate-100 overflow-hidden font-sans select-text">
