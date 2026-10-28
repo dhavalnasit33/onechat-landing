@@ -141,9 +141,13 @@ export function trackFunnelEvent(
     | "interest_selection_completed"
     | "registration_form_viewed"
     | "registration_completed",
-  customProps: Record<string, any> = {}
+  customProps: Record<string, any> = {},
+  onComplete?: () => void
 ) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") {
+    if (onComplete) onComplete();
+    return;
+  }
 
   try {
     const internal = isInternalTraffic();
@@ -179,10 +183,20 @@ export function trackFunnelEvent(
       time: Math.floor(Date.now() / 1000),
     };
 
-    // Send to Mixpanel
+    let callbackCalled = false;
+    const safeComplete = () => {
+      if (!callbackCalled && onComplete) {
+        callbackCalled = true;
+        onComplete();
+      }
+    };
+
+    // Send to Mixpanel with callback & sendBeacon guarantee
     const win = window as any;
     if (win.mixpanel && typeof win.mixpanel.track === "function") {
-      win.mixpanel.track(eventName, basePayload);
+      win.mixpanel.track(eventName, basePayload, { transport: "sendBeacon" }, () => {
+        safeComplete();
+      });
     }
 
     // Also push to standard dataLayer if present
@@ -192,8 +206,14 @@ export function trackFunnelEvent(
         ...basePayload,
       });
     }
+
+    // Safety fallback in case mixpanel callback takes too long or ad blocker suppresses it
+    if (onComplete) {
+      setTimeout(safeComplete, 400);
+    }
   } catch (err) {
     console.warn(`[FunnelAnalytics] Failed to track ${eventName}:`, err);
+    if (onComplete) onComplete();
   }
 }
 

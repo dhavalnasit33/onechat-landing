@@ -28,6 +28,7 @@ interface UserResponse {
   success: boolean;
   token: string;
   fb_session_token?: string;
+  isNewUser?: boolean;
   user: {
     id?: string;
     _id?: string;
@@ -240,6 +241,14 @@ export default function AuthModal({
   ) => {
     const { token, fb_session_token, user } = data;
 
+    let redirected = false;
+    const redirectToDashboard = () => {
+      if (!redirected) {
+        redirected = true;
+        window.location.href = "/";
+      }
+    };
+
     // Save tokens and login states for SharedPreferences compatibility in Flutter Web
     localStorage.setItem("flutter.user_token", JSON.stringify(token));
     localStorage.setItem("flutter.is_logged_in", JSON.stringify(true));
@@ -257,11 +266,17 @@ export default function AuthModal({
       // Track canonical registration_completed & link anonymous ID to registered user
       const registeredUserId = user?._id || user?.id || "";
       const method = user?.authProvider || (showEmailForm ? "email" : "google");
-      trackFunnelEvent("registration_completed", {
-        signup_method: method,
-        user_id: registeredUserId,
-        selected_interests_count: selectedInterests.length,
-      });
+      trackFunnelEvent(
+        "registration_completed",
+        {
+          signup_method: method,
+          user_id: registeredUserId,
+          selected_interests_count: selectedInterests.length,
+        },
+        () => {
+          setTimeout(redirectToDashboard, 150);
+        }
+      );
 
       if (registeredUserId) {
         identifyRegisteredUser(registeredUserId, {
@@ -376,9 +391,11 @@ export default function AuthModal({
     }
 
     // Redirect to Flutter App dashboard
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 200);
+    if (isNewSignup || !isLoginTab) {
+      setTimeout(redirectToDashboard, 700);
+    } else {
+      setTimeout(redirectToDashboard, 200);
+    }
   };
 
   const getCookie = (name: string) => {
@@ -418,7 +435,7 @@ export default function AuthModal({
 
       if (response && response.token) {
         clearRegistrationAttribution();
-        saveAuthSession(response);
+        saveAuthSession(response, Boolean(response?.isNewUser));
       } else {
         throw new Error("Invalid backend token response.");
       }
