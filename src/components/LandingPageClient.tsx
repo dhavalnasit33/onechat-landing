@@ -8,6 +8,7 @@ import {
   handleRegistrationCTA,
   RegistrationCTAInput,
 } from "../lib/attribution";
+import { trackFunnelEvent } from "../lib/funnelAnalytics";
 import SectionTrialCTA from "./SectionTrialCTA";
 import AccessEveryMajorSection from "./Access_Every_major_section";
 
@@ -141,6 +142,9 @@ export default function LandingPageClient() {
       captureGoogleParam("gclid", "oc_gclid");
       captureGoogleParam("gbraid", "oc_gbraid");
       captureGoogleParam("wbraid", "oc_wbraid");
+
+      // Track anonymous landing page view in Mixpanel
+      trackFunnelEvent("landing_page_viewed");
     }
   }, []);
 

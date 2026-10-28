@@ -218,6 +218,9 @@ export const INTEREST_OPTIONS: InterestOption[] = [
   },
 ];
 
+import { trackFunnelEvent } from "../lib/funnelAnalytics";
+import { getRegistrationAttribution } from "../lib/attribution";
+
 interface InterestModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -234,6 +237,7 @@ export default function InterestModal({
   const [selectedInterests, setSelectedInterests] =
     useState<string[]>(initialSelected);
 
+  // Track interest_modal_opened
   useEffect(() => {
     if (isOpen) {
       if (initialSelected && initialSelected.length > 0) {
@@ -241,19 +245,33 @@ export default function InterestModal({
       } else {
         setSelectedInterests([]);
       }
+
+      const attribution = getRegistrationAttribution();
+      trackFunnelEvent("interest_modal_opened", {
+        entry_cta_id: attribution?.cta_id || "direct_or_unknown",
+        entry_cta_location: attribution?.section_id || attribution?.section_label || "",
+      });
     }
   }, [isOpen]);
+
+  const handleClose = () => {
+    trackFunnelEvent("interest_modal_closed", {
+      selected_count: selectedInterests.length,
+      selected_interests: selectedInterests,
+    });
+    onClose();
+  };
 
   // Handle ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, selectedInterests]);
 
   if (!isOpen) return null;
 
@@ -271,6 +289,13 @@ export default function InterestModal({
 
   const handleContinueClick = () => {
     if (!isContinueEnabled) return;
+
+    // Track canonical funnel completion
+    trackFunnelEvent("interest_selection_completed", {
+      selected_interest_ids: selectedInterests,
+      selected_count: selectedInterests.length,
+    });
+
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem(
@@ -292,7 +317,7 @@ export default function InterestModal({
       <div className="relative w-full max-w-[440px] md:max-w-[980px] h-[95vh] md:h-[92vh] max-h-[840px] my-auto bg-[#070b1e] rounded-[22px] md:rounded-[26px] border border-[#1e3264]/70 shadow-[0_0_60px_rgba(20,40,95,0.45)] p-3.5 sm:p-6 md:p-7 flex flex-col text-white animate-in fade-in zoom-in-95 duration-200 select-none">
         {/* Close Button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           aria-label="Close modal"
           className="absolute top-3 right-3 sm:top-5 sm:right-5 w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer z-10"
         >

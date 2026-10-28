@@ -11,6 +11,10 @@ import {
   getRegistrationAttribution,
   clearRegistrationAttribution,
 } from "../lib/attribution";
+import {
+  trackFunnelEvent,
+  identifyRegisteredUser,
+} from "../lib/funnelAnalytics";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -150,6 +154,18 @@ export default function AuthModal({
       setIsLoginTab(initialMode === "signin");
       setShowEmailForm(initialMode === "signin");
       setErrorMsg(null);
+
+      // Track registration form displayed
+      if (initialMode !== "signin") {
+        const attribution = getRegistrationAttribution();
+        setTimeout(() => {
+          trackFunnelEvent("registration_form_viewed", {
+            entry_cta_id: attribution?.cta_id || "direct_or_unknown",
+            entry_cta_location: attribution?.section_id || attribution?.section_label || "",
+            selected_interests_count: selectedInterests.length,
+          });
+        }, 100);
+      }
     }
   }, [isOpen, initialMode]);
 
@@ -237,6 +253,25 @@ export default function AuthModal({
         "flutter.has_seen_welcome_popup",
         JSON.stringify(false),
       );
+
+      // Track canonical registration_completed & link anonymous ID to registered user
+      const registeredUserId = user?._id || user?.id || "";
+      const method = user?.authProvider || (showEmailForm ? "email" : "google");
+      trackFunnelEvent("registration_completed", {
+        signup_method: method,
+        user_id: registeredUserId,
+        selected_interests_count: selectedInterests.length,
+      });
+
+      if (registeredUserId) {
+        identifyRegisteredUser(registeredUserId, {
+          email: user?.email,
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          name: user?.name,
+          authProvider: method,
+        });
+      }
     }
 
     if (user) {

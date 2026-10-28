@@ -17,12 +17,23 @@ export type RegistrationCTAInput = Omit<RegistrationAttribution, "page" | "click
 
 export const ATTRIBUTION_STORAGE_KEY = "onechat_registration_attribution";
 
+import { trackFunnelEvent } from "./funnelAnalytics";
+
 /**
- * Record landing CTA click in analytics systems (gtag, dataLayer, custom event, etc.)
+ * Record landing CTA click in analytics systems (gtag, dataLayer, Mixpanel custom event, etc.)
  * Always safe and non-blocking.
  */
 export function trackLandingCtaClick(attribution: RegistrationAttribution) {
   try {
+    // Canonical Mixpanel Funnel Event
+    trackFunnelEvent("landing_cta_clicked", {
+      cta_id: attribution.cta_id,
+      cta_location: attribution.section_id || attribution.section_label,
+      cta_label: attribution.cta_label,
+      item_id: attribution.item_id || "",
+      item_label: attribution.item_label || "",
+    });
+
     if (typeof window !== "undefined") {
       const win = window as any;
 
