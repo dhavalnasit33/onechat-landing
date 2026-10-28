@@ -65,6 +65,28 @@ interface Message {
   createdAt?: string;
 }
 
+export interface ChatFileItem {
+  originalFileName: string;
+  fileType: string;
+  fileUrl?: string;
+  fileSize?: number;
+  rowCount?: number;
+  columnCount?: number;
+  columns?: string[];
+  tableData?: any[];
+  tabularPreview?: any[];
+  sheetNames?: string[];
+  extractedText?: string;
+  visualImageUrls?: string[];
+  pageCount?: number;
+  datasetCoverage?: {
+    totalRows?: number;
+    analyzedRows?: number;
+    isComplete?: boolean;
+    limitReason?: string;
+  };
+}
+
 interface ChatSession {
   _id: string;
   title: string;
@@ -77,6 +99,7 @@ interface ChatSession {
   columns?: string[];
   tableData?: any[];
   tabularPreview?: any[];
+  sheetNames?: string[];
   extractedText?: string;
   visualImageUrls?: string[];
   initialPrompt?: string;
@@ -86,6 +109,7 @@ interface ChatSession {
     isComplete?: boolean;
     limitReason?: string;
   };
+  files?: ChatFileItem[];
   messages: Message[];
 }
 
@@ -123,7 +147,7 @@ function getAuthToken(): string {
       window.history.replaceState({}, document.title, newUrl);
       return urlToken.trim();
     }
-  } catch (_) {}
+  } catch (_) { }
 
   const candidateKeys = [
     "flutter.user_token",
@@ -174,7 +198,7 @@ export default function AnalyzeChatNextPage() {
   const [viewMode, setViewMode] = useState<"split" | "docOnly" | "chatOnly">(
     "split",
   );
-  const [pdfNumPages, setPdfNumPages] = useState<number>(1);
+  const [pdfNumPages, setPdfNumPages] = useState<number | null>(null);
   const [mobileTab, setMobileTab] = useState<"doc" | "chat">("chat");
   const [isMobile, setIsMobile] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1.0);
@@ -183,6 +207,10 @@ export default function AnalyzeChatNextPage() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [appliedPdfSearch, setAppliedPdfSearch] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Multi-file tabs state
+  const [filesList, setFilesList] = useState<ChatFileItem[]>([]);
+  const [activeFileIndex, setActiveFileIndex] = useState<number>(0);
 
   const [customChatMessages, setCustomChatMessages] = useState<
     { id: string; role: "user" | "assistant"; content: string }[]
@@ -275,6 +303,30 @@ export default function AnalyzeChatNextPage() {
           const chatData = data.chat || data.session;
           if (data.success && chatData) {
             setSession(chatData);
+
+            const loadedFiles: ChatFileItem[] =
+              chatData.files && chatData.files.length > 0
+                ? chatData.files
+                : [
+                  {
+                    originalFileName: chatData.originalFileName,
+                    fileType: chatData.fileType,
+                    fileUrl: chatData.fileUrl,
+                    fileSize: chatData.fileSize,
+                    rowCount: chatData.rowCount,
+                    columnCount: chatData.columnCount,
+                    columns: chatData.columns,
+                    tableData: chatData.tableData || chatData.tabularPreview,
+                    tabularPreview: chatData.tabularPreview,
+                    sheetNames: chatData.sheetNames,
+                    extractedText: chatData.extractedText,
+                    visualImageUrls: chatData.visualImageUrls,
+                    datasetCoverage: chatData.datasetCoverage,
+                  },
+                ];
+            setFilesList(loadedFiles);
+            setActiveFileIndex(0);
+
             const existingMessages = chatData.messages || [];
             setMessages(existingMessages);
 
@@ -287,8 +339,17 @@ export default function AnalyzeChatNextPage() {
 
             if (existingMessages.length === 0 && !autoTriggeredRef.current) {
               autoTriggeredRef.current = true;
+              const rawInitial = (chatData.initialPrompt || "").trim();
+              const isGeneric =
+                !rawInitial ||
+                rawInitial.toLowerCase() === "analyze this file or data" ||
+                rawInitial.toLowerCase() === "analyze this file";
               const promptToUse =
-                chatData.initialPrompt?.trim() || "Analyze this file or data";
+                !isGeneric && rawInitial
+                  ? rawInitial
+                  : loadedFiles.length > 1
+                    ? `Analyze all ${loadedFiles.length} uploaded files and data thoroughly, covering every file in detail.`
+                    : "Analyze this file or data";
               setTimeout(() => sendCustomChatMessage(promptToUse), 150);
             }
           }
@@ -302,22 +363,67 @@ export default function AnalyzeChatNextPage() {
     loadChat();
   }, [chatId]);
 
+  const activeFile: ChatFileItem | null =
+    filesList[activeFileIndex] ||
+    filesList[0] ||
+    (session as any) ||
+    null;
+
+  const docName =
+    activeFile?.originalFileName || session?.originalFileName || session?.title || "Uploaded File";
+  const fileType = (
+    activeFile?.fileType ||
+    docName.split(".").pop() ||
+    "csv"
+  ).toLowerCase();
+  const isImage = ["image", "jpg", "jpeg", "png", "webp", "gif"].includes(
+    fileType,
+  );
+
   // Load and parse all sheets for Excel files (.xlsx, .xls)
   useEffect(() => {
-    if (!session?.fileUrl) return;
+    const fileUrlToUse = activeFile?.fileUrl || session?.fileUrl;
+    if (!fileUrlToUse) {
+      setExcelSheets({});
+      setExcelSheetNames([]);
+      setActiveSheet("");
+      return;
+    }
     const fType = (
-      session.fileType ||
-      session.originalFileName?.split(".").pop() ||
+      activeFile?.fileType ||
+      session?.fileType ||
+      activeFile?.originalFileName?.split(".").pop() ||
+      session?.originalFileName?.split(".").pop() ||
       ""
     ).toLowerCase();
-    if (!["xlsx", "xls"].includes(fType)) return;
+    if (!["xlsx", "xls"].includes(fType)) {
+      setExcelSheets({});
+      setExcelSheetNames([]);
+      setActiveSheet("");
+      return;
+    }
+
+    // Pre-populate sheet names immediately from metadata if available
+    const initialSheets =
+      activeFile?.sheetNames && activeFile.sheetNames.length > 0
+        ? activeFile.sheetNames
+        : session?.sheetNames && session.sheetNames.length > 0
+          ? session.sheetNames
+          : [];
+
+    if (initialSheets.length > 0) {
+      setExcelSheetNames(initialSheets);
+      setActiveSheet((prev) =>
+        prev && initialSheets.includes(prev) ? prev : initialSheets[0],
+      );
+    }
 
     let isMounted = true;
     setExcelLoading(true);
 
-    const fileDownloadUrl = session.fileUrl.startsWith("http")
-      ? session.fileUrl
-      : `${getApiServerBase()}${session.fileUrl}`;
+    const fileDownloadUrl = fileUrlToUse.startsWith("http")
+      ? fileUrlToUse
+      : `${getApiServerBase()}${fileUrlToUse}`;
 
     Promise.all([
       fetch(fileDownloadUrl).then((res) => {
@@ -342,7 +448,11 @@ export default function AnalyzeChatNextPage() {
         setExcelSheets(sheetsMap);
         setExcelSheetNames(workbook.SheetNames);
         if (workbook.SheetNames.length > 0) {
-          setActiveSheet(workbook.SheetNames[0]);
+          setActiveSheet((prev) =>
+            prev && workbook.SheetNames.includes(prev)
+              ? prev
+              : workbook.SheetNames[0],
+          );
         }
       })
       .catch((err) => {
@@ -358,7 +468,18 @@ export default function AnalyzeChatNextPage() {
     return () => {
       isMounted = false;
     };
-  }, [session?.fileUrl, session?.fileType, session?.originalFileName]);
+  }, [
+    activeFile?.fileUrl,
+    activeFile?.fileType,
+    activeFile?.originalFileName,
+    session?.fileUrl,
+    session?.fileType,
+    session?.originalFileName,
+  ]);
+
+  useEffect(() => {
+    setPdfNumPages(null);
+  }, [activeFile?.fileUrl, session?.fileUrl]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -390,19 +511,8 @@ export default function AnalyzeChatNextPage() {
     };
   }, [isDragging]);
 
-  const docName =
-    session?.originalFileName || session?.title || "Uploaded File";
-  const fileType = (
-    session?.fileType ||
-    docName.split(".").pop() ||
-    "csv"
-  ).toLowerCase();
-  const isImage = ["image", "jpg", "jpeg", "png", "webp", "gif"].includes(
-    fileType,
-  );
-
   const getSubtitle = () => {
-    const sizeBytes = session?.fileSize || 0;
+    const sizeBytes = activeFile?.fileSize || session?.fileSize || 0;
     const sizeStr =
       sizeBytes > 0
         ? sizeBytes < 1024 * 1024
@@ -411,12 +521,14 @@ export default function AnalyzeChatNextPage() {
         : "";
 
     if (["csv", "xlsx", "xls"].includes(fileType)) {
-      return `${session?.rowCount || session?.tableData?.length || 0} rows • ${session?.columnCount || session?.columns?.length || 0} cols${sizeStr}`;
+      const rCount = activeFile?.rowCount || session?.rowCount || allRows.length || 0;
+      const cCount = activeFile?.columnCount || session?.columnCount || columnsList.length || 0;
+      return `${rCount} rows • ${cCount} cols${sizeStr}`;
     } else if (["json", "docx", "doc", "txt", "rtf"].includes(fileType)) {
-      const wordCount =
-        (session?.extractedText || "").trim().split(/\s+/).length || 0;
-      return fileType === "json" && session?.tableData?.length
-        ? `${session.tableData.length} records${sizeStr}`
+      const text = activeFile?.extractedText || session?.extractedText || "";
+      const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+      return fileType === "json" && allRows.length
+        ? `${allRows.length} records${sizeStr}`
         : `${wordCount} words${sizeStr}`;
     } else if (
       ["image", "jpg", "jpeg", "png", "webp", "gif"].includes(fileType)
@@ -426,7 +538,7 @@ export default function AnalyzeChatNextPage() {
 
     // ✅ FIX: Use pdfNumPages dynamically for PDFs instead of hardcoding "1 page"
     if (fileType === "pdf") {
-      return `${pdfNumPages} pages${sizeStr}`;
+      return `${pdfNumPages || 1} pages${sizeStr}`;
     }
 
     return `1 page${sizeStr}`;
@@ -437,55 +549,72 @@ export default function AnalyzeChatNextPage() {
     return `${String.fromCharCode(65 + Math.floor(index / 26) - 1)}${String.fromCharCode(65 + (index % 26))}`;
   };
 
-  const renderBadgeIcon = () => {
-    if (["csv", "xlsx", "xls"].includes(fileType)) {
+  const renderBadgeIconForType = (type: string, isMini: boolean = false) => {
+    const dim = isMini ? "w-4 h-4 rounded" : "w-8 h-8 rounded-[7px]";
+    const iconDim = isMini ? "w-2.5 h-2.5" : "w-4 h-4";
+
+    if (["csv", "xlsx", "xls"].includes(type)) {
       return (
-        <div className="w-8 h-8 rounded-[7px] bg-[#107C41] flex items-center justify-center text-white shadow-[0_2px_8px_rgba(16,124,65,0.4)] shrink-0">
-          <FileSpreadsheet className="w-4 h-4" />
+        <div className={`${dim} bg-[#107C41] flex items-center justify-center text-white shrink-0 ${!isMini ? "shadow-[0_2px_8px_rgba(16,124,65,0.4)]" : ""}`}>
+          <FileSpreadsheet className={iconDim} />
         </div>
       );
     }
-    if (fileType === "json") {
+    if (type === "json") {
       return (
-        <div className="w-8 h-8 rounded-[7px] bg-[#E37400] flex items-center justify-center text-white shadow-[0_2px_8px_rgba(227,116,0,0.4)] shrink-0">
-          <FileCode className="w-4 h-4" />
+        <div className={`${dim} bg-[#E37400] flex items-center justify-center text-white shrink-0 ${!isMini ? "shadow-[0_2px_8px_rgba(227,116,0,0.4)]" : ""}`}>
+          <FileCode className={iconDim} />
         </div>
       );
     }
-    if (["docx", "doc"].includes(fileType)) {
+    if (["docx", "doc"].includes(type)) {
       return (
-        <div className="w-8 h-8 rounded-[7px] bg-[#2B579A] flex items-center justify-center text-white shadow-[0_2px_8px_rgba(43,87,154,0.4)] shrink-0">
-          <FileText className="w-4 h-4" />
+        <div className={`${dim} bg-[#2B579A] flex items-center justify-center text-white shrink-0 ${!isMini ? "shadow-[0_2px_8px_rgba(43,87,154,0.4)]" : ""}`}>
+          <FileText className={iconDim} />
         </div>
       );
     }
-    if (["image", "jpg", "jpeg", "png", "webp", "gif"].includes(fileType)) {
+    if (["image", "jpg", "jpeg", "png", "webp", "gif"].includes(type)) {
       return (
-        <div className="w-8 h-8 rounded-[7px] bg-gradient-to-tr from-[#8B5CF6] to-[#EC4899] flex items-center justify-center text-white shadow-[0_2px_8px_rgba(139,92,246,0.4)] shrink-0">
-          <ImageIcon className="w-4 h-4" />
+        <div className={`${dim} bg-gradient-to-tr from-[#8B5CF6] to-[#EC4899] flex items-center justify-center text-white shrink-0 ${!isMini ? "shadow-[0_2px_8px_rgba(139,92,246,0.4)]" : ""}`}>
+          <ImageIcon className={iconDim} />
         </div>
       );
     }
     return (
-      <div className="w-8 h-8 rounded-[7px] bg-[#EF4444] flex items-center justify-center text-white shadow-[0_2px_8px_rgba(239,68,68,0.4)] shrink-0">
-        <FileText className="w-4 h-4" />
+      <div className={`${dim} bg-[#EF4444] flex items-center justify-center text-white shrink-0 ${!isMini ? "shadow-[0_2px_8px_rgba(239,68,68,0.4)]" : ""}`}>
+        <FileText className={iconDim} />
       </div>
     );
   };
+
+  const renderBadgeIcon = () => renderBadgeIconForType(fileType, false);
 
   const allRows = useMemo(() => {
     if (activeSheet && excelSheets[activeSheet]) {
       return excelSheets[activeSheet];
     }
-    return session?.tableData || [];
-  }, [activeSheet, excelSheets, session?.tableData]);
+    return activeFile?.tableData || activeFile?.tabularPreview || session?.tableData || [];
+  }, [activeSheet, excelSheets, activeFile?.tableData, activeFile?.tabularPreview, session?.tableData]);
 
   const columnsList = useMemo(() => {
     if (allRows.length > 0 && allRows[0]) {
       return Object.keys(allRows[0]);
     }
-    return session?.columns || [];
-  }, [allRows, session?.columns]);
+    return activeFile?.columns || session?.columns || [];
+  }, [allRows, activeFile?.columns, session?.columns]);
+
+  const availableSheets = useMemo(() => {
+    if (excelSheetNames.length > 0) return excelSheetNames;
+    if (activeFile?.sheetNames && activeFile.sheetNames.length > 0)
+      return activeFile.sheetNames;
+    if (session?.sheetNames && session.sheetNames.length > 0)
+      return session.sheetNames;
+    return [];
+  }, [excelSheetNames, activeFile?.sheetNames, session?.sheetNames]);
+
+  const hasMultipleSheets =
+    ["xlsx", "xls"].includes(fileType) && availableSheets.length > 1;
 
   const [matchCoords, setMatchCoords] = useState<
     { page: number; rIdx: number; cIdx: number }[]
@@ -636,10 +765,12 @@ export default function AnalyzeChatNextPage() {
 
   const handleDownload = async () => {
     try {
-      if (session?.fileUrl) {
-        const url = session.fileUrl.startsWith("http")
-          ? session.fileUrl
-          : `${getApiServerBase()}${session.fileUrl}`;
+      const currentUrl = activeFile?.fileUrl || session?.fileUrl;
+      const currentText = activeFile?.extractedText || session?.extractedText;
+      if (currentUrl) {
+        const url = currentUrl.startsWith("http")
+          ? currentUrl
+          : `${getApiServerBase()}${currentUrl}`;
         const response = await fetch(url);
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
@@ -669,8 +800,8 @@ export default function AnalyzeChatNextPage() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-      } else if (session?.extractedText) {
-        const blob = new Blob([session.extractedText], {
+      } else if (currentText) {
+        const blob = new Blob([currentText], {
           type: "text/plain;charset=utf-8;",
         });
         const url = URL.createObjectURL(blob);
@@ -683,10 +814,11 @@ export default function AnalyzeChatNextPage() {
         URL.revokeObjectURL(url);
       }
     } catch (err) {
-      if (session?.fileUrl) {
-        const url = session.fileUrl.startsWith("http")
-          ? session.fileUrl
-          : `${getApiServerBase()}${session.fileUrl}`;
+      const currentUrl = activeFile?.fileUrl || session?.fileUrl;
+      if (currentUrl) {
+        const url = currentUrl.startsWith("http")
+          ? currentUrl
+          : `${getApiServerBase()}${currentUrl}`;
         window.open(url, "_blank");
       }
     }
@@ -697,7 +829,7 @@ export default function AnalyzeChatNextPage() {
   const customChatLoadingRef = useRef(customChatLoading);
   customChatLoadingRef.current = customChatLoading;
 
-  const sendCustomChatMessageRef = useRef<(promptText?: string) => Promise<void>>(async () => {});
+  const sendCustomChatMessageRef = useRef<(promptText?: string) => Promise<void>>(async () => { });
 
   const sendCustomChatMessage = async (rawPrompt?: string) => {
     const prompt = (rawPrompt ?? customChatInput).trim();
@@ -746,7 +878,7 @@ export default function AnalyzeChatNextPage() {
         let errMessage = `Request failed (${response.status})`;
         try {
           errMessage = (await response.json())?.message || errMessage;
-        } catch (_) {}
+        } catch (_) { }
         throw new Error(errMessage);
       }
       if (!response.body)
@@ -781,11 +913,11 @@ export default function AnalyzeChatNextPage() {
         current.map((item) =>
           item.id === assistantMessage.id
             ? {
-                ...item,
-                content:
-                  error?.message ||
-                  "Sorry, something went wrong. Please try again.",
-              }
+              ...item,
+              content:
+                error?.message ||
+                "Sorry, something went wrong. Please try again.",
+            }
             : item,
         ),
       );
@@ -985,6 +1117,73 @@ export default function AnalyzeChatNextPage() {
               }}
               className="relative flex flex-col bg-[#0B0E1A] border-r border-[#1E223D] overflow-hidden h-full"
             >
+              {/* File Tabs Bar: shown when multiple files are uploaded (or single file) */}
+              {filesList.length > 0 && (
+                <div className="h-11 bg-[#0F1123] border-b border-[#1E223D] px-3 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 z-20 select-none">
+                  <div className="flex items-center gap-1.5 pr-2 border-r border-[#1E223D] shrink-0">
+                    <span className="text-[11px] font-bold text-[#8E95AF] uppercase tracking-wider">
+                      Files ({filesList.length})
+                    </span>
+                  </div>
+                  {filesList.map((fItem, idx) => {
+                    const isActive = idx === activeFileIndex;
+                    const fExt = (
+                      fItem.fileType ||
+                      fItem.originalFileName?.split(".").pop() ||
+                      "pdf"
+                    ).toLowerCase();
+                    return (
+                      <button
+                        key={`${fItem.originalFileName}-${idx}`}
+                        onClick={() => {
+                          setActiveFileIndex(idx);
+                          setCurrentPage(1);
+                          setSearchQuery("");
+                          setAppliedPdfSearch("");
+                          if (fItem.sheetNames && fItem.sheetNames.length > 0) {
+                            setExcelSheetNames(fItem.sheetNames);
+                            setActiveSheet(fItem.sheetNames[0]);
+                          } else {
+                            setExcelSheetNames([]);
+                            setActiveSheet("");
+                          }
+                          setExcelSheets({});
+                        }}
+                        title={fItem.originalFileName}
+                        className={`cursor-pointer group flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0 border ${isActive
+                          ? "bg-[#261D5A] border-[#635BFF] text-white shadow-sm ring-1 ring-[#635BFF]/30 font-semibold"
+                          : "bg-[#131629] border-[#222642] text-[#8E95AF] hover:text-white hover:bg-[#1A1E38]"
+                          }`}
+                      >
+                        {renderBadgeIconForType(fExt, true)}
+                        <span className="max-w-[130px] sm:max-w-[170px] truncate">
+                          {fItem.originalFileName}
+                        </span>
+                        {fItem.rowCount ? (
+                          <span
+                            className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${isActive
+                              ? "bg-white/15 text-white"
+                              : "bg-[#1C2038] text-[#8E95AF]"
+                              }`}
+                          >
+                            {fItem.rowCount}r
+                          </span>
+                        ) : fItem.pageCount && fItem.pageCount > 1 ? (
+                          <span
+                            className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${isActive
+                              ? "bg-white/15 text-white"
+                              : "bg-[#1C2038] text-[#8E95AF]"
+                              }`}
+                          >
+                            {fItem.pageCount}p
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               {loading ? (
                 <div className="flex h-full items-center justify-center flex-col gap-3 text-slate-400">
                   <Loader2 className="w-7 h-7 animate-spin text-[#8B5CF6]" />
@@ -994,7 +1193,7 @@ export default function AnalyzeChatNextPage() {
                 </div>
               ) : ["csv", "xlsx", "xls"].includes(fileType) &&
                 allRows.length > 0 ? (
-                <div className="flex flex-col h-full bg-white text-slate-800">
+                <div className="flex flex-col flex-1 min-h-0 bg-white text-slate-800">
                   <div className="h-10 bg-[#F3F2F1] border-b border-[#D4D4D4] px-3.5 flex items-center gap-3 shrink-0">
                     <div className="px-2 py-0.5 rounded bg-[#107C41] text-white text-[11px] font-bold tracking-wider flex items-center gap-1">
                       <FileSpreadsheet className="w-3 h-3" /> EXCEL
@@ -1011,17 +1210,24 @@ export default function AnalyzeChatNextPage() {
                     </div>
                   </div>
 
-                  {session?.datasetCoverage &&
-                    session.datasetCoverage.isComplete === false && (
+                  {(activeFile?.datasetCoverage || session?.datasetCoverage) &&
+                    (activeFile?.datasetCoverage || session?.datasetCoverage)
+                      ?.isComplete === false && (
                       <div className="bg-[#FFF4CE] border-b border-[#FDE79E] text-[#797673] px-3.5 py-1.5 text-[11.5px] flex items-center justify-between shrink-0">
                         <span className="font-medium text-[#323130]">
                           ⚠️ Partial Dataset: Displaying and analyzing the first{" "}
                           <strong>
-                            {session.datasetCoverage.analyzedRows?.toLocaleString()}
+                            {(
+                              activeFile?.datasetCoverage ||
+                              session?.datasetCoverage
+                            )?.analyzedRows?.toLocaleString()}
                           </strong>{" "}
                           of{" "}
                           <strong>
-                            {session.datasetCoverage.totalRows?.toLocaleString()}
+                            {(
+                              activeFile?.datasetCoverage ||
+                              session?.datasetCoverage
+                            )?.totalRows?.toLocaleString()}
                           </strong>{" "}
                           rows due to system performance limits.
                         </span>
@@ -1075,7 +1281,7 @@ export default function AnalyzeChatNextPage() {
                                   const isMatchActive =
                                     matchCoords.length > 0 &&
                                     matchCoords[activeMatchIdx]?.rIdx ===
-                                      globalRowIdx &&
+                                    globalRowIdx &&
                                     matchCoords[activeMatchIdx]?.cIdx === cIdx;
                                   return (
                                     <td
@@ -1099,47 +1305,41 @@ export default function AnalyzeChatNextPage() {
                     </div>
                   </div>
 
-                  <div className="h-9 bg-[#F3F2F1] border-t border-[#D4D4D4] px-2 flex items-center justify-between shrink-0 text-xs overflow-x-auto">
-                    <div className="flex items-center gap-1 overflow-x-auto py-1">
-                      {excelSheetNames.length > 0 ? (
-                        excelSheetNames.map((sName) => (
+                  {hasMultipleSheets && (
+                    <div className="h-9 bg-[#F3F2F1] border-t border-[#D4D4D4] px-2 flex items-center justify-between shrink-0 text-xs overflow-x-auto relative z-20">
+                      <div className="flex items-center gap-1 overflow-x-auto py-1">
+                        {availableSheets.map((sName) => (
                           <button
                             key={sName}
                             onClick={() => {
                               setActiveSheet(sName);
                               setCurrentPage(1);
                             }}
-                            className={`flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold transition rounded-t-sm cursor-pointer border-t border-x border-[#D4D4D4] ${
-                              activeSheet === sName
-                                ? "bg-white text-[#107C41] border-b-2 border-b-[#107C41] shadow-xs"
-                                : "bg-[#E1DFDD] text-[#605E5C] hover:bg-white/70 border-b border-b-[#D4D4D4]"
-                            }`}
+                            className={`flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold transition rounded-t-sm cursor-pointer border-t border-x border-[#D4D4D4] shrink-0 ${activeSheet === sName
+                              ? "bg-white text-[#107C41] border-b-2 border-b-[#107C41] shadow-xs font-extrabold"
+                              : "bg-[#E1DFDD] text-[#605E5C] hover:bg-white/70 border-b border-b-[#D4D4D4]"
+                              }`}
                           >
                             <FileSpreadsheet className="w-3 h-3" />
                             <span>{sName}</span>
                           </button>
-                        ))
-                      ) : (
-                        <div className="flex items-center gap-1.5 px-3 py-1 bg-white border-b-2 border-[#107C41] text-[#107C41] font-bold text-[11px]">
-                          <FileSpreadsheet className="w-3 h-3" /> Sheet1
-                        </div>
-                      )}
+                        ))}
+                      </div>
+                      <span className="text-[11px] text-[#605E5C] shrink-0 pl-2 font-medium">
+                        {excelLoading ? (
+                          <span className="flex items-center gap-1 text-[#107C41]">
+                            <Loader2 className="w-3 h-3 animate-spin" /> Loading sheets...
+                          </span>
+                        ) : (
+                          `${allRows.length} rows loaded`
+                        )}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-[#605E5C] shrink-0 pl-2 font-medium">
-                      {excelLoading ? (
-                        <span className="flex items-center gap-1 text-[#107C41]">
-                          <Loader2 className="w-3 h-3 animate-spin" /> Loading
-                          sheets...
-                        </span>
-                      ) : (
-                        `${allRows.length} rows loaded`
-                      )}
-                    </span>
-                  </div>
+                  )}
                 </div>
               ) : ["image", "jpg", "jpeg", "png", "webp"].includes(fileType) ? (
                 <div className="flex-1 overflow-auto p-6 flex items-center justify-center bg-[#0B0E1A]">
-                  {session?.visualImageUrls?.length ? (
+                  {(activeFile?.visualImageUrls?.length || session?.visualImageUrls?.length) ? (
                     <div
                       style={{
                         transform: `scale(${zoomLevel})`,
@@ -1151,12 +1351,12 @@ export default function AnalyzeChatNextPage() {
                       className="max-w-full max-h-full flex items-center justify-center shadow-2xl rounded-lg overflow-hidden border border-white/10"
                     >
                       <img
-                        src={session.visualImageUrls[0]}
+                        src={activeFile?.visualImageUrls?.[0] || session?.visualImageUrls?.[0]}
                         alt={docName}
                         className="max-h-[80vh] w-auto object-contain rounded-lg"
                       />
                     </div>
-                  ) : session?.fileUrl ? (
+                  ) : (activeFile?.fileUrl || session?.fileUrl) ? (
                     <div
                       style={{
                         transform: `scale(${zoomLevel})`,
@@ -1169,9 +1369,9 @@ export default function AnalyzeChatNextPage() {
                     >
                       <img
                         src={
-                          session.fileUrl.startsWith("http")
-                            ? session.fileUrl
-                            : `${getApiServerBase()}${session.fileUrl}`
+                          (activeFile?.fileUrl || session?.fileUrl || "").startsWith("http")
+                            ? (activeFile?.fileUrl || session?.fileUrl)
+                            : `${getApiServerBase()}${activeFile?.fileUrl || session?.fileUrl}`
                         }
                         alt={docName}
                         className="max-h-[80vh] w-auto object-contain rounded-lg"
@@ -1183,15 +1383,19 @@ export default function AnalyzeChatNextPage() {
                     </div>
                   )}
                 </div>
-              ) : fileType === "pdf" && session?.fileUrl ? (
+              ) : fileType === "pdf" && (activeFile?.fileUrl || session?.fileUrl) ? (
                 <div className="flex-1 h-full w-full bg-[#1A1D2E] relative flex flex-col items-center overflow-auto py-8">
                   <Document
                     file={
-                      session.fileUrl.startsWith("http")
-                        ? session.fileUrl
-                        : `${getApiServerBase()}${session.fileUrl}`
+                      (activeFile?.fileUrl || session?.fileUrl || "").startsWith("http")
+                        ? (activeFile?.fileUrl || session?.fileUrl)
+                        : `${getApiServerBase()}${activeFile?.fileUrl || session?.fileUrl}`
                     }
                     onLoadSuccess={({ numPages }) => setPdfNumPages(numPages)}
+                    onLoadError={(err) => {
+                      console.error("PDF load error:", err);
+                      setPdfNumPages(0);
+                    }}
                     loading={
                       <div className="text-white text-sm flex items-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin" /> Loading
@@ -1200,15 +1404,17 @@ export default function AnalyzeChatNextPage() {
                     }
                   >
                     {/* Map through all pages and render them vertically */}
-                    {Array.from(new Array(pdfNumPages), (el, index) => (
-                      <Page
-                        key={`page_${index + 1}`}
-                        pageNumber={index + 1}
-                        scale={zoomLevel}
-                        customTextRenderer={customTextRenderer}
-                        className="shadow-2xl rounded-md overflow-hidden mb-8" // mb-8 creates spacing between pages
-                      />
-                    ))}
+                    {pdfNumPages && pdfNumPages > 0 ? (
+                      Array.from(new Array(pdfNumPages), (el, index) => (
+                        <Page
+                          key={`page_${index + 1}`}
+                          pageNumber={index + 1}
+                          scale={zoomLevel}
+                          customTextRenderer={customTextRenderer}
+                          className="shadow-2xl rounded-md overflow-hidden mb-8" // mb-8 creates spacing between pages
+                        />
+                      ))
+                    ) : null}
                   </Document>
                 </div>
               ) : (
@@ -1234,14 +1440,14 @@ export default function AnalyzeChatNextPage() {
                       </span>
                     </div>
                     <div className="text-[14px] whitespace-pre-wrap font-sans text-slate-800 leading-relaxed font-normal">
-                      {session?.extractedText ? (
+                      {(activeFile?.extractedText || session?.extractedText) ? (
                         debouncedSearchQuery.trim() ? (
                           renderHighlightedText(
-                            session.extractedText,
+                            activeFile?.extractedText || session?.extractedText || "",
                             debouncedSearchQuery.trim(),
                           )
                         ) : (
-                          session.extractedText
+                          activeFile?.extractedText || session?.extractedText
                         )
                       ) : (
                         <div className="text-slate-400 italic text-center py-12">
@@ -1306,7 +1512,9 @@ export default function AnalyzeChatNextPage() {
                 </div>
               )}
 
-              <div className="absolute bottom-5 inset-x-0 flex justify-center pointer-events-none z-10">
+              <div
+                className={`absolute ${hasMultipleSheets ? "bottom-16" : "bottom-5"} inset-x-0 flex justify-center pointer-events-none z-10`}
+              >
                 <div className="pointer-events-auto flex items-center gap-1 px-3 py-1.5 rounded-2xl bg-[#0C101E]/95 border border-[#1E2640] shadow-[0_8px_24px_rgba(0,0,0,0.65)] backdrop-blur-md text-white text-xs font-medium">
                   <button
                     onClick={() =>
@@ -1438,7 +1646,9 @@ export default function AnalyzeChatNextPage() {
                     <div className="min-w-0 flex-1">
                       <h2 className="text-sm font-semibold">OneChat AI</h2>
                       <p className="truncate text-xs text-slate-400">
-                        Ask anything about {docName}
+                        {filesList.length > 1
+                          ? `Ask anything about all ${filesList.length} files (${filesList.map((f) => f.originalFileName).join(", ")})`
+                          : `Ask anything about ${docName}`}
                       </p>
                     </div>
                   </div>
@@ -1451,16 +1661,23 @@ export default function AnalyzeChatNextPage() {
                           What would you like to explore?
                         </h3>
                         <p className="mt-2 text-sm text-slate-400">
-                          Ask questions, analyze trends, or create a report from
-                          your file.
+                          Ask questions, analyze trends, or create an integrated report across your {filesList.length > 1 ? `${filesList.length} files` : "file"}.
                         </p>
                         <div className="mt-6 flex flex-wrap justify-center gap-2">
-                          {[
-                            "Analyze trends",
-                            "Create a dashboard",
-                            "Generate a report",
-                            "Create slides",
-                          ].map((suggestion) => (
+                          {(filesList.length > 1
+                            ? [
+                              `Analyze all ${filesList.length} files`,
+                              "Compare across files",
+                              "Create integrated dashboard",
+                              "Cross-file summary report",
+                            ]
+                            : [
+                              "Analyze trends",
+                              "Create a dashboard",
+                              "Generate a report",
+                              "Create slides",
+                            ]
+                          ).map((suggestion) => (
                             <button
                               key={suggestion}
                               type="button"
@@ -1492,11 +1709,11 @@ export default function AnalyzeChatNextPage() {
                         ) : (
                           <div className="w-full min-w-0 max-w-full overflow-x-auto">
                             {message.content.startsWith("[Error:") ||
-                            message.content.startsWith("Error:") ||
-                            message.content.includes(
-                              "failed to serve this request",
-                            ) ||
-                            message.content.includes("Request failed") ? (
+                              message.content.startsWith("Error:") ||
+                              message.content.includes(
+                                "failed to serve this request",
+                              ) ||
+                              message.content.includes("Request failed") ? (
                               <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-950/40 p-3.5 text-sm text-red-200">
                                 <AlertTriangle className="h-5 w-5 shrink-0 text-red-400 mt-0.5" />
                                 <div>
@@ -1553,7 +1770,9 @@ export default function AnalyzeChatNextPage() {
                         placeholder={
                           customChatLoading
                             ? "Generating answer..."
-                            : "Ask anything about your file..."
+                            : filesList.length > 1
+                              ? `Ask anything about all ${filesList.length} files or a specific file...`
+                              : "Ask anything about your file..."
                         }
                         disabled={customChatLoading || !chatId}
                         className="flex-1 bg-transparent px-2 text-sm text-white outline-none placeholder:text-slate-500 disabled:opacity-50 cursor-text"

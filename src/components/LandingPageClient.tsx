@@ -17,7 +17,10 @@ const CreateZeroSkillSection = dynamic(
 );
 const ViralAiVideoSection = dynamic(() => import("./Viral_Ai_video_section"));
 const ModelMarquee = dynamic(() => import("./ModelMarquee"));
-const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
+// const VideoSliderSection = dynamic(() => import("./VideoSliderSection"));
+const InteractiveVideoTemplatesSection = dynamic(
+  () => import("./InteractiveVideoTemplatesSection"),
+);
 const Oneplace = dynamic(() => import("./Oneplace"));
 const AnalyzeSection = dynamic(() => import("./AnalyzeSection"));
 const Hastheskillsection = dynamic(() => import("./Hastheskillsection"));
@@ -233,6 +236,19 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
+        {/* Generate Any AI Video You Can Imagine - Interactive Templates Showcase */}
+        <InteractiveVideoTemplatesSection
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_video_templates"
+          sectionLabel="Interactive Video Templates Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
         <CreateZeroSkillSection
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
@@ -263,14 +279,15 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-        <VideoSliderSection />
+        {/* Preserved: Old Video Slider Section (kept as requested by client in case needed later) */}
+        {/* <VideoSliderSection />
 
         <SectionTrialCTA
           sectionId="after_video_slider"
           sectionLabel="Video Slider Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
-        />
+        /> */}
 
         {/* <Oneplace
           onOpenAuth={() => handleOpenAuth("signup")}
