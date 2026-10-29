@@ -62,7 +62,7 @@ const CONFIG = {
   settleMs: 250,
   restMs: 1000,
   startDelayMs: 1400,
-  visibleThreshold: 0.6, // part of card that must be on screen to flip
+  visibleThreshold: 0.15, // part of card that must be on screen to flip
   ratioTolerance: 0.25, // how different the next image shape may be
   historySize: 4,
 };
@@ -312,28 +312,28 @@ function pickNext(
   pool: ImageTemplateItem[],
   baseRatio: number,
 ): number {
-  const visible = new Set<number>();
-  const all = new Set<number>();
+  // Collect all images currently visible OR already reserved on any hidden side
+  const inUse = new Set<number>();
   cards.forEach((c) => {
-    const v = c.faces[c.flips % 2];
-    if (v !== null) visible.add(v);
-    c.faces.forEach((f) => f !== null && all.add(f));
+    c.faces.forEach((f) => {
+      if (f !== null) inUse.add(f);
+    });
   });
+
   const me = cards[slot];
   const current = me.faces[me.flips % 2];
   const recent = me.history;
   const diff = (i: number) =>
     Math.abs((pool[i].ratio ?? 0.8) - baseRatio) / baseRatio;
 
+  // Strict tiers: Never pick an image that is already on screen or reserved
   const tiers: Array<(i: number) => boolean> = [
-    (i) => !all.has(i) && !visible.has(i) && !recent.includes(i),
-    (i) => !visible.has(i) && !all.has(i),
-    (i) => !visible.has(i) && !recent.includes(i),
-    (i) => !visible.has(i),
-    (i) => !visible.has(i) && !recent.includes(i),
+    (i) => !inUse.has(i) && !recent.includes(i),
+    (i) => !inUse.has(i),
     (i) => i !== current && !recent.includes(i),
     (i) => i !== current,
   ];
+
   const indexes = pool.map((_, i) => i);
   for (const ok of tiers) {
     const list = indexes.filter(ok);
@@ -382,7 +382,7 @@ const FlipCard = React.memo(function FlipCard({
         const e = entries[entries.length - 1];
         onVisible(
           slot,
-          e.isIntersecting && e.intersectionRatio >= CONFIG.visibleThreshold,
+          e.isIntersecting,
           e.isIntersecting,
         );
       },
@@ -586,25 +586,36 @@ function ImageTemplatesGallery({
     (slot, attempt = 0) => {
       if (!aliveRef.current) return;
       const idx = pickNext(slot, cardsRef.current, pool, baseRatios[slot]);
+      
+      // Reserve the index immediately on the hidden side so other cards won't pick it
+      update(slot, (c) => {
+        const side = c.flips % 2 === 0 ? 1 : 0;
+        const faces: [number, number | null] = [c.faces[0], c.faces[1]];
+        faces[side] = idx;
+        return {
+          ...c,
+          faces,
+          ready: false,
+          busy: true,
+        };
+      });
+
       const im = new window.Image();
       im.onload = () => {
         if (!aliveRef.current) return;
-        update(slot, (c) => {
-          const side = c.flips % 2 === 0 ? 1 : 0;
-          const faces: [number, number | null] = [c.faces[0], c.faces[1]];
-          faces[side] = idx;
-          return {
-            ...c,
-            faces,
-            ready: true,
-            busy: false,
-            history: [...c.history, idx].slice(-CONFIG.historySize),
-          };
-        });
+        update(slot, (c) => ({
+          ...c,
+          ready: true,
+          busy: false,
+          history: [...c.history, idx].slice(-CONFIG.historySize),
+        }));
       };
       im.onerror = () => {
-        if (attempt < 3) loadHidden(slot, attempt + 1);
-        else update(slot, (c) => ({ ...c, busy: false, ready: false }));
+        if (attempt < 3) {
+          loadHidden(slot, attempt + 1);
+        } else {
+          update(slot, (c) => ({ ...c, busy: false, ready: false }));
+        }
       };
       im.src = pool[idx].image;
     },
@@ -861,7 +872,7 @@ function ImageTemplatesGallery({
                       card={cards[slot]}
                       pool={pool}
                       active={activeSlot === slot}
-                      priority={slot < 5}
+                      priority={slot < 8}
                       onVisible={onVisible}
                       onHover={onHover}
                       onSelect={onSelect}
