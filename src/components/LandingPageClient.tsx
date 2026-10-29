@@ -21,6 +21,9 @@ const ModelMarquee = dynamic(() => import("./ModelMarquee"));
 const InteractiveVideoTemplatesSection = dynamic(
   () => import("./InteractiveVideoTemplatesSection"),
 );
+const InteractiveImageTemplatesSection = dynamic(
+  () => import("./InteractiveImagesTemplatesSection"),
+);
 const Oneplace = dynamic(() => import("./Oneplace"));
 const AnalyzeSection = dynamic(() => import("./AnalyzeSection"));
 const Hastheskillsection = dynamic(() => import("./Hastheskillsection"));
@@ -245,6 +248,18 @@ export default function LandingPageClient() {
         <SectionTrialCTA
           sectionId="after_video_templates"
           sectionLabel="Interactive Video Templates Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <InteractiveImageTemplatesSection
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_image_templates"
+          sectionLabel="Interactive image Templates Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
