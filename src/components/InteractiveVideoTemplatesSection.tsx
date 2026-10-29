@@ -291,10 +291,10 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/customer-testimonial.mp4",
   },
   {
-    id: "pet-animation",
-    title: "Pet Animation",
-    desc: "Bring your pet photos to life with stunning animation and dynamic movements.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-animation.mp4", 
+    id: "pet-cartoon",
+    title: "Pet Cartoon",
+    desc: "Transform your pet into an adorable animated character and bring them to life in a colorful cartoon world with expressive movement, playful adventures, and animated movie-style visuals.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-cartoon.mp4", 
   },
   {
     id: "step-into-ancient-greece",
@@ -303,10 +303,10 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-ancient-greece.mp4", 
   },
   {
-    id: "step-into-viking-age",
-    title: "Step Into Viking Age",
-    desc: "Cinematic Viking era scene. A fierce warrior standing amidst the rugged Nordic landscape.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-viking-age.mp4", 
+    id: "step-into-the-viking-age",
+    title: "Step into the Viking Age",
+    desc: "Cinematic Scandinavian Norse historical scene. A Viking warrior or jarl (using attached image) in fur-trimmed armor holding a Norse shield, stepping off a dragon-headed longship onto a misty fjord shoreline with snow-capped cliffs and roaring campfires.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-viking-age.mp4", 
   }
 ];
 
