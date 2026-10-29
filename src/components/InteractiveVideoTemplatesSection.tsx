@@ -244,8 +244,8 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   },
   {
     id: "360-photo-booth",
-    title: "3D Photos Booth",
-    desc: "Cinematic 360-degree photo booth video animation. A glamorous character at a red carpet event while a high-speed camera rig orbits.",
+    title: "360 Photo Booth",
+    desc: "Cinematic 360-degree photo booth video animation. A glamorous character (attached image) at a red carpet event while a high-speed camera rig orbits completely around them in a smooth 360-degree rotation. The background shows flashing paparazzi camera lights, elegant event lighting, and a blurred crowd, capturing a high-end award show slow-motion effect.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/360-photo-booth.mp4",
   },
   {
@@ -274,8 +274,8 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   },
   {
     id: "product-benefits-ad",
-    title: "Product Benefit Ad",
-    desc: "Create a compelling product ad that clearly showcases your product’s most important benefits.",
+    title: "Product Benefits Ad",
+    desc: "Create a compelling product ad that clearly showcases your product’s most important benefits, demonstrates how it improves the customer’s experience, and turns features into persuasive reasons to buy.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/product-benefits-ad.mp4",
   },
   {
@@ -298,7 +298,7 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   },
   {
     id: "step-into-ancient-greece",
-    title: "Step Into Ancient Greece",
+    title: "Step into Ancient Greece",
     desc: "Cinematic epic ancient Greek scene. Step back in time to the world of philosophers and Spartans.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-ancient-greece.mp4", 
   },
