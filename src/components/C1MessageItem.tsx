@@ -960,51 +960,6 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                   className={"chart-action-overlay absolute z-30 flex items-center gap-1 sm:gap-1.5 rounded-lg border border-[#292D49] bg-[#0E1222]/95 px-2 py-1 shadow-2xl backdrop-blur-md transition-all hover:border-[#7564F6]"}
                   style={{ top: '8px', right: '12px' }}
                 >
-                  {/* Full View Button */}
-                  <div className="relative group/fv">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenFullView(target)}
-                      className={"flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95"}
-                      aria-label="Full View"
-                    >
-                      <Maximize2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/fv:text-white transition-colors shrink-0"} />
-                      <span className="hidden xs:inline">Full View</span>
-                    </button>
-                    {/* Tooltip: displays downward to avoid being clipped by top boundary */}
-                    <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/fv:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
-                      Full View
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
-                    </div>
-                  </div>
-
-                  <div className={"h-4 w-px bg-[#292D49] shrink-0"} />
-
-                  {/* Share Button */}
-                  <div className="relative group/share">
-                    <button
-                      type="button"
-                      onClick={() => handleShare(target)}
-                      disabled={sharingId === target.id}
-                      className={"flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"}
-                      aria-label="Share Chart"
-                    >
-                      {sharingId === target.id ? (
-                        <Loader2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0"} />
-                      ) : (
-                        <Share2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/share:text-white transition-colors shrink-0"} />
-                      )}
-                      <span className="hidden xs:inline">Share</span>
-                    </button>
-                    {/* Tooltip: Share Chart - displays downward */}
-                    <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
-                      Share Chart
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
-                    </div>
-                  </div>
-
-                  <div className={"h-4 w-px bg-[#292D49] shrink-0"} />
-
                   {/* Download Dropdown */}
                   <div className={"relative group/dl"}>
                     <button
@@ -1058,6 +1013,51 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                         </button>
                       </div>
                     )}
+                  </div>
+
+                  <div className={"h-4 w-px bg-[#292D49] shrink-0"} />
+
+                  {/* Share Button */}
+                  <div className="relative group/share">
+                    <button
+                      type="button"
+                      onClick={() => handleShare(target)}
+                      disabled={sharingId === target.id}
+                      className={"flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"}
+                      aria-label="Share Chart"
+                    >
+                      {sharingId === target.id ? (
+                        <Loader2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0"} />
+                      ) : (
+                        <Share2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/share:text-white transition-colors shrink-0"} />
+                      )}
+                      <span className="hidden xs:inline">Share</span>
+                    </button>
+                    {/* Tooltip: Share Chart - displays downward */}
+                    <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                      Share Chart
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+                    </div>
+                  </div>
+
+                  <div className={"h-4 w-px bg-[#292D49] shrink-0"} />
+
+                  {/* Full View Button */}
+                  <div className="relative group/fv">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenFullView(target)}
+                      className={"flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95"}
+                      aria-label="Full View"
+                    >
+                      <Maximize2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/fv:text-white transition-colors shrink-0"} />
+                      <span className="hidden xs:inline">Full View</span>
+                    </button>
+                    {/* Tooltip: displays downward to avoid being clipped by top boundary */}
+                    <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/fv:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                      Full View
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+                    </div>
                   </div>
                 </div>
                 , target.element);

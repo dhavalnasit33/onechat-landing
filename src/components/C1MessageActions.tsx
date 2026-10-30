@@ -594,51 +594,6 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
 
         {/* Action Buttons: Full View, Share & Download */}
         <div className="flex items-center gap-1.5">
-          {/* Full View Button */}
-          <div className="relative group/fv">
-            <button
-              type="button"
-              onClick={handleOpenFullView}
-              className="flex items-center gap-1.5 rounded-md border border-[#292D49] bg-[#0E1222] px-2.5 py-1 text-xs text-slate-300 transition hover:border-[#7564F6] hover:bg-[#7564F6]/10 hover:text-white active:scale-95 cursor-pointer"
-              aria-label="Full View"
-            >
-              <Maximize2 className="h-5 w-5 text-slate-400 group-hover/fv:text-white transition-colors" />
-              <span className="text-[11px] hidden xs:inline">Full View</span>
-            </button>
-            {/* Tooltip: drops downward to avoid clipping */}
-            <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/fv:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
-              Full View
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
-            </div>
-          </div>
-
-          {/* Share Button */}
-          <div className="relative group/share">
-            <button
-              type="button"
-              onClick={handleShare}
-              disabled={sharing}
-              className="flex items-center gap-1.5 rounded-md border border-[#292D49] bg-[#0E1222] px-2.5 py-1 text-xs text-slate-300 transition hover:border-[#7564F6] hover:bg-[#7564F6]/10 hover:text-white active:scale-95 disabled:opacity-50 cursor-pointer"
-              aria-label="Share Chart"
-            >
-              {sharing ? (
-                <Loader2 className="h-5 w-5 animate-spin text-[#7564F6]" />
-              ) : copiedShareLink ? (
-                <Check className="h-5 w-5 text-emerald-400" />
-              ) : (
-                <Share2 className="h-5 w-5 text-slate-400 group-hover/share:text-white transition-colors" />
-              )}
-              <span className="text-[11px] hidden xs:inline">
-                {sharing ? "Sharing..." : copiedShareLink ? "Copied!" : "Share"}
-              </span>
-            </button>
-            {/* Tooltip: Share Chart - drops downward */}
-            <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
-              Share Chart
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
-            </div>
-          </div>
-
           {/* Download Dropdown */}
           <div className="relative group/dl" ref={dropdownRef}>
             <button
@@ -700,6 +655,51 @@ export const C1MessageActions: React.FC<C1MessageActionsProps> = ({
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Share Button */}
+          <div className="relative group/share">
+            <button
+              type="button"
+              onClick={handleShare}
+              disabled={sharing}
+              className="flex items-center gap-1.5 rounded-md border border-[#292D49] bg-[#0E1222] px-2.5 py-1 text-xs text-slate-300 transition hover:border-[#7564F6] hover:bg-[#7564F6]/10 hover:text-white active:scale-95 disabled:opacity-50 cursor-pointer"
+              aria-label="Share Chart"
+            >
+              {sharing ? (
+                <Loader2 className="h-5 w-5 animate-spin text-[#7564F6]" />
+              ) : copiedShareLink ? (
+                <Check className="h-5 w-5 text-emerald-400" />
+              ) : (
+                <Share2 className="h-5 w-5 text-slate-400 group-hover/share:text-white transition-colors" />
+              )}
+              <span className="text-[11px] hidden xs:inline">
+                {sharing ? "Sharing..." : copiedShareLink ? "Copied!" : "Share"}
+              </span>
+            </button>
+            {/* Tooltip: Share Chart - drops downward */}
+            <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+              Share Chart
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+            </div>
+          </div>
+
+          {/* Full View Button */}
+          <div className="relative group/fv">
+            <button
+              type="button"
+              onClick={handleOpenFullView}
+              className="flex items-center gap-1.5 rounded-md border border-[#292D49] bg-[#0E1222] px-2.5 py-1 text-xs text-slate-300 transition hover:border-[#7564F6] hover:bg-[#7564F6]/10 hover:text-white active:scale-95 cursor-pointer"
+              aria-label="Full View"
+            >
+              <Maximize2 className="h-5 w-5 text-slate-400 group-hover/fv:text-white transition-colors" />
+              <span className="text-[11px] hidden xs:inline">Full View</span>
+            </button>
+            {/* Tooltip: drops downward to avoid clipping */}
+            <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/fv:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+              Full View
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+            </div>
           </div>
         </div>
       </div>

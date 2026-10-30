@@ -162,7 +162,7 @@ export default function SharedReportPage() {
     if (!item || !reportContainerRef.current) return;
     const el = reportContainerRef.current;
 
-    const fixSvgOverflow = () => {
+    const cleanupAndFix = () => {
       if (!el) return;
       // Force overflow on SVG elements
       el.querySelectorAll<SVGElement>("svg, .recharts-wrapper, .recharts-surface").forEach((svgEl) => {
@@ -172,16 +172,31 @@ export default function SharedReportPage() {
       el.querySelectorAll<HTMLElement>(".recharts-wrapper").forEach((wrapper) => {
         wrapper.style.overflow = "visible";
       });
+
+      // Remove / hide any "Related Queries" / "Related Questions" sections
+      el.querySelectorAll<HTMLElement>("div, section").forEach((sec) => {
+        const titleEl = sec.querySelector("h1, h2, h3, h4, h5, h6, strong, p");
+        const headingText = (titleEl?.textContent || "").toLowerCase();
+        if (
+          headingText.includes("related queries") ||
+          headingText.includes("related questions") ||
+          sec.classList.contains("openui-follow-up-block") ||
+          sec.classList.contains("openui-follow-up-item") ||
+          sec.hasAttribute("data-followup")
+        ) {
+          sec.style.display = "none";
+        }
+      });
     };
 
     // Run at multiple intervals to catch delayed renders from the dynamic C1Component
-    const t1 = setTimeout(fixSvgOverflow, 300);
-    const t2 = setTimeout(fixSvgOverflow, 800);
-    const t3 = setTimeout(fixSvgOverflow, 2000);
-    const t4 = setTimeout(fixSvgOverflow, 4000);
+    const t1 = setTimeout(cleanupAndFix, 300);
+    const t2 = setTimeout(cleanupAndFix, 800);
+    const t3 = setTimeout(cleanupAndFix, 2000);
+    const t4 = setTimeout(cleanupAndFix, 4000);
 
     // Also watch for DOM mutations (chart re-renders, streaming updates)
-    const observer = new MutationObserver(fixSvgOverflow);
+    const observer = new MutationObserver(cleanupAndFix);
     observer.observe(el, { childList: true, subtree: true, attributes: true });
 
     return () => {
@@ -593,61 +608,6 @@ export default function SharedReportPage() {
 
           {/* Action Buttons: Full View, Share & Download */}
           <div className="flex items-center gap-1 sm:gap-1.5 rounded-lg border border-[#292D49] bg-[#0E1222]/95 px-2 py-1 shadow-2xl backdrop-blur-md transition-all hover:border-[#7564F6]">
-            {/* Full View Button */}
-            <div className="relative group/fv">
-              <button
-                type="button"
-                onClick={handleOpenFullView}
-                disabled={!item || lightboxLoading}
-                className="flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"
-                aria-label="Full View"
-              >
-                {lightboxLoading ? (
-                  <Loader2 className="h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0" />
-                ) : (
-                  <>
-                    <Maximize2 className="h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/fv:text-white transition-colors shrink-0" />
-                    <span className="hidden sm:inline">Full View</span>
-                  </>
-                )}
-              </button>
-              {/* Tooltip: displays downward to avoid being clipped by top boundary */}
-              <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/fv:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
-                Full View
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
-              </div>
-            </div>
-
-            <div className="h-4 w-px bg-[#292D49] shrink-0" />
-
-            {/* Share Button */}
-            <div className="relative group/share">
-              <button
-                onClick={handleCopyLink}
-                type="button"
-                className="flex items-center gap-1.5 rounded-lg border border-[#292D49] bg-[#121424] px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-[#7564F6] hover:bg-[#7564F6]/10 active:scale-95 cursor-pointer"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3.5 w-3.5 text-emerald-400" />
-                    <span className="text-emerald-400">Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="h-3.5 w-3.5 text-slate-400" />
-                    <span className="hidden sm:inline">Share</span>
-                  </>
-                )}
-              </button>
-              {/* Tooltip: Share Report - displays downward */}
-              <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
-                Share Chart
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
-              </div>
-            </div>
-
-            <div className="h-4 w-px bg-[#292D49] shrink-0" />
-
             {/* Download Dropdown */}
             <div className="relative group/dl" ref={downloadDropdownRef}>
               <button
@@ -700,12 +660,67 @@ export default function SharedReportPage() {
                 </div>
               )}
             </div>
+
+            <div className="h-4 w-px bg-[#292D49] shrink-0" />
+
+            {/* Share Button */}
+            <div className="relative group/share">
+              <button
+                onClick={handleCopyLink}
+                type="button"
+                className="flex items-center gap-1.5 rounded-lg border border-[#292D49] bg-[#121424] px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-[#7564F6] hover:bg-[#7564F6]/10 active:scale-95 cursor-pointer"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-400" />
+                    <span className="text-emerald-400">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="hidden sm:inline">Share</span>
+                  </>
+                )}
+              </button>
+              {/* Tooltip: Share Report - displays downward */}
+              <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                Share Chart
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+              </div>
+            </div>
+
+            <div className="h-4 w-px bg-[#292D49] shrink-0" />
+
+            {/* Full View Button */}
+            <div className="relative group/fv">
+              <button
+                type="button"
+                onClick={handleOpenFullView}
+                disabled={!item || lightboxLoading}
+                className="flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"
+                aria-label="Full View"
+              >
+                {lightboxLoading ? (
+                  <Loader2 className="h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0" />
+                ) : (
+                  <>
+                    <Maximize2 className="h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/fv:text-white transition-colors shrink-0" />
+                    <span className="hidden sm:inline">Full View</span>
+                  </>
+                )}
+              </button>
+              {/* Tooltip: displays downward to avoid being clipped by top boundary */}
+              <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/fv:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                Full View
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px border-4 border-transparent border-b-[#181B34]" />
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
+      <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
         {loading ? (
           <div className="flex h-96 flex-col items-center justify-center gap-4 text-center">
             <Loader2 className="h-10 w-10 animate-spin text-[#6C56E5]" />
@@ -751,29 +766,22 @@ export default function SharedReportPage() {
             </div>
 
             {/* Thesys C1 Interactive Container */}
-            {/* Outer wrapper: scrolls horizontally if chart is wider than viewport */}
             <div
-              style={{ overflowX: "auto", overflowY: "visible", borderRadius: "16px", border: "1px solid #1E223D", background: "#070914", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)" }}
+              style={{
+                overflowX: "auto",
+                overflowY: "visible",
+                borderRadius: "16px",
+                border: "1px solid #1E223D",
+                background: "#070914",
+                boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
+              }}
             >
-              {/*
-                Inner div has minWidth:900px so Recharts renders ALL months (Jan-Dec).
-                paddingLeft:60px gives the Y-axis labels (e.g. "2.2K") room on the left
-                so they are never clipped.
-              */}
               <div
                 ref={reportContainerRef}
                 suppressHydrationWarning
-                className="dark space-y-4"
+                className="space-y-4 w-full"
                 style={{
-                  colorScheme: "dark",
-                  backgroundColor: "#070914",
-                  color: "#F8FAFC",
-                  minWidth: "900px",
-                  paddingTop: "24px",
-                  paddingBottom: "32px",
-                  paddingLeft: "64px",
-                  paddingRight: "24px",
-                  /* SVG overflow fix: Recharts Y-axis text renders at negative x — must be visible */
+                  padding: "16px sm:24px",
                   position: "relative",
                 }}
               >
@@ -786,6 +794,14 @@ export default function SharedReportPage() {
                   .recharts-text,
                   text {
                     overflow: visible !important;
+                  }
+                  /* Hide Related Queries / follow up questions section on shared report page */
+                  .openui-follow-up-block,
+                  .openui-follow-up-item,
+                  [class*='follow-up'],
+                  [class*='related-quer'],
+                  [data-followup] {
+                    display: none !important;
                   }
                 `}</style>
                 {item.imageUrl ? (

@@ -274,7 +274,7 @@ export default function AnalyzeChatNextPage() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, customChatMessages]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.search) {
@@ -1751,6 +1751,7 @@ export default function AnalyzeChatNextPage() {
                         )}
                       </div>
                     ))}
+                    <div ref={messagesEndRef} className="h-0 w-0" />
                   </div>
 
                   <div className="border-t border-[#1E223D] bg-[#070914] p-4 sm:px-6">
@@ -1770,9 +1771,7 @@ export default function AnalyzeChatNextPage() {
                         placeholder={
                           customChatLoading
                             ? "Generating answer..."
-                            : filesList.length > 1
-                              ? `Ask anything about all ${filesList.length} files or a specific file...`
-                              : "Ask anything about your file..."
+                            : "Ask anything about your file or data"
                         }
                         disabled={customChatLoading || !chatId}
                         className="flex-1 bg-transparent px-2 text-sm text-white outline-none placeholder:text-slate-500 disabled:opacity-50 cursor-text"
