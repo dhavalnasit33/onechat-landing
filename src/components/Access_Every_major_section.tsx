@@ -330,7 +330,7 @@ export default function AccessEveryMajorSection() {
 
             <div className="relative max-w-[1380px] mx-auto flex flex-col items-center z-10">
                 <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-                    <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-[44px] font-extrabold text-white tracking-tight leading-tight mb-4">
+                    <h2 className="font-poppins text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
                         Access All Major {" "}
                         <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">
                             AI Models

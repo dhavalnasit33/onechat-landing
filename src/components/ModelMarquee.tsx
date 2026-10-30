@@ -212,11 +212,10 @@ export default function ModelMarquee() {
         className="flex flex-col items-center justify-center mx-5 sm:mx-8 md:mx-10 shrink-0 select-none group transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
       >
         <div
-          className={`relative rounded-full shadow-md bg-[#0F1426] border border-white/10 overflow-hidden transition-all duration-300 group-hover:border-purple-500/50 group-hover:shadow-[0_0_20px_rgba(108,86,229,0.35)] ${
-            model.isLarge
+          className={`relative rounded-full shadow-md bg-[#0F1426] border border-white/10 overflow-hidden transition-all duration-300 group-hover:border-purple-500/50 group-hover:shadow-[0_0_20px_rgba(108,86,229,0.35)] ${model.isLarge
               ? "w-[82px] h-[82px] md:w-[106px] md:h-[106px]"
               : "w-[70px] h-[70px] md:w-[92px] md:h-[92px]"
-          }`}
+            }`}
         >
           <img
             src={model.asset}
@@ -251,10 +250,12 @@ export default function ModelMarquee() {
 
       <div className="relative max-w-[1440px] mx-auto px-4 text-center">
         {/* Section Title with exact gradient headline */}
-        <h2 className="font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-          <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2E93] bg-clip-text text-transparent">
-            Replace up to 100 Apps & AI Tools
-          </span>
+      
+        <h2 className="mt-5 font-poppins text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15] lg:whitespace-nowrap">
+          Replace up to 100{" "}
+          <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">
+            Apps & AI Tools
+          </span>{" "}
         </h2>
       </div>
 

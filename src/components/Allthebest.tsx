@@ -225,7 +225,7 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                         </div>
 
                         {/* Main Heading */}
-                        <h2 className="font-poppins text-3xl sm:text-4xl md:text-[44px] lg:text-[48px] font-extrabold text-white tracking-tight leading-[1.15]">
+                        <h2 className="font-poppins text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15]">
                             All the Best AI. <br />
                         
                             <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">

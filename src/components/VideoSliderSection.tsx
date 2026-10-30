@@ -226,7 +226,7 @@ export default function VideoSliderSection() {
 
       <div className="relative max-w-[1440px] mx-auto px-4 text-center">
         <div className="flex flex-col items-center">
-          <h2 className="mt-5 font-poppins text-2xl sm:text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight max-w-[950px]">
+          <h2 className="mt-5 font-poppins text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl font-extrabold text-white tracking-tight leading-tight max-w-[950px]">
             Generate Any{" "}
             <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">
               AI Video

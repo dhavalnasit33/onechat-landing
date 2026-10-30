@@ -264,6 +264,32 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
+         <ViralAiVideoSection />
+
+        <SectionTrialCTA
+          sectionId="after_viral_video"
+          sectionLabel="Viral Video Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+
+
+ <AnalyzeSection
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+        <SectionTrialCTA
+          sectionId="after_analyze"
+          sectionLabel="Analyze Section Divider"
+          onOpenAuth={() => handleOpenAuth("signup")}
+          onCTA={handleCTA}
+        />
+
+
+
+
         <CreateZeroSkillSection
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
@@ -276,14 +302,7 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         />
 
-        <ViralAiVideoSection />
-
-        <SectionTrialCTA
-          sectionId="after_viral_video"
-          sectionLabel="Viral Video Section Divider"
-          onOpenAuth={() => handleOpenAuth("signup")}
-          onCTA={handleCTA}
-        />
+       
 
         <ModelMarquee />
 
@@ -316,17 +335,7 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         /> */}
 
-        <AnalyzeSection
-          onOpenAuth={() => handleOpenAuth("signup")}
-          onCTA={handleCTA}
-        />
-
-        <SectionTrialCTA
-          sectionId="after_analyze"
-          sectionLabel="Analyze Section Divider"
-          onOpenAuth={() => handleOpenAuth("signup")}
-          onCTA={handleCTA}
-        />
+       
         {/* (Previous static Image Generation FeaturesList moved above, directly below Video Generation) */}
         <Allthebest
           onOpenAuth={() => handleOpenAuth("signup")}
@@ -365,7 +374,7 @@ export default function LandingPageClient() {
           onCTA={handleCTA}
         /> */}
 
-        <TemplatesShowcase
+        {/* <TemplatesShowcase
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
         />
@@ -375,7 +384,7 @@ export default function LandingPageClient() {
           sectionLabel="Templates Section Divider"
           onOpenAuth={() => handleOpenAuth("signup")}
           onCTA={handleCTA}
-        />
+        /> */}
 
         <WhoItsFor />
 

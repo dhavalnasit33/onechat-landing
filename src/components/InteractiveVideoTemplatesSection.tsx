@@ -342,7 +342,7 @@ export default function InteractiveVideoTemplatesSection({
         
         {/* Header Text */}
         <div className="text-center max-w-[950px] mx-auto mb-10 flex flex-col items-center">
-          <h2 className="mt-5 font-poppins text-[32px] md:text-[48px] font-extrabold text-white tracking-tight leading-[1.15] lg:whitespace-nowrap">
+          <h2 className="mt-5 font-poppins text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15] lg:whitespace-nowrap">
             Generate Any{" "}
             <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">
               AI Video

@@ -474,7 +474,7 @@ const FlipCard = React.memo(function FlipCard({
         )}
       </div>
 
-      <span className="ift-label pointer-events-none absolute left-2.5 top-2.5 z-20 max-w-[85%] truncate rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm transition-opacity sm:text-[11px]">
+      <span className="ift-label pointer-events-none absolute left-2.5 top-2.5 z-20 max-w-[85%] truncate rounded-full bg-black/55 px-2.5 py-1 text-[15px] font-semibold text-white backdrop-blur-sm transition-opacity">
         {sample.category}
       </span>
 
@@ -753,7 +753,7 @@ function ImageTemplatesGallery({
         {/* title description */}
         <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 relative z-10">
           <div className="text-center max-w-[950px] mx-auto mb-10 flex flex-col items-center">
-            <h2 className="mt-5 font-poppins text-[32px] md:text-[48px] font-extrabold text-white tracking-tight leading-[1.15] lg:whitespace-nowrap">
+            <h2 className="mt-5 font-poppins text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15] lg:whitespace-nowrap">
               Generate Amazing{" "}
               <span className="bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent">
                 AI Images
