@@ -174,7 +174,7 @@ export default function SharedReportPage() {
         wrapper.style.overflow = "visible";
       });
 
-      // Remove / hide any "Related Queries" / "Related Questions" sections
+
       el.querySelectorAll<HTMLElement>("div, section").forEach((sec) => {
         const titleEl = sec.querySelector("h1, h2, h3, h4, h5, h6, strong, p");
         const headingText = (titleEl?.textContent || "").toLowerCase();

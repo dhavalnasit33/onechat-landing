@@ -464,5 +464,120 @@ div[class*='recharts-responsive-container'],
 
 
 
+/* =========================================================
+   Perplexity Style Related Questions / Follow-up Block
+   ========================================================= */
 
+/* ૧. મુખ્ય બોક્સની બોર્ડર અને બેકગ્રાઉન્ડ દૂર કરવા */
+.openui-follow-up-block,
+.crayon-follow-up-block {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+}
 
+/* ૨. Thesys ના ડિફોલ્ટ '+' કે 'v' આઇકન છુપાવવા */
+.openui-follow-up-item svg,
+.crayon-follow-up-item svg,
+[data-followup] svg {
+  display: none !important;
+}
+
+/* ૩. Perplexity જેવી ક્લીન ડિઝાઇન અને સ્પેસિંગ */
+.openui-follow-up-item,
+.crayon-follow-up-item,
+[data-followup] {
+  display: flex !important;
+  align-items: center !important;
+  padding: 10px 12px !important;
+  margin-bottom: 4px !important;
+  border: none !important;
+  background: transparent !important;
+  color: #cbd5e1 !important; /* હળવો ગ્રે/વ્હાઇટ કલર */
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease, color 0.2s ease !important;
+}
+
+/* ૪. વાક્યની શરૂઆતમાં '↳' એરો (Arrow) મૂકવો */
+.openui-follow-up-item::before,
+.crayon-follow-up-item::before,
+[data-followup]::before {
+  content: "↳" !important;
+  font-size: 18px !important;
+  color: #64748B !important; /* ડાર્ક ગ્રે કલર */
+  margin-right: 12px !important;
+  display: inline-block;
+  transform: translateY(-2px); /* એરો ને થોડો ઉપર સેટ કરવા */
+}
+
+/* ૫. હોવર (Hover) ઇફેક્ટ - માઉસ લઈ જતાં કલર બદલાય */
+.openui-follow-up-item:hover,
+.crayon-follow-up-item:hover,
+[data-followup]:hover {
+  background-color: #1E223D !important; /* Perplexity જેવું હળવું બેકગ્રાઉન્ડ */
+  color: #ffffff !important;
+}
+
+.openui-follow-up-item:hover::before,
+.crayon-follow-up-item:hover::before,
+[data-followup]:hover::before {
+  color: #A78BFA !important; /* હોવર પર એરો નો કલર ચમકશે */
+}
+
+/* =========================================================
+   Light Theme (OS Light Mode) Follow-up Hover Effect
+   ========================================================= */
+@media (prefers-color-scheme: light) {
+  /* Light mode ma default text color */
+  .openui-follow-up-item,
+  .crayon-follow-up-item,
+  [data-followup] {
+    color: #475569 !important; /* Dark Gray text */
+  }
+
+  /* Light mode ma arrow no color */
+  .openui-follow-up-item::before,
+  .crayon-follow-up-item::before,
+  [data-followup]::before {
+    color: #94A3B8 !important; /* Light Gray arrow */
+  }
+
+  /* Light mode ma hover effect (Soft light background) */
+  .openui-follow-up-item:hover,
+  .crayon-follow-up-item:hover,
+  [data-followup]:hover {
+    background-color: #F1F5F9 !important; /* Ekdam light gray/blue background */
+    color: #0F172A !important; /* Ekdam dark text hover par */
+  }
+
+  /* Light mode ma hover par arrow no color */
+  .openui-follow-up-item:hover::before,
+  .crayon-follow-up-item:hover::before,
+  [data-followup]:hover::before {
+    color: #6C56E5 !important; /* Tamara theme no Purple color */
+  }
+}
+
+/* Jo explicitly .light class use thato hoi html/body par to tena mate pan same rules */
+.light .openui-follow-up-item,
+.light .crayon-follow-up-item,
+.light [data-followup] {
+  color: #475569 !important;
+}
+
+.light .openui-follow-up-item:hover,
+.light .crayon-follow-up-item:hover,
+.light [data-followup]:hover {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+.light .openui-follow-up-item:hover::before,
+.light .crayon-follow-up-item:hover::before,
+.light [data-followup]:hover::before {
+  color: #6C56E5 !important;
+}

@@ -369,12 +369,13 @@ export default function AnalyzeChatNextPage() {
     (session as any) ||
     null;
 
-  const docName =
+  const docName: string =
     activeFile?.originalFileName || session?.originalFileName || session?.title || "Uploaded File";
+  const rawExt = (docName.includes(".") ? (docName.split(".").pop() || "") : "").toLowerCase();
   const fileType = (
-    activeFile?.fileType ||
-    docName.split(".").pop() ||
-    "csv"
+    (["jpg", "jpeg", "png", "webp", "gif", "svg", "bmp"].includes(rawExt)
+      ? "image"
+      : activeFile?.fileType || session?.fileType || rawExt || "pdf")
   ).toLowerCase();
   const isImage = ["image", "jpg", "jpeg", "png", "webp", "gif"].includes(
     fileType,
@@ -946,7 +947,7 @@ export default function AnalyzeChatNextPage() {
         ".c1-component-container, [data-c1-component], .openui-markdown-renderer, .openui-follow-up-block, .openui-follow-up-item"
       );
 
-      // 3. Check if user clicked directly on an OpenUI follow-up item (Related Queries)
+     
       const followUpItem = target.closest(".openui-follow-up-item, [data-followup], .followup-item");
       if (followUpItem) {
         e.preventDefault();
@@ -985,7 +986,7 @@ export default function AnalyzeChatNextPage() {
         return;
       }
 
-      // Check if inside a Related Queries container or accordion content
+
       const isInsideRelatedQueries = Boolean(
         clickable.closest(".openui-follow-up-block, .related-query, .thesys-action-btn") ||
         clickable.closest("[class*='accordion-content'], [data-state='open']") ||
@@ -1002,7 +1003,7 @@ export default function AnalyzeChatNextPage() {
 
       actionText = actionText.replace(/^[\+\-\s*•·›»\u2022\u25B6\u25BC]+/, "").trim();
 
-      // Ensure it is ONLY submitted if it's within Related Queries / Follow-up suggestions
+    
       // OR it's an actual analytical question
       const isActualQuestion =
         actionText.endsWith("?") ||
@@ -1175,10 +1176,12 @@ export default function AnalyzeChatNextPage() {
                   </div>
                   {filesList.map((fItem, idx) => {
                     const isActive = idx === activeFileIndex;
+                    const fileName = fItem.originalFileName || "";
+                    const itemExt = (fileName.includes(".") ? (fileName.split(".").pop() || "") : "").toLowerCase();
                     const fExt = (
-                      fItem.fileType ||
-                      fItem.originalFileName?.split(".").pop() ||
-                      "pdf"
+                      ["jpg", "jpeg", "png", "webp", "gif", "svg", "bmp"].includes(itemExt)
+                        ? "image"
+                        : fItem.fileType || itemExt || "pdf"
                     ).toLowerCase();
                     return (
                       <button
@@ -1385,7 +1388,7 @@ export default function AnalyzeChatNextPage() {
                     </div>
                   )}
                 </div>
-              ) : ["image", "jpg", "jpeg", "png", "webp"].includes(fileType) ? (
+              ) : ["image", "jpg", "jpeg", "png", "webp", "gif", "svg", "bmp"].includes(fileType) ? (
                 <div className="flex-1 overflow-auto p-6 flex items-center justify-center bg-[#0B0E1A]">
                   {(activeFile?.visualImageUrls?.length || session?.visualImageUrls?.length) ? (
                     <div

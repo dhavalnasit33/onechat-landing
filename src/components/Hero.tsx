@@ -1,7 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { handleRegistrationCTA, RegistrationCTAInput } from "../lib/attribution";
+import {
+  handleRegistrationCTA,
+  RegistrationCTAInput,
+} from "../lib/attribution";
 import { ArrowRight } from "lucide-react";
 
 const heroSectionVideo =
@@ -49,7 +52,7 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
 
     // Defer video loading to prioritize critical assets
     const videoTimer = setTimeout(() => {
-     setVideoSrc(`${heroSectionVideo}/uploads/Hero_section.mp4` || "");
+      setVideoSrc(`${heroSectionVideo}/uploads/Hero_section.mp4` || "");
     }, 1000);
 
     return () => {
@@ -93,15 +96,14 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
         <h1 className="font-poppins text-[24px] min-[375px]:text-[28px] min-[450px]:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-5xl mx-auto">
           The #1 AI Super App
           <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-3 mt-1 sm:mt-2">
-            <span className="inline text-white font-extrabold">
-              for
-            </span>
+            <span className="inline text-white font-extrabold">for</span>
             <div className="h-[36px] min-[375px]:h-[42px] min-[425px]:h-[48px] sm:h-[60px] md:h-[80px] overflow-hidden flex items-center justify-center">
               <span
-                className={`inline-block bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent transition-all duration-400 transform text-center font-extrabold tracking-tight whitespace-nowrap ${fadeState === "fade-in"
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 -translate-y-6"
-                  }`}
+                className={`inline-block bg-gradient-to-r from-[#00A3FF] via-[#8B5CF6] via-[#D946EF] to-[#FF2ED9] bg-clip-text text-transparent transition-all duration-400 transform text-center font-extrabold tracking-tight whitespace-nowrap ${
+                  fadeState === "fade-in"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-6"
+                }`}
               >
                 {rotatingWords[wordIndex]}
               </span>
@@ -136,10 +138,10 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
               <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </span>
           </button>
-          <p className="font-sans text-sm sm:text-base md:text-lg text-slate-300 font-medium mt-1 tracking-wide">
+          <p className="font-sans text-xs sm:text-sm text-slate-300 font-medium mt-1 tracking-wide">
             {/* Hundreds of AI Models • Dozens of AI Tools • One Platform */}
-            Dozens of AI Models • Hundreds of AI Tools & Templates • One Platform
-
+            Dozens of AI Models • Hundreds of AI Tools & Templates • One
+            Platform
           </p>
         </div>
 
