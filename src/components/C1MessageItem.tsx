@@ -57,6 +57,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   const [lightboxTarget, setLightboxTarget] = useState<ChartItemTarget | null>(null);
   const [lightboxImageSrc, setLightboxImageSrc] = useState<string | null>(null);
   const [lightboxLoading, setLightboxLoading] = useState<boolean>(false);
+  const [lightboxDropdownOpen, setLightboxDropdownOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (toastMessage) {
@@ -212,9 +213,14 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   // Helper filter to exclude action buttons overlay and scroll navigation buttons when taking screenshot
   const imageFilter = (node: HTMLElement) => {
     if (!node) return true;
+    if (node.dataset?.hiddenForCapture === "true") return false;
     if (node.classList) {
       if (node.classList.contains("chart-action-overlay")) return false;
       if (
+        node.classList.contains("openui-follow-up-block") ||
+        node.classList.contains("openui-follow-up-item") ||
+        node.classList.contains("crayon-follow-up-block") ||
+        node.classList.contains("crayon-follow-up-item") ||
         node.classList.contains("crayon-chart-vertical-scroll-buttons-container") ||
         node.classList.contains("crayon-chart-vertical-scroll-button") ||
         node.classList.contains("openui-chart-vertical-scroll-buttons-container") ||
@@ -231,6 +237,8 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     if (className) {
       if (
         className.includes("chart-action-overlay") ||
+        className.includes("follow-up") ||
+        className.includes("followup") ||
         className.includes("scroll-button") ||
         className.includes("scroll-buttons") ||
         className.includes("scroll-arrow") ||
@@ -240,6 +248,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         return false;
       }
     }
+    if (node.hasAttribute?.("data-followup")) return false;
     const ariaLabel = node.getAttribute?.("aria-label")?.toLowerCase() || "";
     if (ariaLabel.includes("scroll") || ariaLabel.includes("next page") || ariaLabel.includes("previous page")) {
       return false;
@@ -395,6 +404,91 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     };
   };
 
+  // Helper to temporarily hide any "Related Questions" / "Related Queries" / Follow-up blocks during capture
+  const hideRelatedQuestions = (root: HTMLElement): (() => void) => {
+    const hiddenElements: { el: HTMLElement; prevDisplay: string; prevVisibility: string }[] = [];
+
+    const hideEl = (el: HTMLElement) => {
+      if (!el || el.dataset.hiddenForCapture === "true") return;
+      hiddenElements.push({
+        el,
+        prevDisplay: el.style.display,
+        prevVisibility: el.style.visibility,
+      });
+      el.dataset.hiddenForCapture = "true";
+      el.style.setProperty("display", "none", "important");
+      el.style.setProperty("visibility", "hidden", "important");
+    };
+
+    // 1. Direct class & attribute matches
+    root.querySelectorAll<HTMLElement>(
+      ".openui-follow-up-block, .openui-follow-up-item, .crayon-follow-up-block, .crayon-follow-up-item, [data-followup], [class*='follow-up'], [class*='followup']"
+    ).forEach(hideEl);
+
+    // 2. Headings containing "related questions" or "related queries"
+    root.querySelectorAll<HTMLElement>("h1, h2, h3, h4, h5, h6, strong, p, span, div").forEach((heading) => {
+      const text = heading.textContent?.trim().toLowerCase() || "";
+      if (
+        text === "related questions" ||
+        text === "related queries" ||
+        text.startsWith("related questions") ||
+        text.startsWith("related queries")
+      ) {
+        let container: HTMLElement | null = heading.closest("section, div[class*='accordion'], [class*='related']");
+        if (!container || container === root) {
+          const parent = heading.parentElement;
+          if (
+            parent &&
+            parent !== root &&
+            parent.querySelectorAll(".recharts-responsive-container, table, svg").length === 0
+          ) {
+            container = parent;
+          } else {
+            hideEl(heading);
+            let next = heading.nextElementSibling as HTMLElement | null;
+            while (next) {
+              hideEl(next);
+              next = next.nextElementSibling as HTMLElement | null;
+            }
+            return;
+          }
+        }
+        if (container && container !== root) {
+          hideEl(container);
+        } else {
+          hideEl(heading);
+        }
+      }
+    });
+
+    // 3. Any accordion or list of questions outside chart/table
+    root.querySelectorAll<HTMLElement>(".openui-accordion, .crayon-accordion, [class*='accordion']").forEach((acc) => {
+      const text = acc.textContent?.toLowerCase() || "";
+      if (
+        (text.includes("?") || text.includes("related") || acc.querySelector("[class*='trigger']")) &&
+        acc.querySelectorAll(".recharts-responsive-container, table").length === 0
+      ) {
+        hideEl(acc);
+      }
+    });
+
+    return () => {
+      hiddenElements.forEach(({ el, prevDisplay, prevVisibility }) => {
+        delete el.dataset.hiddenForCapture;
+        if (prevDisplay) {
+          el.style.display = prevDisplay;
+        } else {
+          el.style.removeProperty("display");
+        }
+        if (prevVisibility) {
+          el.style.visibility = prevVisibility;
+        } else {
+          el.style.removeProperty("visibility");
+        }
+      });
+    };
+  };
+
   /**
   * Captures the FULL chart (including horizontal and vertical scrolling charts),
   * ensuring all categories, bars, and texts are rendered without being clipped.
@@ -405,6 +499,9 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   ): Promise<string> => {
     const { pixelRatio = 2.5, padding = 24, borderRadius = "16px" } = options;
     const { toPng } = await import("html-to-image");
+
+    // Hide any "Related Questions" or follow-up blocks inside the element before measuring dimensions
+    const restoreRelated = hideRelatedQuestions(element);
 
     // ---- helper: save/restore inline style of any element ----
     const restores: Array<() => void> = [];
@@ -631,6 +728,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       element.classList.remove("c1-chart-capturing");
       restoreForeignObjects();
       restoreSvg();
+      restoreRelated();
       restores.reverse().forEach((fn) => fn()); 
     }
   };
@@ -639,36 +737,52 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   const stripRelatedQueriesFromC1 = (content: string): string => {
     if (!content) return content;
     try {
-      const match = content.match(/^([\s\S]*?<content[^>]*>)([\s\S]*?)(<\/content>[\s\S]*)$/);
-      if (match) {
-        const prefix = match[1];
-        const encodedJson = match[2];
-        const suffix = match[3];
+      // 1. Try stripping from <content> XML/JSON structure
+      const startTagIdx = content.indexOf("<content");
+      const endTagIdx = content.lastIndexOf("</content>");
+      if (startTagIdx !== -1 && endTagIdx !== -1) {
+        const afterStart = content.indexOf(">", startTagIdx) + 1;
+        const prefix = content.slice(0, afterStart);
+        const encodedJson = content.slice(afterStart, endTagIdx);
+        const suffix = content.slice(endTagIdx);
         const decodedJson = encodedJson.replace(/&quot;/g, '"');
         const obj = JSON.parse(decodedJson);
+
+        const isRelated = (item: any): boolean => {
+          if (!item) return false;
+          const str = typeof item === "string" ? item : JSON.stringify(item);
+          const lower = str.toLowerCase();
+          return (
+            lower.includes("related queries") ||
+            lower.includes("related questions") ||
+            lower.includes("openui-follow-up") ||
+            lower.includes("crayon-follow-up") ||
+            lower.includes("followup")
+          );
+        };
 
         const removeRelated = (node: any) => {
           if (!node || typeof node !== "object") return;
           for (const key of Object.keys(node)) {
             if (Array.isArray(node[key])) {
-              node[key] = node[key].filter((item: any) => {
-                const str = JSON.stringify(item);
-                return (
-                  !str.includes("Related Queries") &&
-                  !str.includes("Related Questions") &&
-                  !str.includes("openui-follow-up")
-                );
-              });
+              node[key] = node[key].filter((item: any) => !isRelated(item));
               node[key].forEach(removeRelated);
             } else if (typeof node[key] === "object") {
-              removeRelated(node[key]);
+              if (isRelated(node[key])) {
+                delete node[key];
+              } else {
+                removeRelated(node[key]);
+              }
             }
           }
         };
 
         removeRelated(obj);
-        return prefix + JSON.stringify(obj, null, 2).replace(/"/g, "&quot;") + suffix;
+        content = prefix + JSON.stringify(obj, null, 2).replace(/"/g, "&quot;") + suffix;
       }
+
+      // 2. Also strip any trailing markdown / text "Related Questions" section
+      content = content.replace(/(?:\n\s*(?:###?|##|\*\*|__)?\s*Related (?:Questions|Queries)[\s\S]*$)/i, "");
     } catch (e) {
       console.warn("Could not strip Related Queries from C1 JSON:", e);
     }
@@ -707,7 +821,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         body: JSON.stringify({
           chatId,
           title: overallTitle,
-          description: containerRef.current?.innerText?.slice(0, 300) || "",
+          description: (containerRef.current?.innerText || "").replace(/Related (?:Questions|Queries)[\s\S]*$/i, "").slice(0, 300).trim(),
           c1Content: stripRelatedQueriesFromC1(message.content),
           itemType: "chart",
           imageUrl: capturedThumbnail,
@@ -783,7 +897,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         body: JSON.stringify({
           chatId,
           title: target.title || "AI Generated Analysis",
-          description: target.element.innerText?.slice(0, 300) || "",
+          description: (target.element.innerText || "").replace(/Related (?:Questions|Queries)[\s\S]*$/i, "").slice(0, 300).trim(),
           c1Content: stripRelatedQueriesFromC1(message.content),
           itemType: "chart",
           imageUrl: capturedThumbnail,
@@ -856,6 +970,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     setLightboxTarget(null);
     setLightboxImageSrc(null);
     setLightboxLoading(false);
+    setLightboxDropdownOpen(false);
   };
 
   // ---------------- DOWNLOAD PNG ----------------
@@ -880,6 +995,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     } finally {
       setExportingId(null);
       setActiveDropdownId(null);
+      setLightboxDropdownOpen(false);
     }
   };
 
@@ -937,6 +1053,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     } finally {
       setExportingId(null);
       setActiveDropdownId(null);
+      setLightboxDropdownOpen(false);
     }
   };
 
@@ -1049,6 +1166,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     } finally {
       setExportingId(null);
       setActiveDropdownId(null);
+      setLightboxDropdownOpen(false);
     }
   };
 
@@ -1070,13 +1188,13 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
       >
         {/* Top-Right "Share all charts" button when multiple charts exist in this response */}
         {!isStreaming && detectedItems.length > 1 && (
-          <div className="absolute top-5 right-4 sm:top-6 sm:right-6 z-30">
+          <div className="chart-action-overlay absolute top-5 right-4 sm:top-6 sm:right-6 z-30 flex items-center rounded-lg border border-[#292D49] bg-[#0E1222]/95 p-1 shadow-2xl backdrop-blur-md transition-all hover:border-[#7564F6]">
             <div className="relative group/shareall">
               <button
                 type="button"
                 onClick={handleShareAll}
                 disabled={sharingAll}
-                className="flex items-center justify-center rounded-lg border border-[#292D49] bg-[#0E1222]/95 px-2.5 py-1.5 text-xs font-medium text-slate-300 shadow-2xl backdrop-blur-md transition-all hover:border-[#7564F6] hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"
+                className="flex items-center justify-center rounded-md p-1.5 text-xs font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50 !bg-transparent"
                 aria-label="Share all charts in this Single response"
               >
                 {sharingAll ? (
@@ -1233,28 +1351,132 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
             onClick={handleCloseLightbox}
           >
             <div
-              className={`relative flex flex-col max-h-[92vh] max-w-5xl w-full rounded-2xl border shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ${
+              className={`relative flex flex-col max-h-[96vh] w-[96vw] max-w-7xl lg:max-w-[1440px] rounded-2xl border shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ${
                 light
                   ? "border-slate-200 bg-white text-slate-900"
                   : "border-[#292D49] bg-[#0E1222] text-white"
               }`}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Lightbox Header */}
+              {/* Lightbox Header with Title, Download, Share, and Close */}
               <div
-                className={`flex items-center justify-between border-b px-5 py-3.5 ${
+                className={`flex items-center justify-between border-b px-4 sm:px-6 py-3 sm:py-3.5 ${
                   light
-                    ? "border-slate-200 bg-slate-50/90 text-slate-800"
-                    : "border-[#1E223D] bg-[#070914]/80 text-white"
+                    ? "border-slate-200 bg-slate-50/95 text-slate-800"
+                    : "border-[#1E223D] bg-[#070914]/90 text-white"
                 }`}
               >
-                <div className="flex items-center gap-2 min-w-0 pr-4">
+                <div className="flex items-center gap-2.5 min-w-0 pr-3">
                   <Sparkles className="h-4 w-4 text-[#7564F6] shrink-0" />
                   <h3 className="text-sm sm:text-base font-semibold truncate">
                     {lightboxTarget.title || "Full View"}
                   </h3>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  {/* Download Dropdown inside Popup */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setLightboxDropdownOpen(!lightboxDropdownOpen)}
+                      disabled={exportingId === lightboxTarget.id}
+                      className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition cursor-pointer active:scale-95 disabled:opacity-50 ${
+                        light
+                          ? "border-slate-300 bg-white text-slate-700 hover:bg-slate-100 hover:border-slate-400 shadow-sm"
+                          : "border-[#292D49] bg-[#14182E] text-slate-200 hover:bg-[#7564F6]/20 hover:border-[#7564F6] hover:text-white shadow-md"
+                      }`}
+                      aria-label="Download Chart"
+                      title="Download Chart"
+                    >
+                      {exportingId === lightboxTarget.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-[#7564F6] shrink-0" />
+                      ) : (
+                        <Download className="h-4 w-4 text-slate-400 group-hover:text-white shrink-0" />
+                      )}
+                      <span className="hidden sm:inline">Download</span>
+                    </button>
+
+                    {lightboxDropdownOpen && (
+                      <div
+                        className={`absolute right-0 top-full mt-1.5 w-40 rounded-xl border p-1.5 shadow-2xl z-50 animate-in fade-in zoom-in-95 ${
+                          light
+                            ? "border-slate-200 bg-white text-slate-800 shadow-slate-300/50"
+                            : "border-[#292D49] bg-[#0E1222] text-slate-200 shadow-black/80"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLightboxDropdownOpen(false);
+                            handleDownloadPNG(lightboxTarget);
+                          }}
+                          className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium transition cursor-pointer ${
+                            light
+                              ? "hover:bg-slate-100 text-slate-700 hover:text-slate-900"
+                              : "hover:bg-[#6C56E5]/20 text-slate-200 hover:text-white"
+                          }`}
+                        >
+                          <ImageIcon className="h-4 w-4 text-[#A78BFA] shrink-0" />
+                          <span>PNG Image</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLightboxDropdownOpen(false);
+                            handleDownloadPDF(lightboxTarget);
+                          }}
+                          className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium transition cursor-pointer ${
+                            light
+                              ? "hover:bg-slate-100 text-slate-700 hover:text-slate-900"
+                              : "hover:bg-[#6C56E5]/20 text-slate-200 hover:text-white"
+                          }`}
+                        >
+                          <FileText className="h-4 w-4 text-[#F43F5E] shrink-0" />
+                          <span>PDF Document</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLightboxDropdownOpen(false);
+                            handleDownloadPPT(lightboxTarget);
+                          }}
+                          className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium transition cursor-pointer ${
+                            light
+                              ? "hover:bg-slate-100 text-slate-700 hover:text-slate-900"
+                              : "hover:bg-[#6C56E5]/20 text-slate-200 hover:text-white"
+                          }`}
+                        >
+                          <Presentation className="h-4 w-4 text-[#F97316] shrink-0" />
+                          <span>PPT (Slide)</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Share Button inside Popup */}
+                  <button
+                    type="button"
+                    onClick={() => handleShare(lightboxTarget)}
+                    disabled={sharingId === lightboxTarget.id}
+                    className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition cursor-pointer active:scale-95 disabled:opacity-50 ${
+                      light
+                        ? "border-slate-300 bg-white text-slate-700 hover:bg-slate-100 hover:border-slate-400 shadow-sm"
+                        : "border-[#292D49] bg-[#14182E] text-slate-200 hover:bg-[#7564F6]/20 hover:border-[#7564F6] hover:text-white shadow-md"
+                    }`}
+                    aria-label="Share Chart"
+                    title="Share Chart"
+                  >
+                    {sharingId === lightboxTarget.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-[#7564F6] shrink-0" />
+                    ) : (
+                      <Share2 className="h-4 w-4 text-slate-400 shrink-0" />
+                    )}
+                    <span className="hidden sm:inline">Share</span>
+                  </button>
+
+                  <div className={`h-5 w-px mx-1 ${light ? "bg-slate-300" : "bg-[#292D49]"}`} />
+
+                  {/* Close Button */}
                   <button
                     type="button"
                     onClick={handleCloseLightbox}
@@ -1270,15 +1492,15 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                 </div>
               </div>
 
-              {/* Lightbox Body / Content */}
+              {/* Lightbox Body / Content - Scaled large on desktop */}
               <div
-                className={`flex-1 overflow-auto p-4 sm:p-6 flex items-center justify-center min-h-[300px] ${
+                className={`flex-1 overflow-auto p-3 sm:p-6 md:p-8 flex items-center justify-center min-h-[350px] ${
                   light ? "bg-slate-50/50" : "bg-[#070914]"
                 }`}
               >
                 {lightboxLoading ? (
                   <div
-                    className={`flex flex-col items-center gap-3 py-12 ${
+                    className={`flex flex-col items-center gap-3 py-16 ${
                       light ? "text-slate-600" : "text-slate-400"
                     }`}
                   >
@@ -1289,7 +1511,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                   <img
                     src={lightboxImageSrc}
                     alt={lightboxTarget.title || "Full View Chart"}
-                    className={`max-h-[76vh] w-auto max-w-full rounded-xl object-contain border shadow-2xl ${
+                    className={`max-h-[85vh] w-auto max-w-full rounded-xl object-contain border shadow-2xl transition-all ${
                       light ? "border-slate-200 bg-white" : "border-[#1E223D] bg-[#070914]"
                     }`}
                   />

@@ -66,6 +66,7 @@ export default function SharedReportPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImageSrc, setLightboxImageSrc] = useState<string | null>(null);
   const [lightboxLoading, setLightboxLoading] = useState(false);
+  const [lightboxDropdownOpen, setLightboxDropdownOpen] = useState(false);
 
   const reportContainerRef = useRef<HTMLDivElement>(null);
   const downloadDropdownRef = useRef<HTMLDivElement>(null);
@@ -344,6 +345,8 @@ export default function SharedReportPage() {
           if (className) {
             if (
               className.includes("chart-action-overlay") ||
+              className.includes("follow-up") ||
+              className.includes("followup") ||
               className.includes("scroll-button") ||
               className.includes("scroll-buttons") ||
               className.includes("scroll-arrow") ||
@@ -353,6 +356,7 @@ export default function SharedReportPage() {
               return false;
             }
           }
+          if (node.hasAttribute?.("data-followup")) return false;
           const ariaLabel = node.getAttribute?.("aria-label")?.toLowerCase() || "";
           if (ariaLabel.includes("scroll") || ariaLabel.includes("next page") || ariaLabel.includes("previous page")) {
             return false;
@@ -396,6 +400,7 @@ export default function SharedReportPage() {
     setLightboxOpen(false);
     setLightboxImageSrc(null);
     setLightboxLoading(false);
+    setLightboxDropdownOpen(false);
   };
 
   // Close Lightbox on Esc key
@@ -849,18 +854,95 @@ export default function SharedReportPage() {
           onClick={handleCloseLightbox}
         >
           <div
-            className="relative flex flex-col max-h-[92vh] max-w-5xl w-full rounded-2xl border border-[#292D49] bg-[#0E1222] text-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+            className="relative flex flex-col max-h-[96vh] w-[96vw] max-w-7xl lg:max-w-[1440px] rounded-2xl border border-[#292D49] bg-[#0E1222] text-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Lightbox Header */}
-            <div className="flex items-center justify-between border-b border-[#1E223D] bg-[#070914]/80 px-5 py-3.5 text-white">
-              <div className="flex items-center gap-2 min-w-0 pr-4">
+            {/* Lightbox Header with Title, Download, Share, and Close */}
+            <div className="flex items-center justify-between border-b border-[#1E223D] bg-[#070914]/90 px-4 sm:px-6 py-3 sm:py-3.5 text-white">
+              <div className="flex items-center gap-2.5 min-w-0 pr-3">
                 <Sparkles className="h-4 w-4 text-[#7564F6] shrink-0" />
                 <h3 className="text-sm sm:text-base font-semibold truncate">
                   {item?.title || "Full View"}
                 </h3>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                {/* Download Dropdown inside Popup */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setLightboxDropdownOpen(!lightboxDropdownOpen)}
+                    disabled={downloadingType !== null}
+                    className="flex items-center gap-1.5 rounded-lg border border-[#292D49] bg-[#14182E] px-2.5 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-[#7564F6]/20 hover:border-[#7564F6] hover:text-white cursor-pointer active:scale-95 disabled:opacity-50 shadow-md"
+                    aria-label="Download"
+                    title="Download Report"
+                  >
+                    {downloadingType !== null ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-[#7564F6] shrink-0" />
+                    ) : (
+                      <Download className="h-4 w-4 text-slate-400 group-hover:text-white shrink-0" />
+                    )}
+                    <span className="hidden sm:inline">Download</span>
+                  </button>
+
+                  {lightboxDropdownOpen && (
+                    <div className="absolute right-0 top-full mt-1.5 w-40 rounded-xl border border-[#292D49] bg-[#0E1222] p-1.5 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLightboxDropdownOpen(false);
+                          handleDownloadPNG();
+                        }}
+                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-[#6C56E5]/20 hover:text-white transition cursor-pointer"
+                      >
+                        <ImageIcon className="h-4 w-4 text-[#A78BFA] shrink-0" />
+                        <span>PNG Image</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLightboxDropdownOpen(false);
+                          handleDownloadPDF();
+                        }}
+                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-[#6C56E5]/20 hover:text-white transition cursor-pointer"
+                      >
+                        <FileText className="h-4 w-4 text-[#F43F5E] shrink-0" />
+                        <span>PDF Document</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLightboxDropdownOpen(false);
+                          handleDownloadPPT();
+                        }}
+                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-[#6C56E5]/20 hover:text-white transition cursor-pointer"
+                      >
+                        <Presentation className="h-4 w-4 text-[#F97316] shrink-0" />
+                        <span>PPT (Slide)</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Share Button inside Popup */}
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="flex items-center gap-1.5 rounded-lg border border-[#292D49] bg-[#14182E] px-2.5 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-[#7564F6]/20 hover:border-[#7564F6] hover:text-white cursor-pointer active:scale-95 shadow-md"
+                  aria-label="Share Link"
+                  title="Share Link"
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                  ) : (
+                    <Share2 className="h-4 w-4 text-slate-400 shrink-0" />
+                  )}
+                  <span className="hidden sm:inline">{copied ? "Copied!" : "Share"}</span>
+                </button>
+
+                <div className="h-5 w-px mx-1 bg-[#292D49]" />
+
+                {/* Close Button */}
                 <button
                   type="button"
                   onClick={handleCloseLightbox}
@@ -872,10 +954,10 @@ export default function SharedReportPage() {
               </div>
             </div>
 
-            {/* Lightbox Body / Content */}
-            <div className="flex-1 overflow-auto p-4 sm:p-6 flex items-center justify-center min-h-[300px] bg-[#070914]">
+            {/* Lightbox Body / Content - Scaled large on desktop */}
+            <div className="flex-1 overflow-auto p-3 sm:p-6 md:p-8 flex items-center justify-center min-h-[350px] bg-[#070914]">
               {lightboxLoading ? (
-                <div className="flex flex-col items-center gap-3 py-12 text-slate-400">
+                <div className="flex flex-col items-center gap-3 py-16 text-slate-400">
                   <Loader2 className="h-8 w-8 animate-spin text-[#7564F6]" />
                   <span className="text-sm font-medium">Generating high-resolution view...</span>
                 </div>
@@ -883,7 +965,7 @@ export default function SharedReportPage() {
                 <img
                   src={lightboxImageSrc}
                   alt={item?.title || "Full View Chart"}
-                  className="max-h-[76vh] w-auto max-w-full rounded-xl object-contain border border-[#1E223D] bg-[#070914] shadow-2xl"
+                  className="max-h-[85vh] w-auto max-w-full rounded-xl object-contain border border-[#1E223D] bg-[#070914] shadow-2xl transition-all"
                 />
               ) : (
                 <div className="text-slate-400 text-sm">Failed to render chart image</div>

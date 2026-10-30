@@ -1039,9 +1039,26 @@ export default function AnalyzeChatNextPage() {
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => {
-              window.history.length > 1
-                ? router.back()
-                : (window.location.href = "/analyze");
+              if (typeof window !== "undefined") {
+                // If user came from Flutter app via document.referrer, return with subTab=Analyze
+                if (document.referrer && document.referrer.includes("multi-chat")) {
+                  try {
+                    const refUrl = new URL(document.referrer);
+                    refUrl.searchParams.set("subTab", "Analyze");
+                    window.location.href = refUrl.toString();
+                    return;
+                  } catch (_) { }
+                }
+
+                // If history is available from the same origin, navigate back
+                if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin)) {
+                  router.back();
+                  return;
+                }
+
+                // Fallback direct URL to Flutter multi-chat with Analyze subTab
+                window.location.href = "/multi-chat?subTab=Analyze";
+              }
             }}
             className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#261D5A] border border-[#3B3363] text-[#A78BFA] text-[13px] font-semibold hover:bg-[#322774] transition shrink-0"
           >
