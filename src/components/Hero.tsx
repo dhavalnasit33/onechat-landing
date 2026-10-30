@@ -136,7 +136,7 @@ export default function Hero({ onOpenAuth, onCTA }: HeroProps) {
               <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </span>
           </button>
-          <p className="font-sans text-xs sm:text-sm text-slate-300 font-medium mt-1 tracking-wide">
+          <p className="font-sans text-sm sm:text-base md:text-lg text-slate-300 font-medium mt-1 tracking-wide">
             {/* Hundreds of AI Models • Dozens of AI Tools • One Platform */}
             Dozens of AI Models • Hundreds of AI Tools & Templates • One Platform
 

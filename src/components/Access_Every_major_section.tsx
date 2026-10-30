@@ -336,7 +336,7 @@ export default function AccessEveryMajorSection() {
                             AI Models
                         </span>
                     </h2>
-                    <p className="font-sans text-xs sm:text-sm md:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                    <p className="font-sans text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
                         Chat with ChatGPT, Claude, Gemini, DeepSeek, Grok, and more — all
                         from one powerful platform. Switch between leading AI models and
                         get the answers you need without juggling multiple apps or

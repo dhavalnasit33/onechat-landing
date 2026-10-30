@@ -165,7 +165,7 @@ export default function CreateZeroSkillSection({ onOpenAuth, onCTA }: CreateZero
             </span>
           </h2>
 
-          <p className="mt-4 sm:mt-6 font-sans text-sm sm:text-base md:text-lg text-slate-300  leading-relaxed">
+          <p className="mt-4 sm:mt-6 font-sans text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed">
             Chat, create images, make videos, write, design, research and more — all with the world&apos;s leading AI models in one place.
           </p>
 

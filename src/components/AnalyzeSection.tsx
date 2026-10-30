@@ -95,7 +95,7 @@ export default function AnalyzeSection({
             </span>
           </h2>
 
-          <p className="font-sans text-xs sm:text-sm md:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed px-2">
+          <p className="font-sans text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed px-2">
             Upload your files and get instant insights, beautiful
             visualizations, and detailed reports. Turn complex data into clear,
             actionable answers — in seconds.

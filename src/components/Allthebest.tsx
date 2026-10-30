@@ -234,7 +234,7 @@ export default function Allthebest({ onOpenAuth, onCTA }: AllthebestProps) {
                         </h2>
 
                         {/* Description */}
-                        <p className="mt-3.5 sm:mt-4 font-sans text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed font-normal max-w-md">
+                        <p className="mt-3.5 sm:mt-4 font-sans text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed font-normal max-w-md">
                             Access the world&apos;s leading AI models for chat, image, video, writing, design, research and more — all in one account, one workspace and one subscription.
                         </p>
 

@@ -349,7 +349,7 @@ export default function InteractiveVideoTemplatesSection({
             </span>{" "}
             You Can Imagine
           </h2>
-          <p className="mt-4 font-sans text-[14px] md:text-[16px] text-slate-400 max-w-[600px] leading-relaxed">
+          <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-slate-300 max-w-[600px] leading-relaxed">
             Use text, images, and video to bring your ideas to life with every leading AI video model—all in one place.
           </p>
         </div>

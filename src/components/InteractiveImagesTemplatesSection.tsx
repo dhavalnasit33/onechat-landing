@@ -759,7 +759,7 @@ function ImageTemplatesGallery({
                 AI Images
               </span>{" "}
             </h2>
-            <p className="mt-4 font-sans text-[14px] md:text-[16px] text-slate-400 max-w-[700px] leading-relaxed">
+            <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-slate-300 max-w-[700px] leading-relaxed">
               Create stunning images with Nano Banana, ChatGPT Image, FLUX,
               Stable Diffusion, Ideogram, Recraft, Seedream, Qwen, Kling, and
               more — all in one place.

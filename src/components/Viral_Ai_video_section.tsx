@@ -14,7 +14,7 @@ export default function ViralAiVideoSection({
                                 AI Videos
                             </span>{" "}
                         </h2>
-                        <p className="mt-4 font-sans text-[14px] md:text-[16px] text-slate-400 max-w-[800px] leading-relaxed">
+                        <p className="mt-4 font-sans text-sm sm:text-base md:text-lg text-slate-300 max-w-[800px] leading-relaxed">
                             Turn your ideas into scroll-stopping AI videos in minutes. Create
                             engaging, viral-ready content for TikTok, Instagram Reels, YouTube
                             Shorts, and more. Simply enter your topic, choose your style and
