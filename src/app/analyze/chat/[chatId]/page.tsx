@@ -1014,6 +1014,7 @@ export default function AnalyzeChatNextPage() {
         actionText.length < 160 &&
         !["Download", "Share", "Full View", "PNG Image", "PDF Document", "PPT (Slide)"].includes(actionText) &&
         !actionText.toLowerCase().includes("related quer") &&
+        !actionText.toLowerCase().includes("related quest") &&
         !actionText.toLowerCase().includes("key driver") &&
         !actionText.toLowerCase().includes("channel breakdown")
       ) {
@@ -1034,7 +1035,7 @@ export default function AnalyzeChatNextPage() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-[#070914] text-slate-100 overflow-hidden font-sans select-text">
-      <header className="h-16 px-3.5 md:px-5 flex items-center justify-between bg-[#0F1123] border-b border-[#1E223D] shrink-0 z-20">
+      <header className="h-16 px-3.5 md:px-5 flex items-center justify-between bg-[#0F1123] border-b border-[#1E223D] shrink-0 relative z-30">
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => {
@@ -1061,23 +1062,53 @@ export default function AnalyzeChatNextPage() {
 
         {!isMobile && (
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                setViewMode(viewMode === "split" ? "chatOnly" : "split");
-                setSplitRatio(50);
-              }}
-              className={`cursor-pointer p-2 rounded-lg border transition ${viewMode === "split" ? "bg-[#261D5A] border-[#635BFF] text-[#C7D2FE]" : "bg-[#131629] border-[#242948] text-[#8E95AF] hover:text-white"}`}
-            >
-              <Columns className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() =>
-                setViewMode(viewMode === "docOnly" ? "split" : "docOnly")
-              }
-              className={`cursor-pointer p-2 rounded-lg border transition ${viewMode === "docOnly" ? "bg-[#261D5A] border-[#635BFF] text-[#C7D2FE]" : "bg-[#131629] border-[#242948] text-[#8E95AF] hover:text-white"}`}
-            >
-              <Maximize2 className="w-4 h-4" />
-            </button>
+            {/* Book / Document Full View Toggle Button */}
+            <div className="relative group/docbtn">
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode(viewMode === "docOnly" ? "split" : "docOnly");
+                  setSplitRatio(50);
+                }}
+                className={`cursor-pointer p-2 rounded-lg border transition ${
+                  viewMode === "docOnly"
+                    ? "bg-[#261D5A] border-[#635BFF] text-[#C7D2FE]"
+                    : "bg-[#131629] border-[#242948] text-[#8E95AF] hover:text-white"
+                }`}
+                aria-label="Document Full View"
+              >
+                <Columns className="w-4 h-4" />
+              </button>
+              {/* Tooltip: Document Full View */}
+              <div className="pointer-events-none absolute top-full right-0 mt-2.5 hidden group-hover/docbtn:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-[9999] animate-in fade-in zoom-in-95">
+                Document Full View
+                <div className="absolute bottom-full right-3 -mb-px border-4 border-transparent border-b-[#181B34]" />
+              </div>
+            </div>
+
+            {/* Arrow / Chat Full View Toggle Button */}
+            <div className="relative group/chatbtn">
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode(viewMode === "chatOnly" ? "split" : "chatOnly");
+                  setSplitRatio(50);
+                }}
+                className={`cursor-pointer p-2 rounded-lg border transition ${
+                  viewMode === "chatOnly"
+                    ? "bg-[#261D5A] border-[#635BFF] text-[#C7D2FE]"
+                    : "bg-[#131629] border-[#242948] text-[#8E95AF] hover:text-white"
+                }`}
+                aria-label="Chat Full View"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
+              {/* Tooltip: Chat Full View */}
+              <div className="pointer-events-none absolute top-full right-0 mt-2.5 hidden group-hover/chatbtn:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-[9999] animate-in fade-in zoom-in-95">
+                Chat Full View
+                <div className="absolute bottom-full right-3 -mb-px border-4 border-transparent border-b-[#181B34]" />
+              </div>
+            </div>
           </div>
         )}
       </header>

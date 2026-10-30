@@ -52,6 +52,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
   const [exportingId, setExportingId] = useState<string | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
+  const [sharingAll, setSharingAll] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [lightboxTarget, setLightboxTarget] = useState<ChartItemTarget | null>(null);
   const [lightboxImageSrc, setLightboxImageSrc] = useState<string | null>(null);
@@ -634,6 +635,128 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     }
   };
 
+  // Helper to strip "Related Queries" / "Related Questions" accordions/sections from c1Content for sharing
+  const stripRelatedQueriesFromC1 = (content: string): string => {
+    if (!content) return content;
+    try {
+      const match = content.match(/^([\s\S]*?<content[^>]*>)([\s\S]*?)(<\/content>[\s\S]*)$/);
+      if (match) {
+        const prefix = match[1];
+        const encodedJson = match[2];
+        const suffix = match[3];
+        const decodedJson = encodedJson.replace(/&quot;/g, '"');
+        const obj = JSON.parse(decodedJson);
+
+        const removeRelated = (node: any) => {
+          if (!node || typeof node !== "object") return;
+          for (const key of Object.keys(node)) {
+            if (Array.isArray(node[key])) {
+              node[key] = node[key].filter((item: any) => {
+                const str = JSON.stringify(item);
+                return (
+                  !str.includes("Related Queries") &&
+                  !str.includes("Related Questions") &&
+                  !str.includes("openui-follow-up")
+                );
+              });
+              node[key].forEach(removeRelated);
+            } else if (typeof node[key] === "object") {
+              removeRelated(node[key]);
+            }
+          }
+        };
+
+        removeRelated(obj);
+        return prefix + JSON.stringify(obj, null, 2).replace(/"/g, "&quot;") + suffix;
+      }
+    } catch (e) {
+      console.warn("Could not strip Related Queries from C1 JSON:", e);
+    }
+    return content;
+  };
+
+  // ---------------- SHARE ALL CHARTS ----------------
+  const handleShareAll = async () => {
+    if (sharingAll || sharingId) return;
+    try {
+      setSharingAll(true);
+      let capturedThumbnail: string | null = null;
+
+      try {
+        if (containerRef.current) {
+          capturedThumbnail = await captureFullChart(containerRef.current, {
+            pixelRatio: 2,
+            padding: 24,
+            borderRadius: "16px",
+          });
+        }
+      } catch (e) {
+        console.error("Full thumbnail capture failed:", e);
+      }
+
+      // Find overall title from message or container
+      const headingEl = containerRef.current?.querySelector("h1, h2, h3, h4, [class*='title' i]");
+      const overallTitle = headingEl?.textContent?.trim() || "AI Generated Analysis";
+
+      const res = await fetch(`${apiBaseUrl}/api/analyze-files/share-item`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          chatId,
+          title: overallTitle,
+          description: containerRef.current?.innerText?.slice(0, 300) || "",
+          c1Content: stripRelatedQueriesFromC1(message.content),
+          itemType: "chart",
+          imageUrl: capturedThumbnail,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to generate share link");
+      }
+
+      const shareUrl =
+        data.shareUrl || `${window.location.origin}/analyze/share/${data.shareId}`;
+
+      let copied = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          copied = true;
+        } catch (_) { }
+      }
+      if (!copied) {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = shareUrl;
+          ta.style.position = "fixed";
+          ta.style.top = "-9999px";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          copied = true;
+        } catch (_) { }
+      }
+      setToastMessage(
+        copied
+          ? `Share link for all charts copied to clipboard!`
+          : `Share link generated! Open: ${shareUrl}`
+      );
+    } catch (err: any) {
+      console.error("Error sharing all charts:", err);
+      alert(err.message || "Failed to share. Please try again.");
+    } finally {
+      setSharingAll(false);
+    }
+  };
+
   // ---------------- SHARE ----------------
   const handleShare = async (target: ChartItemTarget) => {
     if (sharingId) return;
@@ -661,7 +784,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
           chatId,
           title: target.title || "AI Generated Analysis",
           description: target.element.innerText?.slice(0, 300) || "",
-          c1Content: message.content,
+          c1Content: stripRelatedQueriesFromC1(message.content),
           itemType: "chart",
           imageUrl: capturedThumbnail,
         }),
@@ -945,6 +1068,33 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
         ref={containerRef}
         className="rounded-2xl border border-slate-200/20 dark:border-[#1E223D] bg-white dark:bg-[#070914] text-slate-900 dark:text-[#F8FAFC] p-3 sm:p-5 shadow-lg relative"
       >
+        {/* Top-Right "Share all charts" button when multiple charts exist in this response */}
+        {!isStreaming && detectedItems.length > 1 && (
+          <div className="absolute top-5 right-4 sm:top-6 sm:right-6 z-30">
+            <div className="relative group/shareall">
+              <button
+                type="button"
+                onClick={handleShareAll}
+                disabled={sharingAll}
+                className="flex items-center justify-center rounded-lg border border-[#292D49] bg-[#0E1222]/95 px-2.5 py-1.5 text-xs font-medium text-slate-300 shadow-2xl backdrop-blur-md transition-all hover:border-[#7564F6] hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95 disabled:opacity-50"
+                aria-label="Share all charts in this Single response"
+              >
+                {sharingAll ? (
+                  <Loader2 className="h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0" />
+                ) : (
+                  <Share2 className="h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/shareall:text-white transition-colors shrink-0" />
+                )}
+              </button>
+
+              {/* Tooltip: "Share all charts in this Single response" */}
+              <div className="pointer-events-none absolute top-full right-0 mt-2 hidden group-hover/shareall:flex items-center whitespace-nowrap rounded-md bg-[#181B34] border border-[#292D49] px-2.5 py-1 text-[11px] font-medium text-slate-200 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+                Share all charts in this Single response
+                <div className="absolute bottom-full right-3 -mb-px border-4 border-transparent border-b-[#181B34]" />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div
           suppressHydrationWarning
           className="space-y-3"
