@@ -148,7 +148,7 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   {
     id: "vacation-photo-comes-alive",
     title: "Vacation Photo Comes Alive",
-    desc: "Turn still holiday snapshots into stunning cinematic videos with swaying palm trees, moving waves, and breeze.",
+    desc: "Bring your favorite vacation photo to life with natural movement, animated scenery, and travel atmosphere.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/vacation-photo-comes-alive.mp4",
   },
   {
@@ -160,13 +160,13 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   {
     id: "historical-portrait-comes-alive",
     title: "Historical Portrait Comes Alive",
-    desc: "Make paintings and vintage museum portraits speak and move with lifelike eyes, expressions, and posture.",
+    desc: "Bring a historical portrait to life with realistic expressions and period-appropriate atmosphere",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/historical-portrait-comes-alive.mp4",
   },
   {
     id: "old-photo-comes-alive",
     title: "Old Photo Comes Alive",
-    desc: "Reanimate vintage black & white or sepia memories with authentic emotion, soft head movement, and nostalgic atmosphere.",
+    desc: "Bring an old or vintage photo to life with realistic facial expressions and natural movement.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/old-photo-comes-alive.mp4",
   },
   {
@@ -196,7 +196,7 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   {
     id: "360-photo-booth",
     title: "360 Photo Booth",
-    desc: "Cinematic 360-degree photo booth video animation. A glamorous character (attached image) at a red carpet event while a high-speed camera rig orbits completely around them in a smooth 360-degree rotation. The background shows flashing paparazzi camera lights, elegant event lighting, and a blurred crowd, capturing a high-end award show slow-motion effect.",
+    desc: "Cinematic 360-degree photo booth video animation. A glamorous character at a red carpet event while a high-speed camera rig orbits.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/360-photo-booth.mp4",
   },
   {
@@ -244,7 +244,7 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   {
     id: "step-into-victorian-london",
     title: "Step into Victorian London",
-    desc: "Cinematic 19th-century Victorian scene. A gentleman or lady in authentic Victorian attire walking through cobblestone streets.",
+   desc: "A Victorian gentleman or lady walking through historic cobblestone streets.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-victorian-london.mp4",
   },
   {
@@ -274,7 +274,7 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   {
     id: "product-benefits-ad",
     title: "Product Benefits Ad",
-    desc: "Create a compelling product ad that clearly showcases your product’s most important benefits, demonstrates how it improves the customer’s experience, and turns features into persuasive reasons to buy.",
+    desc: "Create a compelling product ad that clearly showcases your product’s most important benefits.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/product-benefits-ad.mp4",
   },
   {
@@ -292,7 +292,7 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   {
     id: "pet-cartoon",
     title: "Pet Cartoon",
-    desc: "Transform your pet into an adorable animated character and bring them to life in a colorful cartoon world with expressive movement, playful adventures, and animated movie-style visuals.",
+    desc: "Transform your pet into an adorable cartoon character with playful movements and colorful animated visuals.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-cartoon.mp4",
   },
   {
@@ -304,19 +304,19 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
   {
     id: "step-into-the-viking-age",
     title: "Step into the Viking Age",
-    desc: "Cinematic Scandinavian Norse historical scene. A Viking warrior or jarl (using attached image) in fur-trimmed armor holding a Norse shield, stepping off a dragon-headed longship onto a misty fjord shoreline with snow-capped cliffs and roaring campfires.",
+   desc: "A Viking warrior stepping off a dragon-headed longship onto a misty fjord shore with snowy cliffs and roaring campfires.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-viking-age.mp4",
   },
   {
     id: "step-into-the-aztec-empire",
     title: "Step into the Aztec Empire",
-    desc: "Cinematic Aztec Empire scene. An Aztec warrior with obsidian weapon and quetzal feather crest (using attached image) overlooking the island city of Tenochtitlan with causeways over Lake Texcoco and the Great Temple rising majestically.",
+    desc: "An Aztec warrior overlooking the ancient city of Tenochtitlan with grand temples and lake views.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-aztec-empire.mp4",
   },
   {
     id: "step-into-the-ottoman-empire",
     title: "Step into the Ottoman Empire",
-    desc: "Cinematic Ottoman Imperial scene. A grand vizier or palace figure in rich embroidered silk robes (using attached image) walking through the courtyards of the Topkapi Palace, with the grand domes of Istanbul and the Bosporus sparkling under radiant golden sunlight.",
+    desc: "A royal Ottoman figure walking through Topkapi Palace with grand domes and golden sunlight.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-ottoman-empire.mp4",
   }
 ];
