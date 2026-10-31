@@ -319,17 +319,6 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
     desc: "Cinematic Ottoman Imperial scene. A grand vizier or palace figure in rich embroidered silk robes (using attached image) walking through the courtyards of the Topkapi Palace, with the grand domes of Istanbul and the Bosporus sparkling under radiant golden sunlight.",
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-ottoman-empire.mp4",
   }
-
-
-
-
-
-
-
-
-
-
-
 ];
 
 export default function InteractiveVideoTemplatesSection({
