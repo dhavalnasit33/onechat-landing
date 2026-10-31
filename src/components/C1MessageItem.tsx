@@ -516,6 +516,11 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
     // ---- 1. Un-clip every ancestor ----
     let p: HTMLElement | null = element.parentElement;
     while (p && p !== document.body) {
+    
+      if (p.classList.contains("overflow-y-auto") || (p.classList.contains("overflow-hidden") && p.classList.contains("flex-1"))) {
+        break;
+      }
+      
       saveStyle(p);
       p.style.overflow = "visible";
       p.style.maxHeight = "none";
