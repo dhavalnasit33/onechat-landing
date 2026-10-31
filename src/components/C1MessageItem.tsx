@@ -1243,9 +1243,9 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                       aria-label="Download Chart"
                     >
                       {exportingId === target.id ? (
-                        <Loader2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0"} />
+                        <Loader2 className={"h-[16px] w-[16px] sm:h-4.5 sm:w-4.5 animate-spin text-[#7564F6] shrink-0"} />
                       ) : (
-                        <Download className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/dl:text-white transition-colors shrink-0"} />
+                        <Download className={"h-[16px] w-[16px] sm:h-4.5 sm:w-4.5 text-slate-400 group-hover/dl:text-white transition-colors shrink-0"} />
                       )}
                       <span className="hidden xs:inline">Download</span>
                     </button>
@@ -1300,9 +1300,9 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                       aria-label="Share Chart"
                     >
                       {sharingId === target.id ? (
-                        <Loader2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 animate-spin text-[#7564F6] shrink-0"} />
+                        <Loader2 className={"h-[16px] w-[16px] sm:h-4.5 sm:w-4.5 animate-spin text-[#7564F6] shrink-0"} />
                       ) : (
-                        <Share2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/share:text-white transition-colors shrink-0"} />
+                        <Share2 className={"h-[16px] w-[16px] sm:h-4.5 sm:w-4.5 text-slate-400 group-hover/share:text-white transition-colors shrink-0"} />
                       )}
                       <span className="hidden xs:inline">Share</span>
                     </button>
@@ -1323,7 +1323,7 @@ export const C1MessageItem: React.FC<C1MessageItemProps> = ({
                       className={"flex items-center gap-1 sm:gap-1.5 rounded-md p-1.5 sm:px-2 sm:py-1 text-[10px] sm:text-[11px] font-medium text-slate-300 transition hover:bg-[#7564F6]/20 hover:text-white cursor-pointer active:scale-95"}
                       aria-label="Full View"
                     >
-                      <Maximize2 className={"h-[19px] w-[19px] sm:h-5 sm:w-5 text-slate-400 group-hover/fv:text-white transition-colors shrink-0"} />
+                      <Maximize2 className={"h-[16px] w-[16px] sm:h-4.5 sm:w-4.5 text-slate-400 group-hover/fv:text-white transition-colors shrink-0"} />
                       <span className="hidden xs:inline">Full View</span>
                     </button>
                     {/* Tooltip: displays downward to avoid being clipped by top boundary */}

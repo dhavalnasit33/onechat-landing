@@ -496,7 +496,7 @@ div[class*='recharts-responsive-container'],
   background: transparent !important;
   color: #cbd5e1 !important; /* હળવો ગ્રે/વ્હાઇટ કલર */
   font-size: 14px !important;
-  font-weight: 500 !important;
+  font-weight: 700 !important;
   border-radius: 8px !important;
   cursor: pointer !important;
   transition: background-color 0.2s ease, color 0.2s ease !important;
