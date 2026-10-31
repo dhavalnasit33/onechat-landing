@@ -39,7 +39,7 @@ function VideoTemplateCard({
           if (entry.isIntersecting) {
             setHasStartedLoading(true);
             if (videoRef.current) {
-              videoRef.current.play().catch(() => {});
+              videoRef.current.play().catch(() => { });
             }
           } else {
             // When scrolled far away, pause to save mobile memory/battery
@@ -85,9 +85,8 @@ function VideoTemplateCard({
           onLoadedData={() => setIsReady(true)}
           onCanPlay={() => setIsReady(true)}
           onPlaying={() => setIsReady(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
-            isReady ? "opacity-100" : "opacity-0"
-          }`}
+          className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${isReady ? "opacity-100" : "opacity-0"
+            }`}
         />
       ) : (
         <div className="absolute inset-0 bg-[#070b1e]" />
@@ -118,64 +117,16 @@ function VideoTemplateCard({
 const AI_VIDEO_MODELS = [
   { name: "Veo", icon: "/assets/landing-page/section-2-gemini.png" },
   { name: "PixVerse", icon: "/assets/landing-page/section-2-pix-verse.png" },
-  { name: "Seedance", icon: "/assets/landing-page/section-2-seedream.png" }, 
+  { name: "Seedance", icon: "/assets/landing-page/section-2-seedream.png" },
   { name: "Runway", icon: "/assets/landing-page/section-2-runway.png" },
   { name: "Kling", icon: "/assets/landing-page/section-2-kling.png" },
   { name: "Pika", icon: "/assets/landing-page/section-2-pika.png" },
   { name: "MiniMax", icon: "/assets/landing-page/section-2-minimax.png" },
-  { name: "Wan", icon: "/assets/landing-page/section-2-qwen.png" }, 
+  { name: "Wan", icon: "/assets/landing-page/section-2-qwen.png" },
 ];
 
 // Reordered and Filtered List based on your requested items
 const TEMPLATES_DATA: VideoTemplateItem[] = [
-  {
-    id: "youtube-intro",
-    title: "YouTube Intro",
-    desc: "Create a polished, attention-grabbing YouTube intro that introduces your channel or video with your branding.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/youtube-intro.mp4",
-  },
-  {
-    id: "pet-movie-star",
-    title: "Pet Movie Star",
-    desc: "Turn your pet into the star of their own movie with cinematic scenes, dramatic camera work.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-movie-star.mp4",
-  },
-  {
-    id: "pet-superhero",
-    title: "Pet Superhero",
-    desc: "Turn your pet into an epic superhero with extraordinary powers, a heroic costume, and cinematic visuals.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-superhero.mp4",
-  },
-  {
-    id: "talking-pets",
-    title: "Talking Pets",
-    desc: "Talking pet video animation. Looks directly into the camera with expressive eyes and cheerful facial expressions.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/talking-pets.mp4",
-  },
-  {
-    id: "personal-brand-intro",
-    title: "Personal Brand Intro",
-    desc: "Create a polished introduction for your personal brand that showcases who you are and what you do.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/personal-brand-intro.mp4",
-  },
-  {
-    id: "creator-promo",
-    title: "Creator Promo",
-    desc: "Create a professional promotional video for your personal brand, channel, or creator business.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/creator-promo.mp4",
-  },
-  {
-    id: "news-style-video",
-    title: "News-Style Video",
-    desc: "Turn a topic or update into a polished news-style video with professional narration and headlines.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/news-style-video.mp4",
-  },
-  {
-    id: "step-into-victorian-london",
-    title: "Step into Victorian London",
-    desc: "Cinematic 19th-century Victorian scene. A gentleman or lady in authentic Victorian attire walking through cobblestone streets.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-victorian-london.mp4",
-  },
   {
     id: "step-into-the-renaissance",
     title: "Step into the Renaissance",
@@ -249,6 +200,54 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
     video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/360-photo-booth.mp4",
   },
   {
+    id: "youtube-intro",
+    title: "YouTube Intro",
+    desc: "Create a polished, attention-grabbing YouTube intro that introduces your channel or video with your branding.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/youtube-intro.mp4",
+  },
+  {
+    id: "pet-movie-star",
+    title: "Pet Movie Star",
+    desc: "Turn your pet into the star of their own movie with cinematic scenes, dramatic camera work.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-movie-star.mp4",
+  },
+  {
+    id: "pet-superhero",
+    title: "Pet Superhero",
+    desc: "Turn your pet into an epic superhero with extraordinary powers, a heroic costume, and cinematic visuals.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-superhero.mp4",
+  },
+  {
+    id: "talking-pets",
+    title: "Talking Pets",
+    desc: "Talking pet video animation. Looks directly into the camera with expressive eyes and cheerful facial expressions.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/talking-pets.mp4",
+  },
+  {
+    id: "personal-brand-intro",
+    title: "Personal Brand Intro",
+    desc: "Create a polished introduction for your personal brand that showcases who you are and what you do.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/personal-brand-intro.mp4",
+  },
+  {
+    id: "creator-promo",
+    title: "Creator Promo",
+    desc: "Create a professional promotional video for your personal brand, channel, or creator business.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/creator-promo.mp4",
+  },
+  {
+    id: "news-style-video",
+    title: "News-Style Video",
+    desc: "Turn a topic or update into a polished news-style video with professional narration and headlines.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/news-style-video.mp4",
+  },
+  {
+    id: "step-into-victorian-london",
+    title: "Step into Victorian London",
+    desc: "Cinematic 19th-century Victorian scene. A gentleman or lady in authentic Victorian attire walking through cobblestone streets.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-victorian-london.mp4",
+  },
+  {
     id: "channel-logo-reveal",
     title: "Channel Logo Reveal",
     desc: "Turn your channel logo into a polished animated reveal with dynamic motion, visual effects.",
@@ -294,27 +293,50 @@ const TEMPLATES_DATA: VideoTemplateItem[] = [
     id: "pet-cartoon",
     title: "Pet Cartoon",
     desc: "Transform your pet into an adorable animated character and bring them to life in a colorful cartoon world with expressive movement, playful adventures, and animated movie-style visuals.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-cartoon.mp4", 
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/pet-cartoon.mp4",
   },
   {
     id: "step-into-ancient-greece",
     title: "Step into Ancient Greece",
     desc: "Cinematic epic ancient Greek scene. Step back in time to the world of philosophers and Spartans.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-ancient-greece.mp4", 
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-ancient-greece.mp4",
   },
   {
     id: "step-into-the-viking-age",
     title: "Step into the Viking Age",
     desc: "Cinematic Scandinavian Norse historical scene. A Viking warrior or jarl (using attached image) in fur-trimmed armor holding a Norse shield, stepping off a dragon-headed longship onto a misty fjord shoreline with snow-capped cliffs and roaring campfires.",
-    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-viking-age.mp4", 
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-viking-age.mp4",
+  },
+  {
+    id: "step-into-the-aztec-empire",
+    title: "Step into the Aztec Empire",
+    desc: "Cinematic Aztec Empire scene. An Aztec warrior with obsidian weapon and quetzal feather crest (using attached image) overlooking the island city of Tenochtitlan with causeways over Lake Texcoco and the Great Temple rising majestically.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-aztec-empire.mp4",
+  },
+  {
+    id: "step-into-the-ottoman-empire",
+    title: "Step into the Ottoman Empire",
+    desc: "Cinematic Ottoman Imperial scene. A grand vizier or palace figure in rich embroidered silk robes (using attached image) walking through the courtyards of the Topkapi Palace, with the grand domes of Istanbul and the Bosporus sparkling under radiant golden sunlight.",
+    video: "https://api.onechatai.ai/uploads/video-generation-quick-tools-card-videos/step-into-the-ottoman-empire.mp4",
   }
+
+
+
+
+
+
+
+
+
+
+
 ];
 
 export default function InteractiveVideoTemplatesSection({
   onOpenAuth,
   onCTA,
 }: InteractiveVideoTemplatesSectionProps) {
-  
+
   const handleTemplateClick = (template: VideoTemplateItem) => {
     const attributionInput: RegistrationCTAInput = {
       cta_id: "video_templates",
@@ -334,12 +356,12 @@ export default function InteractiveVideoTemplatesSection({
 
   return (
     <section className="relative w-full py-16 md:py-24 bg-[#050713] overflow-hidden text-white border-t border-white/5">
-      
+
       {/* Background Ambient Glow */}
       <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[800px] h-[350px] rounded-full bg-gradient-to-r from-[#007BFF]/15 via-[#713BFF]/15 to-[#E54BFF]/15 blur-[100px] pointer-events-none" />
 
       <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 relative z-10">
-        
+
         {/* Header Text */}
         <div className="text-center max-w-[950px] mx-auto mb-10 flex flex-col items-center">
           <h2 className="mt-5 font-poppins text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15] lg:whitespace-nowrap">
@@ -354,7 +376,7 @@ export default function InteractiveVideoTemplatesSection({
           </p>
         </div>
 
-       <div className="flex justify-center mb-10 md:mb-14 w-full">
+        <div className="flex justify-center mb-10 md:mb-14 w-full">
           <div className="w-full max-w-[1024px] px-2 py-2">
             <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 md:gap-10">
               {AI_VIDEO_MODELS.map((model) => (
