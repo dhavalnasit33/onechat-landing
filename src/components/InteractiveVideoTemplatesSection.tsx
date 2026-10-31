@@ -25,32 +25,51 @@ function VideoTemplateCard({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasStartedLoading, setHasStartedLoading] = useState(false);
+  const [isInView, setIsInView] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [posterFrame, setPosterFrame] = useState<string | null>(null);
+
+  const handleReady = () => {
+    setIsReady(true);
+    // Capture snapshot for smooth fallback when scrolled out of view
+    if (videoRef.current && !posterFrame) {
+      try {
+        const vid = videoRef.current;
+        if (vid.videoWidth && vid.videoHeight) {
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.min(vid.videoWidth, 360);
+          canvas.height = Math.min(vid.videoHeight, 450);
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+            setPosterFrame(canvas.toDataURL("image/jpeg", 0.6));
+          }
+        }
+      } catch {
+        // Fallback gracefully if CORS prevents canvas export
+      }
+    }
+  };
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    // Use generous margin (600px) so videos load smoothly BEFORE user scrolls to them
+    // Buffer margin of 250px:
+    // Only loads/plays videos currently in or near viewport.
+    // When scrolled out, it releases the Chrome hardware decoder so all 31 videos never freeze!
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setHasStartedLoading(true);
-            if (videoRef.current) {
-              videoRef.current.play().catch(() => { });
-            }
+            setIsInView(true);
           } else {
-            // When scrolled far away, pause to save mobile memory/battery
-            if (videoRef.current) {
-              videoRef.current.pause();
-            }
+            setIsInView(false);
           }
         });
       },
       {
-        rootMargin: "600px 0px",
+        rootMargin: "250px 0px",
         threshold: 0.05,
       }
     );
@@ -66,14 +85,14 @@ function VideoTemplateCard({
       className="group relative w-full aspect-[4/5] rounded-[14px] sm:rounded-[18px] overflow-hidden bg-[#030614] border-2 border-white/10 hover:border-2 hover:border-[#7C3AED] hover:shadow-[0_0_12px_rgba(124,58,237,0.3)] cursor-pointer transition-all duration-300 flex flex-col hover:scale-[1.02]"
     >
       {/* Loading Spinner */}
-      {!isReady && (
+      {!isReady && isInView && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#070b1e] z-10 transition-opacity duration-300">
           <div className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-white/15 border-t-[#A855F7] rounded-full animate-spin" />
         </div>
       )}
 
-      {/* Video Element */}
-      {hasStartedLoading ? (
+      {/* Video Element with Auto-Play and Virtual Decoder Release */}
+      {isInView ? (
         <video
           ref={videoRef}
           src={template.video}
@@ -81,12 +100,25 @@ function VideoTemplateCard({
           loop
           muted
           playsInline
-          preload="auto"
-          onLoadedData={() => setIsReady(true)}
-          onCanPlay={() => setIsReady(true)}
-          onPlaying={() => setIsReady(true)}
-          className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${isReady ? "opacity-100" : "opacity-0"
-            }`}
+          crossOrigin="anonymous"
+          preload="metadata"
+          onLoadedMetadata={handleReady}
+          onLoadedData={handleReady}
+          onCanPlay={(e) => {
+            handleReady();
+            e.currentTarget.play().catch(() => {});
+          }}
+          onPlaying={handleReady}
+          onError={() => setIsReady(true)}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 group-hover:scale-105 ${
+            isReady ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      ) : posterFrame ? (
+        <img
+          src={posterFrame}
+          alt={template.title}
+          className="absolute inset-0 w-full h-full object-cover"
         />
       ) : (
         <div className="absolute inset-0 bg-[#070b1e]" />
