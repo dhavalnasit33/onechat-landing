@@ -1,0 +1,488 @@
+{
+  "ChatGPT": [
+    {
+      "name": "GPT 5.6 Terra",
+      "id": "6a756be690ca2618be6d5f91",
+      "slug": "gpt-5.6-terra",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.6 Luna",
+      "id": "6a756ba990ca2618be6d5418",
+      "slug": "gpt-5.6-luna",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.5 Pro",
+      "id": "6a756b7c90ca2618be6d53de",
+      "slug": "gpt-5.5-pro",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.5",
+      "id": "6a756b4590ca2618be6d5385",
+      "slug": "gpt-5.5",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.4 Pro",
+      "id": "6a756aff90ca2618be6d532c",
+      "slug": "gpt-5.4-pro",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.4",
+      "id": "69cf8b999ead2c8b320548cb",
+      "slug": "gpt-5.4",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.4 Mini",
+      "id": "69cf897be6ddfb1ee868763c",
+      "slug": "gpt-5.4-mini",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.4 Nano",
+      "id": "6a9fd03edd80edb4b7f754ae",
+      "slug": "gpt-5.4-nano",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.2",
+      "id": "6953a36c42521df10d53b899",
+      "slug": "gpt-5.2",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5.1",
+      "id": "698c25d08ebf5649818a1b85",
+      "slug": "gpt-5.1",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5",
+      "id": "68abe9e7f8cd75c73ffb676e",
+      "slug": "gpt-5",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5 Mini",
+      "id": "68abe9b4f8cd75c73ffb6766",
+      "slug": "gpt-5-mini",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 5 Nano",
+      "id": "68abead2f8cd75c73ffb682d",
+      "slug": "gpt-5-nano",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 4.1",
+      "id": "6853d0d4322953e451144fae",
+      "slug": "gpt-4.1",
+      "icon": "assets/images/chatgpt1.png"
+    },
+    {
+      "name": "GPT 4 Turbo",
+      "id": "6853d5f8322953e451144ff0",
+      "slug": "gpt-4-turbo",
+      "icon": "assets/images/chatgpt1.png"
+    }
+  ],
+  "Gemini": [
+    {
+      "name": "Gemini 3.8 Flash",
+      "id": "6aa7b69577f193eebd70cb7e",
+      "slug": "gemini-3.8-flash",
+      "icon": "assets/images/gemini1.png"
+    },
+    {
+      "name": "Gemini 3.6 Flash",
+      "id": "6a756c8b90ca2618be6d746f",
+      "slug": "gemini-3.6-flash",
+      "icon": "assets/images/gemini1.png"
+    },
+    {
+      "name": "Gemini 3.5 Flash",
+      "id": "6a756c2890ca2618be6d6e12",
+      "slug": "gemini-3.5-flash",
+      "icon": "assets/images/gemini1.png"
+    },
+    {
+      "name": "Gemini 3.1 Pro Preview",
+      "id": "69cf8d359ead2c8b32056902",
+      "slug": "gemini-3.1-pro-preview",
+      "icon": "assets/images/gemini1.png"
+    },
+    {
+      "name": "Gemini 2.5 Pro",
+      "id": "698c29b2a5a69892c89f33a2",
+      "slug": "gemini-2.5-pro",
+      "icon": "assets/images/gemini1.png"
+    },
+    {
+      "name": "Gemini 2.5 Flash",
+      "id": "68668b6bfa3b2dd090ecc05f",
+      "slug": "gemini-2.5-flash",
+      "icon": "assets/images/gemini1.png"
+    }
+  ],
+  "Claude": [
+    {
+      "name": "Claude Sonnet 5",
+      "id": "6a756cd290ca2618be6d800f",
+      "slug": "claude-sonnet-5",
+      "icon": "assets/images/claude1.png"
+    },
+    {
+      "name": "Claude Opus 4.8",
+      "id": "6a756d5290ca2618be6d80c1",
+      "slug": "claude-opus-4-8",
+      "icon": "assets/images/claude1.png"
+    },
+    {
+      "name": "Claude Opus 4.7",
+      "id": "6a756d1490ca2618be6d8068",
+      "slug": "claude-opus-4-7",
+      "icon": "assets/images/claude1.png"
+    },
+    {
+      "name": "Claude Sonnet 4.6",
+      "id": "69a51a440892485a4941b83e",
+      "slug": "claude-sonnet-4-6",
+      "icon": "assets/images/claude1.png"
+    },
+    {
+      "name": "Claude Opus 4.6",
+      "id": "698c2aa8a5a69892c89f61a7",
+      "slug": "claude-opus-4-6",
+      "icon": "assets/images/claude1.png"
+    },
+    {
+      "name": "Claude Sonnet 4.5",
+      "id": "685a91cb8d4f52b715b30fcd",
+      "slug": "claude-sonnet-4-5",
+      "icon": "assets/images/claude1.png"
+    },
+    {
+      "name": "Claude Haiku 4.5",
+      "id": "69819a970b420e4f528dfc14",
+      "slug": "claude-haiku-4-5",
+      "icon": "assets/images/claude1.png"
+    },
+    {
+      "name": "Claude Opus 4.5",
+      "id": "69819a8b0b420e4f528dfa02",
+      "slug": "claude-opus-4-5",
+      "icon": "assets/images/claude1.png"
+    }
+  ],
+  "DeepSeek": [
+    {
+      "name": "DeepSeek V4 Pro",
+      "id": "6a756dfd90ca2618be6d83f5",
+      "slug": "deepseek-v4-pro",
+      "icon": "assets/images/deepseek1.png"
+    },
+    {
+      "name": "DeepSeek V4 Flash",
+      "id": "6a756dc990ca2618be6d839c",
+      "slug": "deepseek-v4-flash",
+      "icon": "assets/images/deepseek1.png"
+    }
+  ],
+  "Llama": [
+    {
+      "name": "Llama 4 Maverick",
+      "id": "686b75624d2f3637dac0f192",
+      "slug": "meta-llama/llama-4-maverick",
+      "icon": "assets/images/meta1.png"
+    },
+    {
+      "name": "Llama 4 Scout",
+      "id": "69cf93069ead2c8b3205ef9c",
+      "slug": "meta-llama/llama-4-scout",
+      "icon": "assets/images/meta1.png"
+    },
+    {
+      "name": "Llama 3.3 70B Instruct",
+      "id": "69cf92dd9ead2c8b3205ea0e",
+      "slug": "meta-llama/llama-3.3-70b-instruct",
+      "icon": "assets/images/meta1.png"
+    }
+  ],
+  "Meta Muse": [
+    {
+      "name": "Muse Spark 1.3",
+      "id": "6aa7be895647aa7776bc17cb",
+      "slug": "meta/muse-spark-1.3",
+      "icon": "assets/images/muse-logo.png"
+    }
+  ],
+  "Grok": [
+    {
+      "name": "Grok 4.6",
+      "id": "6aa7b69f77f193eebd70cbbe",
+      "slug": "grok-4.6",
+      "icon": "assets/images/grok-icon.png"
+    },
+    {
+      "name": "Grok 4.20 Reasoning",
+      "id": "69cf91609ead2c8b3205baee",
+      "slug": "grok-4.20-0309-reasoning",
+      "icon": "assets/images/grok-icon.png"
+    },
+    {
+      "name": "Grok 4.20 Non-Reasoning",
+      "id": "69cf90449ead2c8b3205b146",
+      "slug": "grok-4.20-0309-non-reasoning",
+      "icon": "assets/images/grok-icon.png"
+    },
+    {
+      "name": "Grok 4.3",
+      "id": "68668b9dfa3b2dd090ecc092",
+      "slug": "grok-4.3",
+      "icon": "assets/images/grok-icon.png"
+    },
+    {
+      "name": "Grok 3 Mini",
+      "id": "699d405912e32e1e5570ac68",
+      "slug": "grok-3-mini",
+      "icon": "assets/images/grok-icon.png"
+    }
+  ],
+  "Perplexity": [
+    {
+      "name": "Perplexity Sonar Deep Research",
+      "id": "685a28bb6f7240cc72297ee1",
+      "slug": "sonar-deep-research",
+      "icon": "assets/images/perplexity1.png"
+    },
+    {
+      "name": "Perplexity Sonar Reasoning Pro",
+      "id": "68e89d9cbf09dcb77f531b76",
+      "slug": "sonar-reasoning-pro",
+      "icon": "assets/images/perplexity1.png"
+    },
+    {
+      "name": "Perplexity Sonar Pro",
+      "id": "698c27dedcd8df27d3daa5f3",
+      "slug": "sonar-pro",
+      "icon": "assets/images/perplexity1.png"
+    },
+    {
+      "name": "Perplexity Sonar",
+      "id": "685a29a06f7240cc72297ee9",
+      "slug": "sonar",
+      "icon": "assets/images/perplexity1.png"
+    }
+  ],
+  "Kimi": [
+    {
+      "name": "Kimi K3",
+      "id": "6a756e4b90ca2618be6d8450",
+      "slug": "moonshotai/kimi-k3",
+      "icon": "assets/images/kimi-icon.png"
+    },
+    {
+      "name": "Kimi K2.6",
+      "id": "6aa7b6e177f193eebd70cc5b",
+      "slug": "moonshotai/kimi-k2.6",
+      "icon": "assets/images/kimi-icon.png"
+    },
+    {
+      "name": "Kimi K2.5",
+      "id": "69cdf102228e7c57ea72a04f",
+      "slug": "moonshotai/kimi-k2.5",
+      "icon": "assets/images/kimi-icon.png"
+    },
+    {
+      "name": "Kimi K2 Thinking",
+      "id": "69cdf1e9228e7c57ea72cc03",
+      "slug": "moonshotai/kimi-k2-thinking",
+      "icon": "assets/images/kimi-icon.png"
+    },
+    {
+      "name": "Kimi K2 0905",
+      "id": "69cdf208228e7c57ea72ccdf",
+      "slug": "moonshotai/kimi-k2-0905",
+      "icon": "assets/images/kimi-icon.png"
+    },
+    {
+      "name": "Kimi K2",
+      "id": "69cdf217228e7c57ea72ce8e",
+      "slug": "moonshotai/kimi-k2",
+      "icon": "assets/images/kimi-icon.png"
+    }
+  ],
+  "Mistral": [
+    {
+      "name": "Mistral Medium 3.5",
+      "id": "6aa7b70377f193eebd70cc9d",
+      "slug": "mistralai/mistral-medium-3-5",
+      "icon": "assets/images/mistral1.png"
+    },
+    {
+      "name": "Mistral Small 2603",
+      "id": "69cdf46673cdcd9484c924dc",
+      "slug": "mistralai/mistral-small-2603",
+      "icon": "assets/images/mistral1.png"
+    },
+    {
+      "name": "Devstral 2512",
+      "id": "69cdf45173cdcd9484c912c1",
+      "slug": "mistralai/devstral-2512",
+      "icon": "assets/images/mistral1.png"
+    },
+    {
+      "name": "Mistral Medium 3.1",
+      "id": "69cdf50973cdcd9484c94d30",
+      "slug": "mistralai/mistral-medium-3.1",
+      "icon": "assets/images/mistral1.png"
+    }
+  ],
+  "Qwen": [
+    {
+      "name": "Qwen 3.8 27B",
+      "id": "6aa7b73a77f193eebd70cd1f",
+      "slug": "qwen/qwen3.8-27b",
+      "icon": "assets/images/qwen1.png"
+    },
+    {
+      "name": "Qwen3.5 397B A17B",
+      "id": "69cdf77d73cdcd9484c9ca17",
+      "slug": "qwen/qwen3.5-397b-a17b",
+      "icon": "assets/images/qwen1.png"
+    },
+    {
+      "name": "Qwen3.5 122B A10B",
+      "id": "69cdf7b473cdcd9484c9d666",
+      "slug": "qwen/qwen3.5-122b-a10b",
+      "icon": "assets/images/qwen1.png"
+    },
+    {
+      "name": "Qwen3.5 35B A3B",
+      "id": "69cdf7c173cdcd9484c9dbe2",
+      "slug": "qwen/qwen3.5-35b-a3b",
+      "icon": "assets/images/qwen1.png"
+    },
+    {
+      "name": "Qwen3.5 27B",
+      "id": "69cdf7ca73cdcd9484c9de82",
+      "slug": "qwen/qwen3.5-27b",
+      "icon": "assets/images/qwen1.png"
+    }
+  ],
+  "MiniMax": [
+    {
+      "name": "MiniMax M3",
+      "id": "6aa7b76477f193eebd70cd9f",
+      "slug": "minimax/minimax-m3",
+      "icon": "assets/images/minimax1.png"
+    },
+    {
+      "name": "MiniMax M2.7",
+      "id": "69cdf98e0a24a0ba512c518a",
+      "slug": "minimax/minimax-m2.7",
+      "icon": "assets/images/minimax1.png"
+    },
+    {
+      "name": "MiniMax M2.5",
+      "id": "69cdf9970a24a0ba512c52af",
+      "slug": "minimax/minimax-m2.5",
+      "icon": "assets/images/minimax1.png"
+    },
+    {
+      "name": "MiniMax M2.1",
+      "id": "69cdf9a00a24a0ba512c572d",
+      "slug": "minimax/minimax-m2.1",
+      "icon": "assets/images/minimax1.png"
+    },
+    {
+      "name": "MiniMax M2",
+      "id": "69cdf9ff0a24a0ba512c6ec4",
+      "slug": "minimax/minimax-m2",
+      "icon": "assets/images/minimax1.png"
+    }
+  ],
+  "MiMo": [
+    {
+      "name": "MiMo V2.5 Pro",
+      "id": "69cdfaca0a24a0ba512c8c30",
+      "slug": "xiaomi/mimo-v2.5-pro",
+      "icon": "assets/images/mimo1.png"
+    },
+    {
+      "name": "MiMo V2.5",
+      "id": "6aa7b78377f193eebd70cde1",
+      "slug": "xiaomi/mimo-v2.5",
+      "icon": "assets/images/mimo1.png"
+    }
+  ],
+  "GLM": [
+    {
+      "name": "GLM 5.3",
+      "id": "6aa7b78f77f193eebd70ce21",
+      "slug": "z-ai/glm-5.3",
+      "icon": "assets/images/glm1.png"
+    },
+    {
+      "name": "GLM-5-Turbo",
+      "id": "69cdfbfc0a24a0ba512cc882",
+      "slug": "z-ai/glm-5-turbo",
+      "icon": "assets/images/glm1.png"
+    },
+    {
+      "name": "GLM-5",
+      "id": "69cdfbed0a24a0ba512cc474",
+      "slug": "z-ai/glm-5",
+      "icon": "assets/images/glm1.png"
+    },
+    {
+      "name": "GLM-4.7-Flash",
+      "id": "69cdfc1b0a24a0ba512ccdae",
+      "slug": "z-ai/glm-4.7-flash",
+      "icon": "assets/images/glm1.png"
+    },
+    {
+      "name": "GLM-4.7",
+      "id": "69cdfc090a24a0ba512ccc8d",
+      "slug": "z-ai/glm-4.7",
+      "icon": "assets/images/glm1.png"
+    },
+    {
+      "name": "GLM-4.6",
+      "id": "69cdfc270a24a0ba512cce3e",
+      "slug": "z-ai/glm-4.6",
+      "icon": "assets/images/glm1.png"
+    },
+    {
+      "name": "GLM-4.5",
+      "id": "69cdfc3b0a24a0ba512cdbeb",
+      "slug": "z-ai/glm-4.5",
+      "icon": "assets/images/glm1.png"
+    }
+  ],
+  "Nemotron": [
+    {
+      "name": "NVIDIA Nemotron 3 Ultra",
+      "id": "6aa7b7c177f193eebd70ce63",
+      "slug": "nvidia/nemotron-3-ultra-550b-a55b-20260604",
+      "icon": "assets/images/nemotron1.png"
+    },
+    {
+      "name": "NVIDIA Nemotron 3 Super",
+      "id": "69cdfde20a24a0ba512d1deb",
+      "slug": "nvidia/nemotron-3-super-120b-a12b",
+      "icon": "assets/images/nemotron1.png"
+    },
+    {
+      "name": "NVIDIA Nemotron 3 Nano",
+      "id": "69cdfdf00a24a0ba512d22d7",
+      "slug": "nvidia/nemotron-3-nano-30b-a3b",
+      "icon": "assets/images/nemotron1.png"
+    }
+  ]
+}

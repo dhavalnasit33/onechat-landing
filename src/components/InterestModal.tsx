@@ -1,12 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Outfit } from "next/font/google";
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["700", "800", "900"],
-  display: "swap",
-});
 
 export interface InterestOption {
   id: string;
@@ -354,7 +348,7 @@ export default function InterestModal({
 
         {/* Headline & Subtitle */}
         <div className="text-center mb-2 sm:mb-3.5 shrink-0 order-2">
-          <h2 className={`${outfit.className} text-[22px] sm:text-2xl md:text-[32px] font-extrabold text-white tracking-[-0.5px] leading-tight`}>
+          <h2 className={` text-[22px] sm:text-2xl md:text-[32px] font-extrabold text-white tracking-[-0.5px] leading-tight`}>
             Get Started. Select Your{" "}
             <span className="bg-gradient-to-r from-[#60A5FA] via-[#818CF8] to-[#A855F7] bg-clip-text text-transparent font-extrabold">
               Interests.
