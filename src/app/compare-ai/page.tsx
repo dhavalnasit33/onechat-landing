@@ -6,7 +6,6 @@ import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  Square,
   ChevronDown,
   Plus,
   Mic,
@@ -50,8 +49,8 @@ const BASIC_TEXT_MODELS: Record<string, string[]> = {
   DeepSeek: ['DeepSeek V4 Pro'],
   Llama: ['Llama 4 Maverick'],
   'Meta Muse': ['Muse Spark 1.3'],
-  Perplexity: ['Perplexity Sonar'],
-  Grok: ['Grok 4.20 Non-Reasoning'],
+  Perplexity: ['Perplexity Sonar Deep Research', 'Perplexity Sonar'],
+  Grok: ['Grok 4.6', 'Grok 4.20 Non-Reasoning'],
   Kimi: ['Kimi K3'],
   Mistral: ['Mistral Medium 3.5'],
   Qwen: ['Qwen 3.8 27B'],
@@ -122,13 +121,20 @@ function getApiBase(): string {
 }
 
 // Custom Markdown Renderer
-function FormattedAiResponse({ content }: { content: string }) {
-  if (!content) {
+function FormattedAiResponse({ content, isStreaming }: { content: string; isStreaming?: boolean }) {
+  if (!content || content === "Stopped") {
+    if (isStreaming) {
+      return (
+        <div className="flex items-center gap-1.5 py-2 text-gray-400">
+          <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+        </div>
+      );
+    }
     return (
-      <div className="flex items-center gap-1.5 py-2 text-gray-400">
-        <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-        <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-        <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+      <div className="py-2 text-sm text-gray-400 italic flex items-center gap-1.5">
+        <span>Stopped</span>
       </div>
     );
   }
@@ -297,7 +303,13 @@ function CompareAiContent() {
   const isModelAccessible = (provider: string, modelName: string) => {
     if (userPlan === "pro_max" || userPlan === "pro" || userPlan === "premium") return true;
     const allowed = BASIC_TEXT_MODELS[provider] || [];
-    return allowed.includes(modelName);
+    const defaultModelName = PROVIDER_MODELS[provider]?.[0]?.name;
+    if (defaultModelName && defaultModelName.toLowerCase().trim() === modelName.toLowerCase().trim()) {
+      return true;
+    }
+    return allowed.some(
+      (m) => m.toLowerCase().trim() === modelName.toLowerCase().trim()
+    );
   };
 
   // Extract Text from File (File Parser equivalent to Flutter)[cite: 1, 2]
@@ -486,7 +498,21 @@ function CompareAiContent() {
         }
       }
     } catch (e: any) {
-      if (e.name !== "AbortError") {
+      if (e.name === "AbortError") {
+        setProviderPanes((prev) => {
+          if (!prev[paneIndex]) return prev;
+          const copy = [...prev];
+          const msgs = [...copy[paneIndex].messages];
+          if (msgs.length > 0 && msgs[msgs.length - 1].role === "assistant") {
+            const lastMsg = msgs[msgs.length - 1];
+            if (!lastMsg.content || lastMsg.content.trim() === "") {
+              msgs[msgs.length - 1] = { role: "assistant", content: "Stopped" };
+              copy[paneIndex] = { ...copy[paneIndex], messages: msgs };
+            }
+          }
+          return copy;
+        });
+      } else {
         console.error(`Stream error for ${provider}:`, e);
         setProviderPanes((prev) => {
           if (!prev[paneIndex]) return prev;
@@ -746,7 +772,7 @@ function CompareAiContent() {
                   </div>
 
                   {/* Body Messages or Upgrade Card */}
-                  {!accessible && pane.messages.length > 0 ? (
+                  {!accessible ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
                       <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#5A4FF3] flex items-center justify-center shadow-lg shadow-[#5A4FF3]/30 mb-4">
                         <Lock className="w-6 h-6 text-white" />
@@ -773,15 +799,15 @@ function CompareAiContent() {
                                   {msg.content.replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, '').trim()}
                                 </div>
                               ) : (
-                               <div className="w-full text-gray-100 selection:bg-purple-600">
-  <FormattedAiResponse content={msg.content} />
-  {/* Hover Action Buttons (Copy) - Niche dekhaadva mate */}
-  {msg.content && !pane.isStreaming && (
-    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 mt-3">
-      <CopyButton text={msg.content} />
-    </div>
-  )}
-</div>
+                                <div className="w-full text-gray-100 selection:bg-purple-600">
+                                  <FormattedAiResponse content={msg.content} isStreaming={pane.isStreaming && i === pane.messages.length - 1} />
+                                  {/* Hover Action Buttons (Copy) - Niche dekhaadva mate */}
+                                  {msg.content && msg.content !== "Stopped" && !pane.isStreaming && (
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 mt-3">
+                                      <CopyButton text={msg.content} />
+                                    </div>
+                                  )}
+                                </div>
                               )}
                             </div>
                           ))}
@@ -794,7 +820,14 @@ function CompareAiContent() {
                                   abortControllersRef.current[pane.provider]?.abort();
                                   setProviderPanes((prev) => {
                                     const copy = [...prev];
-                                    copy[index] = { ...copy[index], isStreaming: false };
+                                    const msgs = [...copy[index].messages];
+                                    if (msgs.length > 0 && msgs[msgs.length - 1].role === "assistant") {
+                                      const lastMsg = msgs[msgs.length - 1];
+                                      if (!lastMsg.content || lastMsg.content.trim() === "") {
+                                        msgs[msgs.length - 1] = { role: "assistant", content: "Stopped" };
+                                      }
+                                    }
+                                    copy[index] = { ...copy[index], messages: msgs, isStreaming: false };
                                     return copy;
                                   });
                                 }}

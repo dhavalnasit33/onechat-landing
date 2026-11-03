@@ -918,44 +918,54 @@ function ChatPdfInner() {
         }
     }, [jumpPageInput, pdfNumPages, handleJumpToPage, showToast]);
 
-    const handleDownloadDocument = useCallback(() => {
-        const fileName = session?.originalFileName || "Document.pdf";
-        const fileUrl = session?.fileUrl;
+    const handleDownloadDocument = useCallback(async () => {
+  const fileName = session?.originalFileName || "Document.pdf";
+  const fileUrl = session?.fileUrl;
 
-        if (fileUrl) {
-            const fullUrl = fileUrl.startsWith("http")
-                ? fileUrl
-                : `${getApiServerBase()}${fileUrl}`;
-            const a = document.createElement("a");
-            a.href = fullUrl;
-            a.download = fileName;
-            a.target = "_blank";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast(`Downloading ${fileName}...`);
-            return;
-        }
+  try {
+    if (fileUrl) {
+      const fullUrl = fileUrl.startsWith("http")
+        ? fileUrl
+        : `${getApiServerBase()}${fileUrl}`;
+      const response = await fetch(fullUrl);
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+      showToast(`Downloading ${fileName}...`);
+      return;
+    }
 
-        if (session?.extractedText) {
-            const downloadName = fileName.replace(/\.[^/.]+$/, "") + ".txt";
-            const blob = new Blob([session.extractedText], {
-                type: "text/plain;charset=utf-8",
-            });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = downloadName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast(`Downloaded document text as ${downloadName}`);
-            return;
-        }
+    if (session?.extractedText) {
+      const downloadName = fileName.replace(/\.[^/.]+$/, "") + ".txt";
+      const blob = new Blob([session.extractedText], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = downloadName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Downloaded document text as ${downloadName}`);
+      return;
+    }
 
-        showToast("No document available to download.");
-    }, [session, showToast]);
+    showToast("No document available to download.");
+  } catch (err) {
+    // Fallback: open in new tab
+    if (fileUrl) {
+      const url = fileUrl.startsWith("http") ? fileUrl : `${getApiServerBase()}${fileUrl}`;
+      window.open(url, "_blank");
+    }
+  }
+}, [session, showToast]);
 
     // 9. Rename chat
     const handleRenameChat = useCallback(async () => {
