@@ -581,3 +581,16 @@ div[class*='recharts-responsive-container'],
 .light [data-followup]:hover::before {
   color: #6C56E5 !important;
 }
+
+
+
+.react-pdf__Page__textContent mark.pdf-hit {
+    background: rgba(255, 235, 59, 0.6);
+    color: transparent;
+    border-radius: 2px;
+    padding: 0;
+}
+.react-pdf__Page__textContent mark.pdf-hit.pdf-hit-current {
+    background: rgba(255, 152, 0, 0.85);
+    outline: 2px solid #ff9800;
+}
