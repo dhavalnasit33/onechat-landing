@@ -623,9 +623,36 @@ function FormattedAiResponse({
 function AiChatInner() {
   const searchParams = useSearchParams();
 
+  // State to track if current session is specifically Deep Research tab
+  const [isDeepResearchMode, setIsDeepResearchMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const provParam = searchParams.get("model") || searchParams.get("provider");
+    const cookieMode = getCookie("chat_deep_research_mode");
+    return (
+      provParam?.toLowerCase() === "sonar-deep-research" ||
+      provParam?.toLowerCase() === "deep_research" ||
+      provParam?.toLowerCase() === "deep-research" ||
+      cookieMode === "true"
+    );
+  });
+
   const initialResolved = (() => {
     if (typeof window === "undefined") return resolveProviderAndModel(null);
-    return resolveProviderAndModel(searchParams.get("model") || searchParams.get("provider"));
+    const provParam = searchParams.get("model") || searchParams.get("provider");
+    // Deep Research redirect support
+    if (
+      provParam?.toLowerCase() === "sonar-deep-research" ||
+      provParam?.toLowerCase() === "deep_research" ||
+      provParam?.toLowerCase() === "deep-research" ||
+      (typeof document !== "undefined" && getCookie("chat_deep_research_mode") === "true")
+    ) {
+      const perplexityModels = PROVIDER_MODELS["Perplexity"] || [];
+      const deepModel = perplexityModels.find(
+        (m) => m.slug === "sonar-deep-research" || m.name.toLowerCase().includes("deep research")
+      ) || perplexityModels[0];
+      return { providerName: "Perplexity", modelItem: deepModel };
+    }
+    return resolveProviderAndModel(provParam);
   })();
 
   const [selectedProvider, setSelectedProvider] = useState<string>(initialResolved.providerName);
@@ -692,7 +719,22 @@ function AiChatInner() {
 
   useEffect(() => {
     const provParam = searchParams.get("model") || searchParams.get("provider");
-    if (provParam) {
+    const isDeep =
+      provParam?.toLowerCase() === "sonar-deep-research" ||
+      provParam?.toLowerCase() === "deep_research" ||
+      provParam?.toLowerCase() === "deep-research" ||
+      getCookie("chat_deep_research_mode") === "true";
+
+    if (isDeep) {
+      setIsDeepResearchMode(true);
+      const perplexityModels = PROVIDER_MODELS["Perplexity"] || [];
+      const deepModel = perplexityModels.find(
+        (m) => m.slug === "sonar-deep-research" || m.name.toLowerCase().includes("deep research")
+      ) || perplexityModels[0];
+      setSelectedProvider("Perplexity");
+      setSelectedModel(deepModel);
+    } else if (provParam) {
+      setIsDeepResearchMode(false);
       const resolved = resolveProviderAndModel(provParam);
       setSelectedProvider(resolved.providerName);
       setSelectedModel(resolved.modelItem);
@@ -712,6 +754,10 @@ function AiChatInner() {
     if (promptToTrigger) {
       hasAutoTriggeredRef.current = true;
       deleteCookie("chat_initial_prompt");
+      // Clean URL: Replace messy long URL with clean /ai-chat
+      try {
+        window.history.replaceState({}, "", "/ai-chat");
+      } catch (_) {}
       setTimeout(() => handleSendMessage(promptToTrigger), 300);
     }
   }, [selectedModel]);
@@ -751,6 +797,8 @@ function AiChatInner() {
   }, []);
 
   const handleModelSidebarClick = (item: (typeof MAJOR_PROVIDERS)[0]) => {
+    setIsDeepResearchMode(false);
+    deleteCookie("chat_deep_research_mode");
     if (item.name.toLowerCase() === selectedProvider.toLowerCase()) {
       setCurrentChatId(null);
       setMessages([]);
@@ -910,8 +958,10 @@ function AiChatInner() {
     if (!token) return;
 
     try {
-      // Use fast Flash model for instant follow-up generation instead of deep reasoning
-      const fastModelId = "6a756dc990ca2618be6d839c";
+      // Find fast Flash model dynamically from PROVIDER_MODELS helper instead of hardcoded ID
+      const deepSeekModels = PROVIDER_MODELS["DeepSeek"] || [];
+      const flashModel = deepSeekModels.find((m) => m.slug?.includes("flash") || m.name.toLowerCase().includes("flash")) || deepSeekModels[0];
+      const fastModelId = flashModel?.id || "6a756dc990ca2618be6d839c";
       const followUpPrompt = `System:
 You are an AI assistant. Return ONLY a valid JSON array of 5 concise follow-up questions.
 Format: ["Question 1?", "Question 2?", "Question 3?", "Question 4?", "Question 5?"]
@@ -1082,7 +1132,10 @@ ${aiLastAnswer.substring(0, 500)}`;
     const controller = new AbortController();
     abortControllerRef.current = controller;
     const token = getAuthToken();
-    const activeModelId = isDeepThinkActive ? "6a756dfd90ca2618be6d83f5" : selectedModel.id;
+    const deepSeekModels = PROVIDER_MODELS["DeepSeek"] || [];
+    const proModel = deepSeekModels.find((m) => m.slug?.includes("pro") || m.name.toLowerCase().includes("pro")) || deepSeekModels[0];
+    const flashModel = deepSeekModels.find((m) => m.slug?.includes("flash") || m.name.toLowerCase().includes("flash")) || deepSeekModels[1] || selectedModel;
+    const activeModelId = isDeepThinkActive ? proModel.id : selectedModel.id;
 
     try {
       const res = await fetch(`${getApiBase()}/api/tools/ai/general-stream`, {
@@ -1328,7 +1381,7 @@ ${aiLastAnswer.substring(0, 500)}`;
             {/* Ahiya thi hidden md:block nikali didhu che */}
             {isSidebarOpen && <span className="block text-[13.5px] whitespace-nowrap">Home</span>}
           </a>
-          <a href="/compare-ai" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition">
+          <a href="/multi-chat" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition">
             <div className="w-5 h-5 flex items-center justify-center shrink-0 text-[#6366F1]">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m16 3 4 4-4 4" /><path d="M20 7H4" /><path d="m8 21-4-4 4-4" /><path d="M4 17h16" /></svg>
             </div>
@@ -1339,7 +1392,7 @@ ${aiLastAnswer.substring(0, 500)}`;
 
        <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5 scrollbar-thin scrollbar-thumb-[#1B1F30]">
           {MAJOR_PROVIDERS.map((item) => {
-            const isSelected = selectedProvider.toLowerCase() === item.name.toLowerCase();
+            const isSelected = !isDeepResearchMode && selectedProvider.toLowerCase() === item.name.toLowerCase();
             return (
               <button key={item.name} type="button" onClick={() => handleModelSidebarClick(item)} className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition cursor-pointer ${isSelected ? "bg-[#6342E8]/25 border border-[#8B5CF6]/40 text-[#C4B5FD] font-semibold" : "text-gray-300 hover:bg-[#151928] hover:text-white border border-transparent"}`}>
                 <div className="w-5 h-5 rounded-md flex items-center justify-center shrink-0">
@@ -1416,9 +1469,10 @@ ${aiLastAnswer.substring(0, 500)}`;
                           <div className="flex items-center gap-2 mb-1">
                             {(() => {
                               const isDeepResearch =
-                                selectedProvider.toLowerCase() === "perplexity" &&
-                                (selectedModel.id === "685a28bb6f7240cc72297ee1" ||
-                                  selectedModel.name.toLowerCase().includes("deep research"));
+                                isDeepResearchMode ||
+                                (selectedProvider.toLowerCase() === "perplexity" &&
+                                  (selectedModel.slug === "sonar-deep-research" ||
+                                    selectedModel.name.toLowerCase().includes("deep research")));
                               
                               const iconPath = isDeepResearch
                                 ? "/assets/images/onechat.png"
@@ -1515,7 +1569,7 @@ ${aiLastAnswer.substring(0, 500)}`;
         <div className="px-4 pb-6 pt-2 bg-[#08090E] flex flex-col items-center">
           <input {...getInputProps()} />
           <ModelSpecificSearchInput
-            selectedProvider={selectedProvider}
+            selectedProvider={isDeepResearchMode ? "deep_research" : selectedProvider}
             selectedModel={selectedModel}
             onModelSelect={(m) => setSelectedModel(m)}
             prompt={prompt}

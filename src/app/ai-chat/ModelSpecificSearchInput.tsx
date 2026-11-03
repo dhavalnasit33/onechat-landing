@@ -76,7 +76,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
   useEffect(() => {
     if (selectedProvider.toLowerCase() === "deepseek") {
       if (
-        selectedModel.id === "6a756dfd90ca2618be6d83f5" ||
+        selectedModel.slug?.includes("pro") ||
         selectedModel.name.toLowerCase().includes("pro")
       ) {
         setIsDeepThinkActive(true);
@@ -84,12 +84,12 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         setIsDeepThinkActive(false);
       }
     }
-  }, [selectedModel.id, selectedModel.name, selectedProvider, setIsDeepThinkActive]);
+  }, [selectedModel.slug, selectedModel.name, selectedProvider, setIsDeepThinkActive]);
 
   useEffect(() => {
     if (selectedProvider.toLowerCase() === "perplexity") {
       if (
-        selectedModel.id === "685a28bb6f7240cc72297ee1" ||
+        selectedModel.slug === "sonar-deep-research" ||
         selectedModel.name.toLowerCase().includes("deep research")
       ) {
         setIsPerplexityDeep(true);
@@ -97,21 +97,21 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         setIsPerplexityDeep(false);
       }
     }
-  }, [selectedModel.id, selectedModel.name, selectedProvider]);
+  }, [selectedModel.slug, selectedModel.name, selectedProvider]);
 
   const handleDeepThinkToggle = () => {
     const nextState = !isDeepThinkActive;
     setIsDeepThinkActive(nextState);
 
-    // Exact Flutter logic: find Pro or Flash in available models and select it
+    // Dynamic slug/name resolution matching production
     if (nextState) {
       const proModel =
-        availableModels.find((m) => m.id === "6a756dfd90ca2618be6d83f5") ||
+        availableModels.find((m) => m.slug?.includes("pro")) ||
         availableModels.find((m) => m.name.toLowerCase().includes("pro"));
       if (proModel) onModelSelect(proModel);
     } else {
       const flashModel =
-        availableModels.find((m) => m.id === "6a756dc990ca2618be6d839c") ||
+        availableModels.find((m) => m.slug?.includes("flash")) ||
         availableModels.find((m) => m.name.toLowerCase().includes("flash"));
       if (flashModel) onModelSelect(flashModel);
     }
@@ -120,15 +120,15 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
   const handlePerplexityToggle = (deep: boolean) => {
     setIsPerplexityDeep(deep);
 
-    // Exact Flutter logic: switch between sonarDeepResearchId and sonarId
+    // Dynamic slug/name resolution matching production
     if (deep) {
       const deepModel =
-        availableModels.find((m) => m.id === "685a28bb6f7240cc72297ee1") ||
+        availableModels.find((m) => m.slug === "sonar-deep-research") ||
         availableModels.find((m) => m.name.toLowerCase().includes("deep research"));
       if (deepModel) onModelSelect(deepModel);
     } else {
       const standardModel =
-        availableModels.find((m) => m.id === "685a29a06f7240cc72297ee9") ||
+        availableModels.find((m) => m.slug === "sonar") ||
         availableModels.find((m) => m.name.toLowerCase() === "perplexity sonar");
       if (standardModel) onModelSelect(standardModel);
     }
@@ -806,14 +806,15 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
   }
 
   // ==========================================
-  // 6. PERPLEXITY SPECIFIC UI (_buildPerplexityUI)
+  // 6. PERPLEXITY & DEEP RESEARCH SPECIFIC UI (_buildPerplexityUI)
   // Exact Flutter Implementation:
   // - Rounded card container (rounded-[26px]) with AppThemeColors.chatInputBg
   // - "Ask anything..." placeholder
   // - Left: Joint toggle with Search (lens) and Deep Research (auto_awesome / layers icon)
-  // - Right: Model selector pill + Attach file clip + Mic + Circular Send button
+  // - Right: Model selector pill (hidden when deep_research) + Attach file clip + Mic + Circular Send button
   // ==========================================
-  if (providerKey === "perplexity") {
+  if (providerKey === "perplexity" || providerKey === "deep_research") {
+    const isDirectDeepResearch = providerKey === "deep_research";
     return (
       <div className="w-full max-w-[720px] flex flex-col items-center">
         {renderHiddenFileInput()}
@@ -843,7 +844,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => handlePerplexityToggle(false)}
                 className={`w-8 h-[28px] rounded-[7px] flex items-center justify-center transition cursor-pointer ${
-                  !isPerplexityDeep
+                  !isPerplexityDeep && !isDirectDeepResearch
                     ? "bg-[#20808D] text-white shadow-sm"
                     : "text-gray-400 hover:text-white"
                 }`}
@@ -857,7 +858,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => handlePerplexityToggle(true)}
                 className={`w-8 h-[28px] rounded-[7px] flex items-center justify-center transition cursor-pointer ml-0.5 ${
-                  isPerplexityDeep
+                  isPerplexityDeep || isDirectDeepResearch
                     ? "bg-[#20808D] text-white shadow-sm"
                     : "text-gray-400 hover:text-white"
                 }`}
@@ -880,11 +881,13 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               </button>
             </div>
 
-            {/* Right: Model Dropdown + Paperclip Attach + Mic + Send */}
+            {/* Right: Model Dropdown (hidden in Deep Research mode) + Paperclip Attach + Mic + Send */}
             <div className="flex items-center gap-2">
-              {renderModelDropdown(
-                "bg-[#141829] hover:bg-[#1D223B] border border-[#22273F] px-3 py-1.5 rounded-full text-xs font-semibold max-w-[200px]",
-                "text-gray-200 truncate"
+              {!isDirectDeepResearch && (
+                renderModelDropdown(
+                  "bg-[#141829] hover:bg-[#1D223B] border border-[#22273F] px-3 py-1.5 rounded-full text-xs font-semibold max-w-[200px]",
+                  "text-gray-200 truncate"
+                )
               )}
 
               {/* Attach File Clip matching Flutter's attach_file */}
