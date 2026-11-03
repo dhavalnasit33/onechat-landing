@@ -71,7 +71,31 @@ export async function extractTextFromFile(file: File): Promise<string> {
     }
   }
 
-  // 2. PDF Files via client-side PDF.js (Matches Flutter file_text_extractor.dart)
+  // 2. Excel files (.xlsx, .xls)
+  if (["xlsx", "xls"].includes(ext)) {
+    try {
+      const XLSX = await import("xlsx");
+      const buffer = await file.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: "array" });
+      const parts: string[] = [];
+      let totalLength = 0;
+      for (const sheetName of wb.SheetNames) {
+        const sheet = wb.Sheets[sheetName];
+        if (sheet) {
+          const csv = XLSX.utils.sheet_to_csv(sheet);
+          parts.push(`Sheet: ${sheetName}\n${csv}`);
+          totalLength += csv.length;
+          if (totalLength > maxCharacters) break;
+        }
+      }
+      return parts.join("\n\n").slice(0, maxCharacters);
+    } catch (e) {
+      console.error("Excel extraction error:", e);
+      return `Error reading Excel file: ${e}`;
+    }
+  }
+
+  // 3. PDF Files via client-side PDF.js (Matches Flutter file_text_extractor.dart)
   if (ext === "pdf") {
     try {
       const pdfjsLib = await loadPdfJsLib();

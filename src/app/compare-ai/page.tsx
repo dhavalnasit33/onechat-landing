@@ -19,16 +19,29 @@ import {
   X,
   FileText,
   Lock,
-  Zap
+  Zap,
+  Image as ImageIcon,
+  Paperclip,
 } from "lucide-react";
+import { extractTextFromFile } from "@/lib/extractFileText";
 import {
   PROVIDER_MODELS,
   AIModelItem,
 } from "@/constants/providerModelsHelper";
 
+interface SearchResult {
+  title: string;
+  url: string;
+  content?: string;
+  snippet?: string;
+  domain?: string;
+}
+
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  imageUrl?: string;
+  searchResults?: SearchResult[];
 }
 
 interface ActiveProviderState {
@@ -120,27 +133,358 @@ function getApiBase(): string {
   return "https://api.onechatai.ai";
 }
 
-// Custom Markdown Renderer
-function FormattedAiResponse({ content, isStreaming }: { content: string; isStreaming?: boolean }) {
-  if (!content || content === "Stopped") {
+// Citation Badge and Hover Popup Card (matching ai-chat)
+function CitationBadgeHover({
+  index,
+  extraCount = 0,
+  searchResults,
+}: {
+  index: number;
+  extraCount?: number;
+  searchResults?: SearchResult[];
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeSubIndex, setActiveSubIndex] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const start = Math.max(0, index - 1);
+  const sources = searchResults
+    ? searchResults.slice(start, start + extraCount + 1)
+    : [];
+
+  const source = sources[activeSubIndex] || sources[0];
+
+  const domain =
+    source?.domain?.replace(/^www\./, "") ||
+    (() => {
+      try {
+        return source?.url ? new URL(source.url).hostname.replace(/^www\./, "") : "";
+      } catch {
+        return source?.url || "";
+      }
+    })();
+
+  const faviconUrl = domain
+    ? `https://www.google.com/s2/favicons?sz=64&domain=${domain}`
+    : "";
+
+  let displayDomain = domain;
+  if (domain.includes(".")) {
+    const parts = domain.split(".");
+    if (parts.length > 1) {
+      displayDomain = parts[parts.length - 2];
+    }
+  }
+  if (!displayDomain) displayDomain = `${index}`;
+
+  const badgeLabel = extraCount > 0 ? `${displayDomain} +${extraCount}` : displayDomain;
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 150);
+  };
+
+  const handleClickBadge = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (source?.url) {
+      window.open(source.url, "_blank");
+    }
+  };
+
+  return (
+    <span
+      className="relative inline-block mx-1 align-baseline"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <button
+        type="button"
+        onClick={handleClickBadge}
+        className="inline-flex items-center px-2 py-0.5 rounded-[12px] bg-[#E8EAED] hover:bg-[#dadce0] text-[11px] font-semibold text-[#5F6368] transition cursor-pointer select-none leading-none"
+      >
+        {badgeLabel}
+      </button>
+
+      {isOpen && source && (
+        <div
+          className="absolute z-50 left-0 top-full mt-2 w-[290px] sm:w-[320px] bg-white text-gray-900 rounded-[14px] border border-[#E8E8E8] shadow-[0_10px_30px_rgba(0,0,0,0.18)] p-3 text-left animate-in fade-in zoom-in-95 duration-150"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {sources.length > 1 && (
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#F0F0F0] text-[12px] text-[#7A7A7A]">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={activeSubIndex === 0}
+                  onClick={() => setActiveSubIndex((prev) => Math.max(0, prev - 1))}
+                  className="w-5 h-5 rounded hover:bg-gray-100 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  ‹
+                </button>
+                <span className="font-medium text-[#6E6B67]">
+                  {activeSubIndex + 1}/{sources.length}
+                </span>
+                <button
+                  type="button"
+                  disabled={activeSubIndex === sources.length - 1}
+                  onClick={() =>
+                    setActiveSubIndex((prev) => Math.min(sources.length - 1, prev + 1))
+                  }
+                  className="w-5 h-5 rounded hover:bg-gray-100 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  ›
+                </button>
+              </div>
+              <span className="text-[11.5px] text-[#7A7A7A]">
+                {sources.length} sources
+              </span>
+            </div>
+          )}
+
+          <div
+            className="flex items-center gap-2 mb-2 cursor-pointer group"
+            onClick={() => window.open(source.url, "_blank")}
+          >
+            <div className="w-[18px] h-[18px] rounded bg-white flex items-center justify-center overflow-hidden shrink-0 border border-gray-200">
+              {faviconUrl ? (
+                <img
+                  src={faviconUrl}
+                  alt={domain}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                <span className="text-[10px] font-bold text-[#5048E5]">
+                  {(domain.charAt(0) || "S").toUpperCase()}
+                </span>
+              )}
+            </div>
+            <span className="text-[12px] font-medium text-[#7A7A7A] group-hover:text-[#5048E5] transition truncate">
+              {domain}
+            </span>
+          </div>
+
+          <a
+            href={source.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-[14px] font-semibold text-[#2C2C2C] hover:text-[#5048E5] leading-snug mb-1.5 transition line-clamp-2 no-underline"
+          >
+            {source.title || domain}
+          </a>
+
+          {(source.snippet || source.content) && (
+            <p className="text-[12px] text-[#6F6F6F] leading-relaxed line-clamp-3 mb-0">
+              {source.snippet || source.content}
+            </p>
+          )}
+        </div>
+      )}
+    </span>
+  );
+}
+
+// Markdown with Citations component matching ai-chat's exact Typography & Styles
+function FormattedAiResponse({
+  content,
+  isStreaming,
+  searchResults,
+}: {
+  content: string;
+  isStreaming?: boolean;
+  searchResults?: SearchResult[];
+}) {
+  if (!content) {
     if (isStreaming) {
       return (
-        <div className="flex items-center gap-1.5 py-2 text-gray-400">
-          <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-          <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-          <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div className="flex items-center gap-1.5 py-2">
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#8B5CF6] animate-pulse" />
+          <span
+            className="inline-block w-2.5 h-2.5 rounded-full bg-[#8B5CF6] animate-pulse"
+            style={{ animationDelay: "150ms" }}
+          />
+          <span
+            className="inline-block w-2.5 h-2.5 rounded-full bg-[#8B5CF6] animate-pulse"
+            style={{ animationDelay: "300ms" }}
+          />
         </div>
       );
     }
+    return null;
+  }
+
+  if (content === "Stopped") {
     return (
       <div className="py-2 text-sm text-gray-400 italic flex items-center gap-1.5">
         <span>Stopped</span>
       </div>
     );
   }
+
+  // Format thinking tags for DeepSeek
+  let formattedContent = content;
+  if (formattedContent.includes("<think>") && !formattedContent.includes("</think>")) {
+    formattedContent = formattedContent.replace("<think>", "### 🧠 Thinking...\n\n---\n\n");
+  } else {
+    formattedContent = formattedContent
+      .replace(/<think>/g, "### 🧠 Thinking Process\n\n---\n\n")
+      .replace(/<\/think>/g, "\n\n---\n\n");
+  }
+
+  // Turn [1] or [1][2] citations into our citation tokens
+  // Matching Flutter's _linkifyReferences and [cite:X]
+  formattedContent = formattedContent.replace(
+    /\[(\d+)\]/g,
+    "[cite:$1]"
+  );
+
   return (
-    <div className="prose prose-invert max-w-none text-[14.5px] leading-relaxed font-normal marker:text-purple-400">
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+    <div className="prose prose-invert max-w-none text-[15.5px] leading-[1.7] font-normal text-[#E2E8F0] selection:bg-purple-600/40">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          // Headings matching Flutter's typography (h1: 24px bold, h2: 20px w800, h3: 18px w600)
+          h1: ({ node, ...props }) => (
+            <h1 className="text-[24px] font-bold text-white mt-6 mb-3 tracking-tight leading-snug" {...props} />
+          ),
+          h2: ({ node, ...props }) => (
+            <h2 className="text-[20px] font-extrabold text-white mt-5 mb-2.5 tracking-tight leading-snug" {...props} />
+          ),
+          h3: ({ node, ...props }) => (
+            <h3 className="text-[18px] font-bold text-white mt-4 mb-2 tracking-tight leading-snug" {...props} />
+          ),
+          h4: ({ node, ...props }) => (
+            <h4 className="text-[17px] font-semibold text-white mt-3.5 mb-1.5" {...props} />
+          ),
+          // Tables matching Flutter's exact Markdown table styling with borders and padding
+          table: ({ node, ...props }) => (
+            <div className="w-full overflow-x-auto my-4 rounded-xl border border-[#1B1F30] bg-[#0E101D]">
+              <table className="w-full border-collapse text-left text-[14px]" {...props} />
+            </div>
+          ),
+          thead: ({ node, ...props }) => (
+            <thead className="bg-[#121524] border-b border-[#1B1F30] text-white font-semibold" {...props} />
+          ),
+          tbody: ({ node, ...props }) => (
+            <tbody className="divide-y divide-[#1B1F30]/70" {...props} />
+          ),
+          tr: ({ node, ...props }) => (
+            <tr className="hover:bg-[#161A2C]/60 transition" {...props} />
+          ),
+          th: ({ node, ...props }) => (
+            <th className="px-4 py-3 font-semibold text-white tracking-wide border-r border-[#1B1F30] last:border-r-0" {...props} />
+          ),
+          td: ({ node, ...props }) => (
+            <td className="px-4 py-3.5 text-[#E2E8F0] leading-relaxed border-r border-[#1B1F30] last:border-r-0 align-top" {...props} />
+          ),
+          p: ({ node, children, ...props }) => {
+            // Render children with custom citation detection
+            return (
+              <p className="mb-3.5 leading-[1.7] text-[#E2E8F0]" {...props}>
+                {React.Children.map(children, (child) => {
+                  if (typeof child === "string") {
+                    // Check for [cite:X]
+                    const parts = child.split(/(\[cite:\d+\])/g);
+                    if (parts.length > 1) {
+                      return parts.map((part, pIdx) => {
+                        const m = part.match(/\[cite:(\d+)\]/);
+                        if (m) {
+                          const idx = parseInt(m[1], 10);
+                          return (
+                            <CitationBadgeHover
+                              key={pIdx}
+                              index={idx}
+                              searchResults={searchResults}
+                            />
+                          );
+                        }
+                        return part;
+                      });
+                    }
+                  }
+                  return child;
+                })}
+              </p>
+            );
+          },
+          ul: ({ node, ...props }) => (
+            <ul className="list-disc pl-5 mb-3.5 space-y-1.5 text-[#E2E8F0]" {...props} />
+          ),
+          ol: ({ node, ...props }) => (
+            <ol className="list-decimal pl-5 mb-3.5 space-y-1.5 text-[#E2E8F0]" {...props} />
+          ),
+          li: ({ node, children, ...props }) => (
+            <li className="leading-[1.7]" {...props}>
+              {React.Children.map(children, (child) => {
+                if (typeof child === "string") {
+                  const parts = child.split(/(\[cite:\d+\])/g);
+                  if (parts.length > 1) {
+                    return parts.map((part, pIdx) => {
+                      const m = part.match(/\[cite:(\d+)\]/);
+                      if (m) {
+                        const idx = parseInt(m[1], 10);
+                        return (
+                          <CitationBadgeHover
+                            key={pIdx}
+                            index={idx}
+                            searchResults={searchResults}
+                          />
+                        );
+                      }
+                      return part;
+                    });
+                  }
+                }
+                return child;
+              })}
+            </li>
+          ),
+          strong: ({ node, ...props }) => (
+            <strong className="font-bold text-white" {...props} />
+          ),
+          code: ({ node, inline, ...props }: any) => {
+            if (inline) {
+              return (
+                <code
+                  className="px-1.5 py-0.5 rounded bg-[#181C2B] text-[#E0A8FF] font-mono text-[13px] border border-[#252A40]"
+                  {...props}
+                />
+              );
+            }
+            return (
+              <pre className="p-3.5 rounded-xl bg-[#0F111C] border border-[#22273D] overflow-x-auto text-[13px] text-gray-200 my-3 font-mono">
+                <code {...props} />
+              </pre>
+            );
+          },
+          blockquote: ({ node, ...props }) => (
+            <blockquote
+              className="border-l-4 border-[#8B5CF6] pl-4 py-1 my-3 bg-[#121522] rounded-r-lg text-gray-300 italic"
+              {...props}
+            />
+          ),
+          a: ({ node, ...props }) => (
+            <a
+              {...props}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#9386FF] hover:text-[#B4A8FF] underline font-medium"
+            />
+          ),
+        }}
+      >
+        {formattedContent}
+      </ReactMarkdown>
     </div>
   );
 }
@@ -170,6 +514,9 @@ function CompareAiContent() {
   // File Extraction State[cite: 1]
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [fileContext, setFileContext] = useState<string>(""); 
+  const [attachedImageBase64, setAttachedImageBase64] = useState<string | null>(null);
+  const [attachedImagePreview, setAttachedImagePreview] = useState<string | null>(null);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   // UI State
@@ -312,31 +659,75 @@ function CompareAiContent() {
     );
   };
 
-  // Extract Text from File (File Parser equivalent to Flutter)[cite: 1, 2]
-  const extractTextFromFile = async (file: File): Promise<string> => {
-    return new Promise((resolve) => {
+  const isImageFile = (file: File) => {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    return ["png", "jpg", "jpeg", "webp", "gif", "heic"].includes(ext) || file.type.startsWith("image/");
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target?.result as string || "");
-      reader.onerror = () => resolve("");
-      reader.readAsText(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
     });
   };
 
-  const handleFileSelect = async (files: FileList | null) => {
-    if (!files) return;
-    const newFiles = Array.from(files);
-    setSelectedFiles(prev => [...prev, ...newFiles]);
+  const reprocessFiles = async (files: File[]) => {
+    if (files.length === 0) {
+      setFileContext("");
+      setAttachedImageBase64(null);
+      if (attachedImagePreview) {
+        URL.revokeObjectURL(attachedImagePreview);
+        setAttachedImagePreview(null);
+      }
+      return;
+    }
+    setIsProcessingFile(true);
+    try {
+      let combinedText = "";
+      let foundImage = false;
+      for (const file of files) {
+        if (isImageFile(file)) {
+          if (!foundImage) {
+            const base64 = await fileToBase64(file);
+            setAttachedImageBase64(base64);
+            setAttachedImagePreview(URL.createObjectURL(file));
+            foundImage = true;
+          }
+          combinedText += `\n\n--- Attached Image: ${file.name} ---`;
+        } else {
+          const text = await extractTextFromFile(file);
+          combinedText += `\n\n--- Attached File: ${file.name} ---\n${text}`;
+        }
+      }
+      if (!foundImage) {
+        setAttachedImageBase64(null);
+        if (attachedImagePreview) {
+          URL.revokeObjectURL(attachedImagePreview);
+          setAttachedImagePreview(null);
+        }
+      }
+      setFileContext(combinedText);
+    } catch (e) {
+      console.error("Error reprocessing files:", e);
+    } finally {
+      setIsProcessingFile(false);
+    }
+  };
 
-    let combinedText = "";
-    for (const file of newFiles) {
-      if (file.name.match(/\.(txt|csv|md|json)$/i)) {
-        const text = await extractTextFromFile(file);
-        combinedText += `\n\n--- File: ${file.name} ---\n${text}`;
-      } else {
-        combinedText += `\n\n--- Attached File: ${file.name} (Binary/Image) ---`;
+  const handleFileSelect = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const newFiles = Array.from(files);
+
+    const combinedFiles = [...selectedFiles];
+    for (const f of newFiles) {
+      if (!combinedFiles.some((existing) => existing.name === f.name && existing.size === f.size)) {
+        combinedFiles.push(f);
       }
     }
-    setFileContext(prev => prev + combinedText);
+    setSelectedFiles(combinedFiles);
+    await reprocessFiles(combinedFiles);
   };
 
   // Drag and Drop Handlers[cite: 2]
@@ -352,9 +743,9 @@ function CompareAiContent() {
   };
 
   const removeFile = (indexToRemove: number) => {
-    setSelectedFiles(prev => prev.filter((_, idx) => idx !== indexToRemove));
-    // Simple reset for file context (In production, you'd re-parse the remaining files)
-    if (selectedFiles.length === 1) setFileContext(""); 
+    const updated = selectedFiles.filter((_, idx) => idx !== indexToRemove);
+    setSelectedFiles(updated);
+    reprocessFiles(updated);
   };
 
   // Ensure Chat ID (Backend History Saving)[cite: 1]
@@ -386,12 +777,23 @@ function CompareAiContent() {
     }
   };
 
-  const streamToPane = async (promptText: string, paneIndex: number, provider: string, modelItem: AIModelItem, currentChatId?: string, promptId?: string) => {
+  const streamToPane = async (
+    promptText: string,
+    paneIndex: number,
+    provider: string,
+    modelItem: AIModelItem,
+    currentChatId?: string,
+    promptId?: string,
+    imageUrl?: string | null,
+    displayContent?: string
+  ) => {
     const token = getAuthToken();
     const base = getApiBase();
     
     // 1. Get/Create Chat ID for history (Safely read currentChatId without accessing state directly)
     let chatId = await ensureChatId(provider, currentChatId);
+
+    const userMsgContent = displayContent || promptText;
 
     setProviderPanes((prev) => {
       if (!prev[paneIndex]) return prev;
@@ -400,7 +802,11 @@ function CompareAiContent() {
         ...copy[paneIndex],
         chatId: chatId,
         isStreaming: true,
-        messages: [...copy[paneIndex].messages, { role: "user", content: promptText }, { role: "assistant", content: "" }],
+        messages: [
+          ...copy[paneIndex].messages,
+          { role: "user", content: userMsgContent, imageUrl: imageUrl || undefined },
+          { role: "assistant", content: "" },
+        ],
       };
       return copy;
     });
@@ -409,19 +815,24 @@ function CompareAiContent() {
     abortControllersRef.current[provider] = controller;
 
     try {
+      const payload: Record<string, any> = {
+        prompt: promptText,
+        modelId: modelItem.id,
+        chatId: chatId,
+        ischatehistry: false,
+        max_tokens: 4000,
+        source: "multi-chat-text",
+        promptId: promptId || `${Date.now()}_${provider}`,
+        system_prompt: "You are a helpful AI assistant in OneChat AI.",
+      };
+      if (imageUrl) {
+        payload.imageUrl = imageUrl;
+      }
+
       const res = await fetch(`${base}/api/tools/ai/general-stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          prompt: promptText,
-          modelId: modelItem.id,
-          chatId: chatId, // Attach chatId to payload so backend saves messages[cite: 1]
-          ischatehistry: false,
-          max_tokens: 4000,
-          source: "multi-chat-text",
-          promptId: promptId || `${Date.now()}_${provider}`, // 🔥 Flutter exact key to increment checkCombinedChatLimit!
-          system_prompt: "You are a helpful AI assistant in OneChat AI.",
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       });
 
@@ -433,6 +844,16 @@ function CompareAiContent() {
             errorMsg = errData.message;
           }
         } catch (_) {}
+
+        const lowerMsg = errorMsg.toLowerCase();
+        if (
+          lowerMsg.includes("support image") ||
+          lowerMsg.includes("image input") ||
+          lowerMsg.includes("filter by image") ||
+          lowerMsg.includes("no endpoints found that support image")
+        ) {
+          errorMsg = "This model does not support image analysis. Please try a vision-supported model like ChatGPT, Gemini, Claude, or Grok.";
+        }
 
         setProviderPanes((prev) => {
           if (!prev[paneIndex]) return prev;
@@ -537,38 +958,55 @@ function CompareAiContent() {
 
    const handleSendPrompt = (promptText: string, targetPanes?: ActiveProviderState[]) => {
     let finalPrompt = promptText.trim();
+    const activeImage = attachedImageBase64;
     
-    // File Context Construction
-    if (fileContext) {
-      finalPrompt = `CURRENT ATTACHED FILE CONTENT:\n${fileContext}\n\nUSER INSTRUCTION:\n${finalPrompt}\n\n(IMPORTANT: Focus your analysis strictly on the CURRENT ATTACHED FILE CONTENT provided above.)`;
-    } else if (selectedFiles.length > 0) {
-      const fileNames = selectedFiles.map(f => `📄 ${f.name}`).join("\n");
-      finalPrompt = `${fileNames}\n\n${finalPrompt}`;
+    // Auto-prompt when only file or image is sent without text
+    if (!finalPrompt && activeImage) {
+      finalPrompt = "What is in this image? Please describe and analyze it.";
+    } else if (!finalPrompt && fileContext) {
+      finalPrompt = "Please analyze the attached file content and provide key insights.";
     }
-    if (!finalPrompt) return;
-    // 🔥 જે પેન્સ પાસ થયા હોય તે વાપરો, નહિંતર state વાળા
+
+    if (!finalPrompt && selectedFiles.length === 0 && !activeImage) return;
+
+    // File Context Construction (Flutter exact)
+    let promptToSend = finalPrompt;
+    if (fileContext) {
+      promptToSend = `CURRENT ATTACHED FILE CONTENT:\n${fileContext}\n\nUSER INSTRUCTION:\n${finalPrompt}\n\n(IMPORTANT: Focus your analysis strictly on the CURRENT ATTACHED FILE CONTENT provided above.)`;
+    }
+
+    // Visual Display for User message bubble
+    let displayContent = finalPrompt;
+    if (selectedFiles.length > 0) {
+      const fileNames = selectedFiles.map((f) => `📎 ${f.name}`).join("\n");
+      displayContent = displayContent ? `${fileNames}\n\n${displayContent}` : fileNames;
+    }
+
     const activePanes = targetPanes || providerPanes;
-    // Check Plan Limits before triggering APIs
     const activeStreamCount = activePanes.filter(p => p.isEnabled).length;
     const remainingRequests = dailyLimit - requestsUsed;
     if (remainingRequests < activeStreamCount && dailyLimit > 0) {
       alert(`Daily limit reached! You only have ${Math.max(0, remainingRequests)} requests left, but selected ${activeStreamCount} models. Please upgrade your plan.`);
       return;
     }
+
     setPrompt("");
     setSelectedFiles([]); 
     setFileContext("");
+    setAttachedImageBase64(null);
+    if (attachedImagePreview) {
+      URL.revokeObjectURL(attachedImagePreview);
+      setAttachedImagePreview(null);
+    }
     setRequestsUsed(prev => prev + activeStreamCount);
 
-    // 🔥 Flutter exact batchPromptId format so backend checkCombinedChatLimit updates!
     const batchPromptId = Date.now().toString();
 
     activePanes.forEach((pane, idx) => {
       if (pane.isEnabled) {
-        // Skip streaming if model is locked
         if (isModelAccessible(pane.provider, pane.selectedModel.name)) {
           const modelPromptId = `${batchPromptId}_${pane.provider}`;
-          streamToPane(finalPrompt, idx, pane.provider, pane.selectedModel, pane.chatId, modelPromptId);
+          streamToPane(promptToSend, idx, pane.provider, pane.selectedModel, pane.chatId, modelPromptId, activeImage, displayContent);
         }
       }
     });
@@ -619,7 +1057,7 @@ function CompareAiContent() {
           <div className="flex flex-col items-center gap-4 bg-[#121522] p-8 rounded-2xl shadow-2xl">
             <Plus className="w-12 h-12 text-[#5048E5] animate-bounce cursor-pointer" />
             <h2 className="text-2xl font-bold">Drop files to attach</h2>
-            <p className="text-gray-400 text-sm">Supports txt, csv, md, json</p>
+            <p className="text-gray-400 text-sm">Supports Images (PNG, JPG, WebP), PDF, Word, Excel, CSV, TXT, JSON, MD</p>
           </div>
         </div>
       )}
@@ -795,12 +1233,25 @@ function CompareAiContent() {
                           {pane.messages.map((msg, i) => (
                             <div key={i} className={`flex flex-col group relative ${msg.role === "user" ? "items-end" : "items-start"}`}>
                               {msg.role === "user" ? (
-                                <div className="max-w-[320px] rounded-[18px] px-4 py-2.5 bg-[#181C2B] border border-[#252A40] text-[14.5px] text-white shadow-md whitespace-pre-wrap">
+                                <div className="max-w-[340px] rounded-[18px] px-4 py-2.5 bg-[#181C2B] border border-[#252A40] text-[14.5px] text-white shadow-md whitespace-pre-wrap">
+                                  {msg.imageUrl && (
+                                    <div className="mb-2.5 overflow-hidden rounded-xl border border-[#252A40] bg-black/40">
+                                      <img
+                                        src={msg.imageUrl}
+                                        alt="Attached preview"
+                                        className="max-h-56 w-full object-contain rounded-lg"
+                                      />
+                                    </div>
+                                  )}
                                   {msg.content.replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, '').trim()}
                                 </div>
                               ) : (
                                 <div className="w-full text-gray-100 selection:bg-purple-600">
-                                  <FormattedAiResponse content={msg.content} isStreaming={pane.isStreaming && i === pane.messages.length - 1} />
+                                  <FormattedAiResponse
+                                    content={msg.content}
+                                    isStreaming={pane.isStreaming && i === pane.messages.length - 1}
+                                    searchResults={msg.searchResults}
+                                  />
                                   {/* Hover Action Buttons (Copy) - Niche dekhaadva mate */}
                                   {msg.content && msg.content !== "Stopped" && !pane.isStreaming && (
                                     <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 mt-3">
@@ -857,14 +1308,45 @@ function CompareAiContent() {
             
             {/* File Chips */}
             {selectedFiles.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-                {selectedFiles.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-[#181C2B] border border-[#252A40] px-3 py-1.5 rounded-xl">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span className="text-xs text-gray-200 max-w-[120px] truncate">{file.name}</span>
-                    <button onClick={() => removeFile(idx)} className="text-gray-400 hover:text-red-400"><X className="w-3.5 h-3.5" /></button>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none items-center">
+                {selectedFiles.map((file, idx) => {
+                  const isImg = isImageFile(file);
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 bg-[#181C2B] border border-[#252A40] px-3 py-1.5 rounded-xl shrink-0 group hover:border-[#6342E8]/60 transition"
+                    >
+                      {isImg ? (
+                        <div className="w-5 h-5 rounded overflow-hidden relative shrink-0 bg-black/50 flex items-center justify-center">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={file.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <FileText className="w-4 h-4 text-purple-400 shrink-0" />
+                      )}
+                      <span className="text-xs text-gray-200 max-w-[130px] truncate">
+                        {file.name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeFile(idx)}
+                        className="text-gray-400 hover:text-red-400 transition cursor-pointer p-0.5"
+                        title="Remove file"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  );
+                })}
+                {isProcessingFile && (
+                  <div className="flex items-center gap-1.5 text-xs text-purple-400 px-2 py-1 shrink-0 animate-pulse">
+                    <div className="w-3 h-3 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                    <span>Processing...</span>
                   </div>
-                ))}
+                )}
               </div>
             )}
 
@@ -880,8 +1362,23 @@ function CompareAiContent() {
 
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-center gap-2">
-                <input type="file" ref={fileInputRef} onChange={(e) => handleFileSelect(e.target.files)} className="hidden" multiple />
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1.5 rounded-lg border border-[#1B1F30] text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer" title="Upload attachment">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    handleFileSelect(e.target.files);
+                    e.target.value = "";
+                  }}
+                  className="hidden"
+                  accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xlsx,.xls,.json,.md"
+                  multiple
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-1.5 rounded-lg border border-[#1B1F30] text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer"
+                  title="Upload attachment (Image, PDF, Word, Excel, CSV, TXT)"
+                >
                   <Plus className="w-4 h-4" />
                 </button>
 
@@ -903,7 +1400,17 @@ function CompareAiContent() {
                   <Mic className={`w-4 h-4 ${isListening ? "animate-pulse" : ""}`} />
                 </button>
 
-                <button type="button" onClick={() => handleSendPrompt(prompt)} disabled={(!prompt.trim() && selectedFiles.length === 0) || isAnyStreaming} className={`p-2.5 rounded-xl flex items-center justify-center transition cursor-pointer ${ (prompt.trim() || selectedFiles.length > 0) && !isAnyStreaming ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-indigo-600/30 hover:scale-105" : "bg-[#181C2B] text-gray-500 cursor-not-allowed" }`}>
+                <button
+                  type="button"
+                  onClick={() => handleSendPrompt(prompt)}
+                  disabled={(!prompt.trim() && selectedFiles.length === 0 && !attachedImageBase64) || isAnyStreaming || isProcessingFile}
+                  className={`p-2.5 rounded-xl flex items-center justify-center transition cursor-pointer ${
+                    (prompt.trim() || selectedFiles.length > 0 || attachedImageBase64) && !isAnyStreaming && !isProcessingFile
+                      ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-indigo-600/30 hover:scale-105"
+                      : "bg-[#181C2B] text-gray-500 cursor-not-allowed"
+                  }`}
+                  title="Send message"
+                >
                   <ArrowUp className="w-4 h-4" />
                 </button>
               </div>
