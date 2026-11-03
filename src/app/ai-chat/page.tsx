@@ -14,8 +14,11 @@ import {
   Brain,
   X,
   Menu,
+  Plus,
+  Mic,
 } from "lucide-react";
 import { PROVIDER_MODELS, AIModelItem } from "@/constants/providerModelsHelper";
+import { extractTextFromFile } from "@/lib/extractFileText";
 
 // 15 Major Models list (Exact Flutter models & icons)
 export const MAJOR_PROVIDERS = [
@@ -268,39 +271,76 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
+function resolveProviderAndModel(param: string | null): {
+  providerName: string;
+  modelItem: AIModelItem;
+} {
+  const defaultProvider = "ChatGPT";
+  const defaultModel =
+    PROVIDER_MODELS["ChatGPT"]?.[0] || {
+      name: "GPT 5.6 Terra",
+      id: "6a756be690ca2618be6d5f91",
+      slug: "gpt-5.6-terra",
+      icon: "assets/images/chatgpt1.png",
+    };
+
+  if (!param) {
+    return { providerName: defaultProvider, modelItem: defaultModel };
+  }
+
+  const p = param.trim().toLowerCase();
+
+  // 1. First check if it matches a model slug or model name across all providers
+  for (const prov of Object.keys(PROVIDER_MODELS)) {
+    const list = PROVIDER_MODELS[prov] || [];
+    for (const item of list) {
+      if (
+        item.slug.toLowerCase() === p ||
+        item.name.toLowerCase() === p ||
+        item.id.toLowerCase() === p
+      ) {
+        return { providerName: prov, modelItem: item };
+      }
+    }
+  }
+
+  // 2. Next check if it matches provider alias/name
+  const provMatch = MAJOR_PROVIDERS.find(
+    (item) =>
+      item.name.toLowerCase() === p ||
+      item.provider.toLowerCase() === p ||
+      p.includes(item.name.toLowerCase()) ||
+      p.includes(item.provider.toLowerCase()),
+  );
+
+  if (provMatch) {
+    const list = PROVIDER_MODELS[provMatch.name] || [];
+    const model = list[0] || defaultModel;
+    return { providerName: provMatch.name, modelItem: model };
+  }
+
+  return { providerName: defaultProvider, modelItem: defaultModel };
+}
+
 function AiChatInner() {
   const searchParams = useSearchParams();
 
-  // Find initial provider from URL params (?model=deepseek)
-  const initialProviderName = (() => {
-    if (typeof window === "undefined") return "DeepSeek";
-    const params = new URLSearchParams(window.location.search);
-    const m = params.get("model") || params.get("provider") || "";
-    if (m) {
-      const match = MAJOR_PROVIDERS.find(
-        (p) =>
-          p.name.toLowerCase() === m.toLowerCase() ||
-          p.provider.toLowerCase() === m.toLowerCase() ||
-          m.toLowerCase().includes(p.name.toLowerCase()) ||
-          m.toLowerCase().includes(p.provider.toLowerCase()),
-      );
-      if (match) return match.name;
+  // Find initial provider & model from URL params (?model=gpt-5.6-terra)
+  const initialResolved = (() => {
+    if (typeof window === "undefined") {
+      return resolveProviderAndModel(null);
     }
-    return "DeepSeek";
+    const params = new URLSearchParams(window.location.search);
+    const m = params.get("model") || params.get("provider");
+    return resolveProviderAndModel(m);
   })();
 
-  const [selectedProvider, setSelectedProvider] =
-    useState<string>(initialProviderName);
-  const [selectedModel, setSelectedModel] = useState<AIModelItem>(() => {
-    return (
-      PROVIDER_MODELS[initialProviderName]?.[0] || {
-        name: "DeepSeek V4 Pro",
-        id: "6a756dc990ca2618be6d839c",
-        slug: "deepseek-v4-pro",
-        icon: "assets/images/deepseek1.png",
-      }
-    );
-  });
+  const [selectedProvider, setSelectedProvider] = useState<string>(
+    initialResolved.providerName,
+  );
+  const [selectedModel, setSelectedModel] = useState<AIModelItem>(
+    initialResolved.modelItem,
+  );
 
   const [openSubModelDropdown, setOpenSubModelDropdown] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -337,20 +377,9 @@ function AiChatInner() {
   useEffect(() => {
     const provParam = searchParams.get("model") || searchParams.get("provider");
     if (provParam) {
-      const match = MAJOR_PROVIDERS.find(
-        (p) =>
-          p.name.toLowerCase() === provParam.toLowerCase() ||
-          p.provider.toLowerCase() === provParam.toLowerCase() ||
-          provParam.toLowerCase().includes(p.name.toLowerCase()) ||
-          provParam.toLowerCase().includes(p.provider.toLowerCase()),
-      );
-      if (match && match.name !== selectedProvider) {
-        setSelectedProvider(match.name);
-        const models = PROVIDER_MODELS[match.name] || [];
-        if (models.length > 0) {
-          setSelectedModel(models[0]);
-        }
-      }
+      const resolved = resolveProviderAndModel(provParam);
+      setSelectedProvider(resolved.providerName);
+      setSelectedModel(resolved.modelItem);
     }
 
     const chatIdParam = searchParams.get("chatId");
@@ -426,17 +455,35 @@ function AiChatInner() {
     return () => window.removeEventListener("click", closeDropdown);
   }, []);
 
-  // 🔄 જ્યારે યુઝર સાઇડબારમાંથી બીજા કોઈ મોડેલ પર ક્લિક કરે -> સીધું Flutter માં પાછા જવું!
+  // 🔄 સાઇડબારમાંથી મોડેલ બદલવા માટેનું હેન્ડલર (Smooth in-page switch without full Flutter reload)
   const handleModelSidebarClick = (item: (typeof MAJOR_PROVIDERS)[0]) => {
+    // જો એ જ મોડેલ પર ક્લિક કરે તો નવો ફ્રેશ ચેટ થ્રેડ શરૂ કરવો
     if (item.name.toLowerCase() === selectedProvider.toLowerCase()) {
+      setCurrentChatId(null);
+      setMessages([]);
+      setPrompt("");
+      setSelectedFiles([]);
       return;
     }
-    const flutterHost =
-      window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1"
-        ? window.location.origin
-        : "";
-    window.location.href = `${flutterHost}${item.route}`;
+
+    // બીજા મોડેલ પર સ્વિચ કરવું
+    setSelectedProvider(item.name);
+    const models = PROVIDER_MODELS[item.name] || [];
+    if (models.length > 0) {
+      setSelectedModel(models[0]);
+    }
+    setCurrentChatId(null);
+    setMessages([]);
+    setPrompt("");
+    setSelectedFiles([]);
+
+    // URL query param અપડેટ કરવું
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("model", item.name.toLowerCase());
+      url.searchParams.delete("chatId");
+      window.history.pushState({}, "", url.toString());
+    } catch (_) {}
   };
 
   // Ensure Chat ID in Backend (ischatehistry: true matching Flutter)
@@ -519,10 +566,162 @@ function AiChatInner() {
     }
   };
 
+  // Build prompt with conversation history context & attached file content
+  const buildPromptWithContext = (
+    currentPrompt: string,
+    historyMessages: ChatMessage[],
+    fileContent?: string,
+  ): string => {
+    // 1. Build conversation turns (similar to Flutter buildPromptWithContextFromDetail)
+    const historyPairs: string[] = [];
+    for (let i = 0; i < historyMessages.length; i++) {
+      const msg = historyMessages[i];
+      if (msg.role === "user" && i + 1 < historyMessages.length) {
+        const nextMsg = historyMessages[i + 1];
+        if (nextMsg.role === "assistant" && nextMsg.content) {
+          historyPairs.push(`User: ${msg.content}\nAI: ${nextMsg.content}`);
+        }
+      }
+    }
+
+    const lines: string[] = [];
+    lines.push(currentPrompt.trim());
+    lines.push(
+      "\n{{historyData}} Please answer casually with emojis, and don't mention anything about markdown or formatting.",
+    );
+
+    if (fileContent && fileContent.trim()) {
+      lines.push(`\n---\nFile Content:\n${fileContent.trim()}`);
+    }
+
+    if (historyPairs.length > 0) {
+      lines.push("\nConversation:");
+      const recentPairs =
+        historyPairs.length > 6 ? historyPairs.slice(-6) : historyPairs;
+      for (const pair of recentPairs) {
+        lines.push(pair);
+      }
+    }
+
+    return lines.join("\n");
+  };
+
+  // Generate / update chat title via backend stream (matching Flutter _logLastUserMessageBeforeExit)
+  const generateAndUpdateTitle = async (
+    chatId: string,
+    userPrompt: string,
+    modelId: string,
+  ) => {
+    const token = getAuthToken();
+    if (!token || !chatId) return;
+
+    try {
+      const prompt = `${userPrompt} Generate a perfect title for this chat (max 20 characters) from the given chat history. In any case, do not give or mention Markdown format.`;
+      const res = await fetch(
+        `${getApiBase()}/api/tools/ai/title-generate-stream`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ prompt, modelId }),
+        },
+      );
+
+      if (!res.ok) return;
+
+      const reader = res.body?.getReader();
+      if (!reader) return;
+      const decoder = new TextDecoder();
+      let newTitle = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        chunk.split("\n").forEach((line) => {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("data:")) {
+            const dataContent = trimmed.replace(/^data:\s*/, "");
+            if (dataContent !== "[DONE]") {
+              try {
+                const parsed = JSON.parse(dataContent);
+                newTitle += parsed.chunk || parsed.text || parsed.content || "";
+              } catch (_) {
+                newTitle += dataContent;
+              }
+            }
+          }
+        });
+      }
+
+      newTitle = newTitle
+        .replace(/[#*`"']/g, "")
+        .replace(/\n+/g, " ")
+        .trim();
+
+      if (newTitle && newTitle.length > 1) {
+        await fetch(`${getApiBase()}/api/chat-history/${chatId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: newTitle.substring(0, 30),
+            ischatehistry: true,
+          }),
+        });
+        loadProviderHistory(selectedProvider);
+      }
+    } catch (e) {
+      console.error("Failed to generate title:", e);
+    }
+  };
+
   // Handle Stream Generation (ischatehistry: true matching Flutter)
   const handleSendMessage = async (textToSend?: string) => {
-    const promptText = (textToSend || prompt).trim();
+    let promptText = (textToSend || prompt).trim();
     if (!promptText && selectedFiles.length === 0) return;
+
+    // Flutter autofills "Analyze these files" if prompt was empty but files are attached
+    if (!promptText && selectedFiles.length > 0) {
+      promptText = "Analyze these files";
+    }
+
+    // Read attached file text if any (extracting text properly from PDF / docs / text)
+    let attachedFileContent = "";
+    let displayUserMessage = promptText;
+
+    if (selectedFiles.length > 0) {
+      try {
+        const fileInfoPrefix = selectedFiles
+          .map((f) => {
+            const ext = (f.name.split(".").pop() || "").toUpperCase();
+            return `📄 ${f.name} (${ext})`;
+          })
+          .join("\n");
+
+        displayUserMessage = promptText
+          ? `${fileInfoPrefix}\n${promptText}`
+          : fileInfoPrefix;
+
+        const fileTexts = await Promise.all(
+          selectedFiles.map(async (f) => {
+            try {
+              const text = await extractTextFromFile(f);
+              return `=== File: ${f.name} ===\n${text}\n`;
+            } catch (err: any) {
+              return `=== File: ${f.name} (Error extracting text: ${err?.message || err}) ===\n`;
+            }
+          }),
+        );
+        attachedFileContent = fileTexts.join("\n");
+      } catch (e) {
+        console.error("Error reading attached file:", e);
+      }
+    }
 
     setPrompt("");
     setSelectedFiles([]);
@@ -533,9 +732,16 @@ function AiChatInner() {
       promptText,
     );
 
+    // Build final prompt with previous messages & attached file content
+    const promptWithContext = buildPromptWithContext(
+      promptText,
+      messages,
+      attachedFileContent,
+    );
+
     setMessages((prev) => [
       ...prev,
-      { role: "user", content: promptText },
+      { role: "user", content: displayUserMessage },
       { role: "assistant", content: "" },
     ]);
     setIsStreaming(true);
@@ -543,6 +749,10 @@ function AiChatInner() {
     const controller = new AbortController();
     abortControllerRef.current = controller;
     const token = getAuthToken();
+
+    const activeModelId = isDeepThinkActive
+      ? "6a756dfd90ca2618be6d83f5"
+      : selectedModel.id;
 
     try {
       const res = await fetch(`${getApiBase()}/api/tools/ai/general-stream`, {
@@ -552,16 +762,15 @@ function AiChatInner() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          prompt: promptText,
-          modelId: isDeepThinkActive
-            ? "6a756dfd90ca2618be6d83f5"
-            : selectedModel.id,
+          prompt: promptWithContext,
+          modelId: activeModelId,
           chatId: chatId,
           ischatehistry: true, // ✅ MATCHES FLUTTER
           max_tokens: 4000,
           source: "model-chat-text",
           promptId: `${Date.now()}_${selectedProvider}`,
-          system_prompt: "You are a helpful AI assistant in OneChat AI.",
+          system_prompt:
+            "You are a helpful AI assistant in OneChat AI. Follow the user's instructions and provide accurate, helpful, and relevant responses.",
         }),
         signal: controller.signal,
       });
@@ -632,6 +841,11 @@ function AiChatInner() {
           return copy;
         });
       }
+
+      // Generate & update title in background if this was the first turn or title is default
+      if (chatId) {
+        generateAndUpdateTitle(chatId, promptText, activeModelId);
+      }
     } catch (e: any) {
       if (e.name !== "AbortError") {
         console.error("Stream generation error:", e);
@@ -659,22 +873,22 @@ function AiChatInner() {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#08090E] text-white font-sans">
       {/* 1. LEFT SIDEBAR (EXACT FLUTTER 2ND IMAGE MATCH) */}
-      <div
+     <div
         className={`${
-          isSidebarOpen ? "w-[240px]" : "w-[68px]"
-        } transition-all duration-300 bg-[#090B14] border-r border-[#1B1F30]/80 flex flex-col shrink-0 relative z-30`}
+          isSidebarOpen ? "w-[68px] md:w-[240px]" : "w-[68px]"
+        } transition-all duration-300 bg-[#090B14] border-r border-[#1B1F30]/80 flex flex-col shrink-0 relative z-30 overflow-hidden`}
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#1B1F30]/60">
           {isSidebarOpen && (
-            <span className="font-bold text-[17px] tracking-wide text-white">
+            <span className="hidden md:block font-bold text-[17px] tracking-wide text-white whitespace-nowrap">
               Chat
             </span>
           )}
           <button
             type="button"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer ml-auto"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer mx-auto md:ml-auto md:mx-0"
             title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             <Menu className="w-4 h-4" />
@@ -695,7 +909,7 @@ function AiChatInner() {
               />
             </div>
 
-            {isSidebarOpen && <span className="text-[13.5px]">Home</span>}
+            {isSidebarOpen && <span className="hidden md:block text-[13.5px] whitespace-nowrap">Home</span>}
           </a>
           <a
             href="/compare-ai"
@@ -717,13 +931,13 @@ function AiChatInner() {
               </svg>
             </div>
             {isSidebarOpen && (
-              <span className="text-[13.5px]">Compare AIs</span>
+              <span className="hidden md:block text-[13.5px] whitespace-nowrap">Compare AIs</span>
             )}
           </a>
         </div>
 
         {/* Major Models List */}
-        <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5 scrollbar-thin scrollbar-thumb-[#1B1F30]">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5 scrollbar-thin scrollbar-thumb-[#1B1F30]">
           {MAJOR_PROVIDERS.map((item) => {
             const isSelected =
               selectedProvider.toLowerCase() === item.name.toLowerCase();
@@ -749,7 +963,7 @@ function AiChatInner() {
                   />
                 </div>
                 {isSidebarOpen && (
-                  <span className="text-[13.5px] truncate">{item.name}</span>
+                  <span className="hidden md:block text-[13.5px] truncate">{item.name}</span>
                 )}
               </button>
             );
@@ -757,9 +971,9 @@ function AiChatInner() {
 
           {/* Model History Section (Exact Flutter: "Your <Model> History") */}
           {isSidebarOpen && (
-            <div className="pt-4 mt-3 border-t border-[#1B1F30]/70">
+            <div className="hidden md:block pt-4 mt-3 border-t border-[#1B1F30]/70">
               <div className="px-2 mb-2">
-                <span className="text-[12px] font-bold text-white tracking-wide">
+                <span className="text-[12px] font-bold text-white tracking-wide truncate block">
                   Your {selectedProvider} History
                 </span>
               </div>
@@ -790,7 +1004,7 @@ function AiChatInner() {
                             : "text-gray-400 hover:bg-[#121522] hover:text-gray-200"
                         }`}
                       >
-                        <span className="truncate">
+                        <span className="truncate block">
                           {hist.title || "Untitled Chat"}
                         </span>
                       </button>
@@ -876,30 +1090,70 @@ function AiChatInner() {
           )}
         </div>
 
-        {/* 3. FLUTTER-STYLE SEARCH INPUT CONTAINER (MATCHING IMAGE 1) */}
-        <div className="px-4 pb-6 pt-2 bg-[#08090E]">
-          <div className="max-w-[850px] mx-auto rounded-[20px] bg-[#0E1220] border border-[#1E253A] shadow-2xl p-3 flex flex-col gap-2">
-            {/* File attachment preview */}
-            {selectedFiles.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {selectedFiles.map((file, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 bg-[#181C2B] px-3 py-1 rounded-xl text-xs"
+        {/* 3. FLUTTER-STYLE SEARCH INPUT CONTAINER (PILL DESIGN EXACT MATCH) */}
+        <div className="px-4 pb-6 pt-2 bg-[#08090E] flex flex-col items-center">
+          {/* File attachment preview */}
+          {selectedFiles.length > 0 && (
+            <div className="w-full max-w-[700px] flex gap-2 overflow-x-auto pb-2">
+              {selectedFiles.map((file, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 bg-[#181C2B] border border-[#252A40] px-3 py-1.5 rounded-full text-xs text-gray-200"
+                >
+                  <span className="truncate max-w-[120px]">{file.name}</span>
+                  <button
+                    onClick={() => setSelectedFiles([])}
+                    className="text-gray-400 hover:text-red-400"
                   >
-                    <span className="truncate max-w-[120px]">{file.name}</span>
-                    <button
-                      onClick={() => setSelectedFiles([])}
-                      className="text-gray-400 hover:text-red-400"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="w-full max-w-[700px] bg-[#0E111C] border border-[#252A40] rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.3)] px-4 py-1.5 flex items-center gap-3">
+            {/* 1. Left Plus (+) Button */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setSelectedFiles([e.target.files[0]]);
+                  // Autofill "Analyze these files" if prompt is empty (matching Flutter's _autofillFilePromptIfNeeded)
+                  if (!prompt.trim()) {
+                    setPrompt("Analyze these files");
+                  }
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0"
+              title="Add photos & files"
+            >
+              <Plus className="w-6 h-6 stroke-[1.75]" />
+            </button>
+
+            {/* DeepThink toggle for DeepSeek */}
+            {selectedProvider === "DeepSeek" && (
+              <button
+                type="button"
+                onClick={() => setIsDeepThinkActive(!isDeepThinkActive)}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition cursor-pointer shrink-0 ${
+                  isDeepThinkActive
+                    ? "bg-[#2563EB]/25 text-[#60A5FA] border border-[#3B82F6]/50"
+                    : "bg-[#141A2D] text-gray-300 hover:bg-[#1C243E] border border-[#232B45]"
+                }`}
+              >
+                <Brain className="w-3.5 h-3.5" />
+                <span>DeepThink</span>
+              </button>
             )}
 
-            {/* Input Text Area */}
+            {/* 2. Text Input (Centered, single-line pill style) */}
             <input
               type="text"
               value={prompt}
@@ -910,102 +1164,70 @@ function AiChatInner() {
                   handleSendMessage();
                 }
               }}
-              placeholder={`Message ${selectedProvider}...`}
-              className="w-full bg-transparent border-none outline-none text-white text-[15px] placeholder-gray-500 px-1 py-1"
+              placeholder="Ask anything"
+              className="flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4] py-1.5"
               disabled={isStreaming}
             />
 
-            {/* Bottom Actions Row matching Image 1 */}
-            <div className="flex items-center justify-between pt-1">
-              {/* Left Action Button (Only DeepThink - Search removed) */}
-              <div className="flex items-center gap-2">
-                {selectedProvider === "DeepSeek" && (
-                  <button
-                    type="button"
-                    onClick={() => setIsDeepThinkActive(!isDeepThinkActive)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer ${
-                      isDeepThinkActive
-                        ? "bg-[#2563EB]/25 text-[#60A5FA] border border-[#3B82F6]/50"
-                        : "bg-[#141A2D] text-gray-300 hover:bg-[#1C243E] border border-[#232B45]"
-                    }`}
-                  >
-                    <Brain className="w-3.5 h-3.5" />
-                    <span>DeepThink</span>
-                  </button>
-                )}
-              </div>
+            {/* 3. Right: Model Dropdown */}
+            <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenSubModelDropdown(!openSubModelDropdown);
+                }}
+                className="flex items-center gap-1 text-[13.5px] font-normal text-white/90 hover:text-white transition cursor-pointer px-1 py-1"
+              >
+                <span className="truncate max-w-[120px]">{selectedModel.name}</span>
+                <ChevronDown className="w-4 h-4 text-white/70" />
+              </button>
 
-              {/* Right Side: Model Name Dropdown, Attachment, Send Button */}
-              <div className="flex items-center gap-3">
-                {/* Model Selector Dropdown */}
-                <div className="relative" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenSubModelDropdown(!openSubModelDropdown);
-                    }}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-gray-300 hover:text-white transition cursor-pointer"
-                  >
-                    <span>{selectedModel.name.replace("DeepSeek ", "")}</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-                  </button>
-
-                  {openSubModelDropdown && (
-                    <div className="absolute bottom-full right-0 mb-2 w-56 bg-[#121522] border border-[#252A40] rounded-xl shadow-2xl py-1.5 z-50">
-                      {(PROVIDER_MODELS[selectedProvider] || []).map((m) => (
-                        <button
-                          key={m.id}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedModel(m);
-                            setOpenSubModelDropdown(false);
-                          }}
-                          className="w-full text-left px-3 py-2 text-xs transition flex items-center text-gray-300 hover:bg-[#181C2B] hover:text-white cursor-pointer"
-                        >
-                          <span className="truncate">{m.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+              {openSubModelDropdown && (
+                <div className="absolute bottom-full right-0 mb-3 w-56 bg-[#121522] border border-[#252A40] rounded-2xl shadow-2xl py-2 z-50">
+                  {(PROVIDER_MODELS[selectedProvider] || []).map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedModel(m);
+                        setOpenSubModelDropdown(false);
+                      }}
+                      className="w-full text-left px-3.5 py-2 text-xs transition flex items-center justify-between text-gray-200 hover:bg-[#181C2B] hover:text-white cursor-pointer"
+                    >
+                      <span className="truncate">{m.name}</span>
+                      {selectedModel.id === m.id && (
+                        <span className="text-[#6366F1]">✓</span>
+                      )}
+                    </button>
+                  ))}
                 </div>
-
-                {/* Attachment Clip */}
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={(e) => {
-                    if (e.target.files)
-                      setSelectedFiles(Array.from(e.target.files));
-                  }}
-                  className="hidden"
-                  multiple
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-gray-400 hover:text-white transition cursor-pointer"
-                  title="Attach file"
-                >
-                  <Paperclip className="w-4 h-4" />
-                </button>
-
-                {/* Send Button */}
-                <button
-                  type="button"
-                  onClick={() => handleSendMessage()}
-                  disabled={!prompt.trim() || isStreaming}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer ${
-                    prompt.trim() && !isStreaming
-                      ? "bg-white text-black hover:bg-gray-200"
-                      : "bg-[#1E253A] text-gray-500 cursor-not-allowed"
-                  }`}
-                >
-                  <ArrowUp className="w-4 h-4" />
-                </button>
-              </div>
+              )}
             </div>
+
+            {/* 4. Mic Icon */}
+            <button
+              type="button"
+              className="text-white/60 hover:text-white transition cursor-pointer shrink-0"
+              title="Speech to text"
+            >
+              <Mic className="w-5 h-5 stroke-[1.75]" />
+            </button>
+
+            {/* 5. Send Arrow Button (Circular Purple/Gray button) */}
+            <button
+              type="button"
+              onClick={() => handleSendMessage()}
+              disabled={!prompt.trim() || isStreaming}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${
+                prompt.trim() && !isStreaming
+                  ? "bg-[#5A4FF3] text-white hover:bg-[#4F46E5]"
+                  : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+              }`}
+            >
+              <ArrowUp className="w-4 h-4 stroke-[2.2]" />
+            </button>
           </div>
         </div>
       </div>
