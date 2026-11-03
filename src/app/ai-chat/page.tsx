@@ -1,132 +1,57 @@
 "use client";
 
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useDropzone } from "react-dropzone";
 import {
   ChevronDown,
   Copy,
   CheckCheck,
-  Paperclip,
   ArrowUp,
   Brain,
   X,
   Menu,
   Plus,
   Mic,
+  MicOff,
+  Globe,
+  UploadCloud,
+  ExternalLink,
+  ArrowRight,
+  ArrowUpRight
 } from "lucide-react";
 import { PROVIDER_MODELS, AIModelItem } from "@/constants/providerModelsHelper";
 import { extractTextFromFile } from "@/lib/extractFileText";
+import { ModelSpecificSearchInput } from "./ModelSpecificSearchInput";
 
-// 15 Major Models list (Exact Flutter models & icons)
+// Type declarations for Web Speech API
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
+// 15 Major Models list
 export const MAJOR_PROVIDERS = [
-  {
-    name: "ChatGPT",
-    route: "/chatgpt",
-    provider: "openai",
-    icon: "/assets/images/home_chatGPT.png",
-    defaultModel: "GPT 5.6 Terra",
-  },
-  {
-    name: "Gemini",
-    route: "/gemini",
-    provider: "google",
-    icon: "/assets/images/home_gemini.png",
-    defaultModel: "Gemini 2.5 Flash",
-  },
-  {
-    name: "Claude",
-    route: "/claude",
-    provider: "anthropic",
-    icon: "/assets/images/claude1.png",
-    defaultModel: "Claude Sonnet 5",
-  },
-  {
-    name: "DeepSeek",
-    route: "/deepseek",
-    provider: "deepseek",
-    icon: "/assets/images/deepseek1.png",
-    defaultModel: "DeepSeek V4 Pro",
-  },
-  {
-    name: "Llama",
-    route: "/llama",
-    provider: "meta",
-    icon: "/assets/images/home_meta_ai.png",
-    defaultModel: "Llama 4 Maverick",
-  },
-  {
-    name: "Meta Muse",
-    route: "/muse",
-    provider: "muse",
-    icon: "/assets/images/muse-logo.png",
-    defaultModel: "Meta Muse Pro",
-  },
-  {
-    name: "Grok",
-    route: "/grok",
-    provider: "xai",
-    icon: "/assets/images/grok-icon.png",
-    defaultModel: "Grok 4.20",
-  },
-  {
-    name: "Perplexity",
-    route: "/perplexity",
-    provider: "perplexity",
-    icon: "/assets/images/home_perplexity.png",
-    defaultModel: "Sonar",
-  },
-  {
-    name: "Kimi",
-    route: "/kimi",
-    provider: "kimi",
-    icon: "/assets/images/kimi-icon.png",
-    defaultModel: "Kimi K3",
-  },
-  {
-    name: "Mistral",
-    route: "/mistral",
-    provider: "mistral",
-    icon: "/assets/images/mistral1.png",
-    defaultModel: "Mistral Small 2603",
-  },
-  {
-    name: "Qwen",
-    route: "/qwen",
-    provider: "qwen",
-    icon: "/assets/images/qwen1.png",
-    defaultModel: "Qwen 3.8 27B",
-  },
-  {
-    name: "MiniMax",
-    route: "/minimax",
-    provider: "minimax",
-    icon: "/assets/images/minimax1.png",
-    defaultModel: "MiniMax M3",
-  },
-  {
-    name: "MiMo",
-    route: "/mimo",
-    provider: "mimo",
-    icon: "/assets/images/mimo1.png",
-    defaultModel: "MiMo V2.5 Pro",
-  },
-  {
-    name: "GLM",
-    route: "/glm",
-    provider: "glm",
-    icon: "/assets/images/glm1.png",
-    defaultModel: "GLM 5.3",
-  },
-  {
-    name: "Nemotron",
-    route: "/nemotron",
-    provider: "nemotron",
-    icon: "/assets/images/nemotron1.png",
-    defaultModel: "NVIDIA Nemotron 3...",
-  },
+  { name: "ChatGPT", route: "/chatgpt", provider: "openai", icon: "/assets/images/home_chatGPT.png", defaultModel: "GPT 5.6 Terra" },
+  { name: "Gemini", route: "/gemini", provider: "google", icon: "/assets/images/home_gemini.png", defaultModel: "Gemini 2.5 Flash" },
+  { name: "Claude", route: "/claude", provider: "anthropic", icon: "/assets/images/claude1.png", defaultModel: "Claude Sonnet 5" },
+  { name: "DeepSeek", route: "/deepseek", provider: "deepseek", icon: "/assets/images/deepseek1.png", defaultModel: "DeepSeek V4 Pro" },
+  { name: "Llama", route: "/llama", provider: "meta", icon: "/assets/images/home_meta_ai.png", defaultModel: "Llama 4 Maverick" },
+  { name: "Meta Muse", route: "/muse", provider: "muse", icon: "/assets/images/muse-logo.png", defaultModel: "Meta Muse Pro" },
+  { name: "Grok", route: "/grok", provider: "xai", icon: "/assets/images/grok-icon.png", defaultModel: "Grok 4.20" },
+  { name: "Perplexity", route: "/perplexity", provider: "perplexity", icon: "/assets/images/home_perplexity.png", defaultModel: "Sonar" },
+  { name: "Kimi", route: "/kimi", provider: "kimi", icon: "/assets/images/kimi-icon.png", defaultModel: "Kimi K3" },
+  { name: "Mistral", route: "/mistral", provider: "mistral", icon: "/assets/images/mistral1.png", defaultModel: "Mistral Small 2603" },
+  { name: "Qwen", route: "/qwen", provider: "qwen", icon: "/assets/images/qwen1.png", defaultModel: "Qwen 3.8 27B" },
+  { name: "MiniMax", route: "/minimax", provider: "minimax", icon: "/assets/images/minimax1.png", defaultModel: "MiniMax M3" },
+  { name: "MiMo", route: "/mimo", provider: "mimo", icon: "/assets/images/mimo1.png", defaultModel: "MiMo V2.5 Pro" },
+  { name: "GLM", route: "/glm", provider: "glm", icon: "/assets/images/glm1.png", defaultModel: "GLM 5.3" },
+  { name: "Nemotron", route: "/nemotron", provider: "nemotron", icon: "/assets/images/nemotron1.png", defaultModel: "NVIDIA Nemotron 3..." },
 ];
 
 export const PROVIDER_ICONS: Record<string, string> = {
@@ -147,9 +72,20 @@ export const PROVIDER_ICONS: Record<string, string> = {
   Nemotron: "/assets/images/nemotron1.png",
 };
 
+interface SearchResult {
+  title: string;
+  url: string;
+  content?: string;
+  snippet?: string;
+  domain?: string;
+}
+
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  searchResults?: SearchResult[];
+  followUps?: string[];
+  isThinking?: boolean;
 }
 
 interface HistoryItem {
@@ -160,6 +96,7 @@ interface HistoryItem {
   isDouble?: boolean;
 }
 
+// Helpers for Auth and Base URL
 function getCookie(name: string): string {
   if (typeof document === "undefined") return "";
   const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
@@ -173,60 +110,342 @@ function deleteCookie(name: string) {
 
 function getAuthToken(): string {
   if (typeof window === "undefined") return "";
-  try {
-    const searchParams = new URLSearchParams(window.location.search);
-    const urlToken = searchParams.get("token");
-    if (urlToken && urlToken.trim().length > 10) {
-      localStorage.setItem(
-        "flutter.user_token",
-        JSON.stringify(urlToken.trim()),
-      );
-      searchParams.delete("token");
-      const newQuery = searchParams.toString();
-      const newUrl =
-        window.location.pathname +
-        (newQuery ? `?${newQuery}` : "") +
-        window.location.hash;
-      window.history.replaceState({}, document.title, newUrl);
-      return urlToken.trim();
-    }
-  } catch (_) {}
-
-  const candidateKeys = [
-    "flutter.user_token",
-    "token",
-    "authToken",
-    "user_token",
-  ];
-  for (const key of candidateKeys) {
+  const keys = ["flutter.user_token", "token", "authToken", "user_token"];
+  for (const key of keys) {
     const val = localStorage.getItem(key);
     if (val && val !== "null" && val !== "undefined") {
-      try {
-        const parsed = JSON.parse(val);
-        if (typeof parsed === "string" && parsed.length > 10) return parsed;
-      } catch (_) {
-        const cleaned = val.replace(/^"+|"+$/g, "").trim();
-        if (cleaned.length > 10) return cleaned;
-      }
+      const cleaned = val.replace(/^"+|"+$/g, "").trim();
+      if (cleaned.length > 10) return cleaned;
     }
   }
   return "";
 }
 
 function getApiBase(): string {
-  const envBase =
-    process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
+  const envBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
   if (envBase) return envBase.replace(/\/api\/?$/, "");
   if (typeof window !== "undefined") {
-    return window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1"
+    return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
       ? "http://localhost:5000"
       : "https://api.onechatai.ai";
   }
   return "https://api.onechatai.ai";
 }
 
-function FormattedAiResponse({ content }: { content: string }) {
+function resolveProviderAndModel(param: string | null): { providerName: string; modelItem: AIModelItem } {
+  const defaultProvider = "ChatGPT";
+  const defaultModel = PROVIDER_MODELS["ChatGPT"]?.[0] || { name: "GPT 5.6 Terra", id: "6a756be690ca2618be6d5f91", slug: "gpt-5.6-terra", icon: "assets/images/chatgpt1.png" };
+  if (!param) return { providerName: defaultProvider, modelItem: defaultModel };
+  
+  const p = param.trim().toLowerCase();
+  for (const prov of Object.keys(PROVIDER_MODELS)) {
+    const list = PROVIDER_MODELS[prov] || [];
+    for (const item of list) {
+      if (item.slug.toLowerCase() === p || item.name.toLowerCase() === p || item.id.toLowerCase() === p) {
+        return { providerName: prov, modelItem: item };
+      }
+    }
+  }
+  
+  const provMatch = MAJOR_PROVIDERS.find((item) => item.name.toLowerCase() === p || item.provider.toLowerCase() === p);
+  if (provMatch) {
+    const list = PROVIDER_MODELS[provMatch.name] || [];
+    return { providerName: provMatch.name, modelItem: list[0] || defaultModel };
+  }
+  return { providerName: defaultProvider, modelItem: defaultModel };
+}
+
+// Chain Link SVG matching Flutter's _kSourcesChainLinkSvg
+const SourcesChainLinkSvg = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#9386FF"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
+
+// Sources Pill Button matching Flutter's _buildSourcesPillButton
+function SourcesPillButton({
+  sources,
+  onClick,
+}: {
+  sources: SearchResult[];
+  onClick: () => void;
+}) {
+  const count = sources.length;
+  const sourceColors = ["#E07C54", "#3B82F6", "#EF4444"];
+  const displaySources = sources.slice(0, 3);
+
+  const getDomain = (url: string, domain?: string) => {
+    if (domain) return domain.replace(/^www\./, "");
+    try {
+      return new URL(url).hostname.replace(/^www\./, "");
+    } catch {
+      return url || "";
+    }
+  };
+
+  const getInitial = (s: SearchResult, i: number) => {
+    const dom = getDomain(s.url, s.domain);
+    if (dom) return dom.charAt(0).toUpperCase();
+    if (s.title) return s.title.charAt(0).toUpperCase();
+    return ["C", "S", "M"][i] || "S";
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-transparent hover:bg-[#181C2B] border border-transparent hover:border-[#252A40] transition cursor-pointer group"
+    >
+      {/* 3 Overlapping Favicon / Initial Circles */}
+      <div className="relative w-[34px] h-[18px] flex items-center">
+        {displaySources.map((s, i) => {
+          const dom = getDomain(s.url, s.domain);
+          const initial = getInitial(s, i);
+          const color = sourceColors[i % sourceColors.length];
+          const faviconUrl = dom
+            ? `https://www.google.com/s2/favicons?sz=64&domain=${dom}`
+            : "";
+
+          return (
+            <div
+              key={i}
+              className="absolute w-[18px] h-[18px] rounded-full bg-white border border-[#121522] overflow-hidden flex items-center justify-center shadow-sm"
+              style={{ left: `${i * 8}px`, zIndex: 10 - i }}
+            >
+              {faviconUrl ? (
+                <img
+                  src={faviconUrl}
+                  alt={dom}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    // Fallback to letter circle on error
+                    (e.target as HTMLElement).style.display = "none";
+                    const parent = (e.target as HTMLElement).parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<span style="font-size:11px;font-weight:700;color:${color}">${initial}</span>`;
+                    }
+                  }}
+                />
+              ) : (
+                <span
+                  style={{ color }}
+                  className="text-[11px] font-bold leading-none select-none"
+                >
+                  {initial}
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <span className="text-[13px] font-medium text-[#B0B0B0] group-hover:text-white transition">
+        {count} sources
+      </span>
+    </button>
+  );
+}
+
+// Copy Button Component
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button onClick={handleCopy} className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-[#181C2B] transition cursor-pointer" title="Copy">
+      {copied ? <CheckCheck className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+    </button>
+  );
+}
+
+// Citation Badge and Hover Popup Card (matching Flutter's CitationBadge & _InteractiveCitationHoverCard)
+function CitationBadgeHover({
+  index,
+  extraCount = 0,
+  searchResults,
+}: {
+  index: number;
+  extraCount?: number;
+  searchResults?: SearchResult[];
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeSubIndex, setActiveSubIndex] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const start = Math.max(0, index - 1);
+  const sources = searchResults
+    ? searchResults.slice(start, start + extraCount + 1)
+    : [];
+
+  const source = sources[activeSubIndex] || sources[0];
+
+  const domain =
+    source?.domain?.replace(/^www\./, "") ||
+    (() => {
+      try {
+        return source?.url ? new URL(source.url).hostname.replace(/^www\./, "") : "";
+      } catch {
+        return source?.url || "";
+      }
+    })();
+
+  const faviconUrl = domain
+    ? `https://www.google.com/s2/favicons?sz=64&domain=${domain}`
+    : "";
+
+  let displayDomain = domain;
+  if (domain.includes(".")) {
+    const parts = domain.split(".");
+    if (parts.length > 1) {
+      displayDomain = parts[parts.length - 2];
+    }
+  }
+  if (!displayDomain) displayDomain = `${index}`;
+
+  const badgeLabel = extraCount > 0 ? `${displayDomain} +${extraCount}` : displayDomain;
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 150);
+  };
+
+  const handleClickBadge = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (source?.url) {
+      window.open(source.url, "_blank");
+    }
+  };
+
+  return (
+    <span
+      className="relative inline-block mx-1 align-baseline"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* 1. Citation Pill matching Flutter's CitationBadge: bg-[#E8EAED] text-[#5F6368] rounded-[12px] */}
+      <button
+        type="button"
+        onClick={handleClickBadge}
+        className="inline-flex items-center px-2 py-0.5 rounded-[12px] bg-[#E8EAED] hover:bg-[#dadce0] text-[11px] font-semibold text-[#5F6368] transition cursor-pointer select-none leading-none"
+      >
+        {badgeLabel}
+      </button>
+
+      {/* 2. White Hover Card Popup matching 1st uploaded image & Flutter's _CitationHoverCard */}
+      {isOpen && source && (
+        <div
+          className="absolute z-50 left-0 top-full mt-2 w-[290px] sm:w-[320px] bg-white text-gray-900 rounded-[14px] border border-[#E8E8E8] shadow-[0_10px_30px_rgba(0,0,0,0.18)] p-3 text-left animate-in fade-in zoom-in-95 duration-150"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Multiple sources navigation header if extraCount > 0 */}
+          {sources.length > 1 && (
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#F0F0F0] text-[12px] text-[#7A7A7A]">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={activeSubIndex === 0}
+                  onClick={() => setActiveSubIndex((prev) => Math.max(0, prev - 1))}
+                  className="w-5 h-5 rounded hover:bg-gray-100 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  ‹
+                </button>
+                <span className="font-medium text-[#6E6B67]">
+                  {activeSubIndex + 1}/{sources.length}
+                </span>
+                <button
+                  type="button"
+                  disabled={activeSubIndex === sources.length - 1}
+                  onClick={() =>
+                    setActiveSubIndex((prev) => Math.min(sources.length - 1, prev + 1))
+                  }
+                  className="w-5 h-5 rounded hover:bg-gray-100 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  ›
+                </button>
+              </div>
+              <span className="text-[11.5px] text-[#7A7A7A]">
+                {sources.length} sources
+              </span>
+            </div>
+          )}
+
+          {/* Favicon + Domain row */}
+          <div
+            className="flex items-center gap-2 mb-2 cursor-pointer group"
+            onClick={() => window.open(source.url, "_blank")}
+          >
+            <div className="w-[18px] h-[18px] rounded bg-white flex items-center justify-center overflow-hidden shrink-0 border border-gray-200">
+              {faviconUrl ? (
+                <img
+                  src={faviconUrl}
+                  alt={domain}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                <span className="text-[10px] font-bold text-[#5048E5]">
+                  {(domain.charAt(0) || "S").toUpperCase()}
+                </span>
+              )}
+            </div>
+            <span className="text-[12px] font-medium text-[#7A7A7A] group-hover:text-[#5048E5] transition truncate">
+              {domain}
+            </span>
+          </div>
+
+          {/* Title / Headline (Purple/Blue on hover) */}
+          <a
+            href={source.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-[14px] font-semibold text-[#2C2C2C] hover:text-[#5048E5] leading-snug mb-1.5 transition line-clamp-2 no-underline"
+          >
+            {source.title || domain}
+          </a>
+
+          {/* Snippet / Content */}
+          {(source.snippet || source.content) && (
+            <p className="text-[12px] text-[#6F6F6F] leading-relaxed line-clamp-3 mb-0">
+              {source.snippet || source.content}
+            </p>
+          )}
+        </div>
+      )}
+    </span>
+  );
+}
+
+// Markdown with Citations component matching Flutter's exact Typography & Styles
+function FormattedAiResponse({
+  content,
+  searchResults,
+}: {
+  content: string;
+  searchResults?: SearchResult[];
+}) {
   if (!content) {
     return (
       <div className="flex items-center gap-1.5 py-2">
@@ -242,110 +461,177 @@ function FormattedAiResponse({ content }: { content: string }) {
       </div>
     );
   }
+
+  // Format thinking tags for DeepSeek
+  let formattedContent = content;
+  if (formattedContent.includes("<think>") && !formattedContent.includes("</think>")) {
+    formattedContent = formattedContent.replace("<think>", "### 🧠 Thinking...\n\n---\n\n");
+  } else {
+    formattedContent = formattedContent
+      .replace(/<think>/g, "### 🧠 Thinking Process\n\n---\n\n")
+      .replace(/<\/think>/g, "\n\n---\n\n");
+  }
+
+  // Turn [1] or [1][2] citations into our citation tokens
+  // Matching Flutter's _linkifyReferences and [cite:X]
+  formattedContent = formattedContent.replace(
+    /\[(\d+)\]/g,
+    "[cite:$1]"
+  );
+
   return (
-    <div className="prose prose-invert max-w-none text-[15px] leading-relaxed font-normal text-[#E2E8F0] selection:bg-purple-600/40">
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+    <div className="prose prose-invert max-w-none text-[15.5px] leading-[1.7] font-normal text-[#E2E8F0] selection:bg-purple-600/40">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          // Headings matching Flutter's typography (h1: 24px bold, h2: 20px w800, h3: 18px w600)
+          h1: ({ node, ...props }) => (
+            <h1 className="text-[24px] font-bold text-white mt-6 mb-3 tracking-tight leading-snug" {...props} />
+          ),
+          h2: ({ node, ...props }) => (
+            <h2 className="text-[20px] font-extrabold text-white mt-5 mb-2.5 tracking-tight leading-snug" {...props} />
+          ),
+          h3: ({ node, ...props }) => (
+            <h3 className="text-[18px] font-bold text-white mt-4 mb-2 tracking-tight leading-snug" {...props} />
+          ),
+          h4: ({ node, ...props }) => (
+            <h4 className="text-[17px] font-semibold text-white mt-3.5 mb-1.5" {...props} />
+          ),
+          // Tables matching Flutter's exact Markdown table styling with borders and padding
+          table: ({ node, ...props }) => (
+            <div className="w-full overflow-x-auto my-4 rounded-xl border border-[#1B1F30] bg-[#0E101D]">
+              <table className="w-full border-collapse text-left text-[14px]" {...props} />
+            </div>
+          ),
+          thead: ({ node, ...props }) => (
+            <thead className="bg-[#121524] border-b border-[#1B1F30] text-white font-semibold" {...props} />
+          ),
+          tbody: ({ node, ...props }) => (
+            <tbody className="divide-y divide-[#1B1F30]/70" {...props} />
+          ),
+          tr: ({ node, ...props }) => (
+            <tr className="hover:bg-[#161A2C]/60 transition" {...props} />
+          ),
+          th: ({ node, ...props }) => (
+            <th className="px-4 py-3 font-semibold text-white tracking-wide border-r border-[#1B1F30] last:border-r-0" {...props} />
+          ),
+          td: ({ node, ...props }) => (
+            <td className="px-4 py-3.5 text-[#E2E8F0] leading-relaxed border-r border-[#1B1F30] last:border-r-0 align-top" {...props} />
+          ),
+          p: ({ node, children, ...props }) => {
+            // Render children with custom citation detection
+            return (
+              <p className="mb-3.5 leading-[1.7] text-[#E2E8F0]" {...props}>
+                {React.Children.map(children, (child) => {
+                  if (typeof child === "string") {
+                    // Check for [cite:X]
+                    const parts = child.split(/(\[cite:\d+\])/g);
+                    if (parts.length > 1) {
+                      return parts.map((part, pIdx) => {
+                        const m = part.match(/\[cite:(\d+)\]/);
+                        if (m) {
+                          const idx = parseInt(m[1], 10);
+                          return (
+                            <CitationBadgeHover
+                              key={pIdx}
+                              index={idx}
+                              searchResults={searchResults}
+                            />
+                          );
+                        }
+                        return part;
+                      });
+                    }
+                  }
+                  return child;
+                })}
+              </p>
+            );
+          },
+          ul: ({ node, ...props }) => (
+            <ul className="list-disc pl-5 mb-3.5 space-y-1.5 text-[#E2E8F0]" {...props} />
+          ),
+          ol: ({ node, ...props }) => (
+            <ol className="list-decimal pl-5 mb-3.5 space-y-1.5 text-[#E2E8F0]" {...props} />
+          ),
+          li: ({ node, children, ...props }) => (
+            <li className="leading-[1.7]" {...props}>
+              {React.Children.map(children, (child) => {
+                if (typeof child === "string") {
+                  const parts = child.split(/(\[cite:\d+\])/g);
+                  if (parts.length > 1) {
+                    return parts.map((part, pIdx) => {
+                      const m = part.match(/\[cite:(\d+)\]/);
+                      if (m) {
+                        const idx = parseInt(m[1], 10);
+                        return (
+                          <CitationBadgeHover
+                            key={pIdx}
+                            index={idx}
+                            searchResults={searchResults}
+                          />
+                        );
+                      }
+                      return part;
+                    });
+                  }
+                }
+                return child;
+              })}
+            </li>
+          ),
+          strong: ({ node, ...props }) => (
+            <strong className="font-bold text-white" {...props} />
+          ),
+          code: ({ node, inline, ...props }: any) => {
+            if (inline) {
+              return (
+                <code
+                  className="px-1.5 py-0.5 rounded bg-[#181C2B] text-[#E0A8FF] font-mono text-[13px] border border-[#252A40]"
+                  {...props}
+                />
+              );
+            }
+            return (
+              <pre className="p-3.5 rounded-xl bg-[#0F111C] border border-[#22273D] overflow-x-auto text-[13px] text-gray-200 my-3 font-mono">
+                <code {...props} />
+              </pre>
+            );
+          },
+          blockquote: ({ node, ...props }) => (
+            <blockquote
+              className="border-l-4 border-[#8B5CF6] pl-4 py-1 my-3 bg-[#121522] rounded-r-lg text-gray-300 italic"
+              {...props}
+            />
+          ),
+          a: ({ node, ...props }) => (
+            <a
+              {...props}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#9386FF] hover:text-[#B4A8FF] underline font-medium"
+            />
+          ),
+        }}
+      >
+        {formattedContent}
+      </ReactMarkdown>
     </div>
   );
-}
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-  return (
-    <button
-      onClick={handleCopy}
-      className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-[#181C2B] transition cursor-pointer"
-      title="Copy"
-    >
-      {copied ? (
-        <CheckCheck className="w-3.5 h-3.5 text-green-400" />
-      ) : (
-        <Copy className="w-3.5 h-3.5" />
-      )}
-    </button>
-  );
-}
-
-function resolveProviderAndModel(param: string | null): {
-  providerName: string;
-  modelItem: AIModelItem;
-} {
-  const defaultProvider = "ChatGPT";
-  const defaultModel =
-    PROVIDER_MODELS["ChatGPT"]?.[0] || {
-      name: "GPT 5.6 Terra",
-      id: "6a756be690ca2618be6d5f91",
-      slug: "gpt-5.6-terra",
-      icon: "assets/images/chatgpt1.png",
-    };
-
-  if (!param) {
-    return { providerName: defaultProvider, modelItem: defaultModel };
-  }
-
-  const p = param.trim().toLowerCase();
-
-  // 1. First check if it matches a model slug or model name across all providers
-  for (const prov of Object.keys(PROVIDER_MODELS)) {
-    const list = PROVIDER_MODELS[prov] || [];
-    for (const item of list) {
-      if (
-        item.slug.toLowerCase() === p ||
-        item.name.toLowerCase() === p ||
-        item.id.toLowerCase() === p
-      ) {
-        return { providerName: prov, modelItem: item };
-      }
-    }
-  }
-
-  // 2. Next check if it matches provider alias/name
-  const provMatch = MAJOR_PROVIDERS.find(
-    (item) =>
-      item.name.toLowerCase() === p ||
-      item.provider.toLowerCase() === p ||
-      p.includes(item.name.toLowerCase()) ||
-      p.includes(item.provider.toLowerCase()),
-  );
-
-  if (provMatch) {
-    const list = PROVIDER_MODELS[provMatch.name] || [];
-    const model = list[0] || defaultModel;
-    return { providerName: provMatch.name, modelItem: model };
-  }
-
-  return { providerName: defaultProvider, modelItem: defaultModel };
 }
 
 function AiChatInner() {
   const searchParams = useSearchParams();
 
-  // Find initial provider & model from URL params (?model=gpt-5.6-terra)
   const initialResolved = (() => {
-    if (typeof window === "undefined") {
-      return resolveProviderAndModel(null);
-    }
-    const params = new URLSearchParams(window.location.search);
-    const m = params.get("model") || params.get("provider");
-    return resolveProviderAndModel(m);
+    if (typeof window === "undefined") return resolveProviderAndModel(null);
+    return resolveProviderAndModel(searchParams.get("model") || searchParams.get("provider"));
   })();
 
-  const [selectedProvider, setSelectedProvider] = useState<string>(
-    initialResolved.providerName,
-  );
-  const [selectedModel, setSelectedModel] = useState<AIModelItem>(
-    initialResolved.modelItem,
-  );
-
+  const [selectedProvider, setSelectedProvider] = useState<string>(initialResolved.providerName);
+  const [selectedModel, setSelectedModel] = useState<AIModelItem>(initialResolved.modelItem);
   const [openSubModelDropdown, setOpenSubModelDropdown] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  // DeepThink Toggle (Search removed)
   const [isDeepThinkActive, setIsDeepThinkActive] = useState(false);
 
   // Chat State
@@ -353,14 +639,32 @@ function AiChatInner() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [activeSourcesDrawer, setActiveSourcesDrawer] = useState<SearchResult[] | null>(null);
+
+  // Voice State
+  const [isListening, setIsListening] = useState(false);
+  const speechRecognitionRef = useRef<any>(null);
+
+  // Toast State
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const showToast = useCallback((msg: string) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToastMessage(msg);
+    toastTimeoutRef.current = setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  }, []);
 
   // History State
   const [historyList, setHistoryList] = useState<HistoryItem[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  // File
+  // Files & Drag Drop
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const hasAutoTriggeredRef = useRef(false);
@@ -373,7 +677,19 @@ function AiChatInner() {
     scrollToBottom();
   }, [messages, isStreaming]);
 
-  // Read URL query params & load Model / ChatId
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     const provParam = searchParams.get("model") || searchParams.get("provider");
     if (provParam) {
@@ -381,7 +697,6 @@ function AiChatInner() {
       setSelectedProvider(resolved.providerName);
       setSelectedModel(resolved.modelItem);
     }
-
     const chatIdParam = searchParams.get("chatId");
     if (chatIdParam) {
       setCurrentChatId(chatIdParam);
@@ -389,52 +704,33 @@ function AiChatInner() {
     }
   }, [searchParams]);
 
-  // 🚀 Auto-trigger initial prompt from Cookie or Query param
   useEffect(() => {
     if (hasAutoTriggeredRef.current) return;
-
     const cookiePrompt = getCookie("chat_initial_prompt");
     const queryPrompt = searchParams.get("prompt");
     const promptToTrigger = (cookiePrompt || queryPrompt || "").trim();
-
     if (promptToTrigger) {
       hasAutoTriggeredRef.current = true;
       deleteCookie("chat_initial_prompt");
-      setTimeout(() => {
-        handleSendMessage(promptToTrigger);
-      }, 300);
+      setTimeout(() => handleSendMessage(promptToTrigger), 300);
     }
   }, [selectedModel]);
 
-  // 🔥 Load History strictly matching Flutter (removes isDouble / Multi-Chat)
   const loadProviderHistory = async (provName: string) => {
     const token = getAuthToken();
     if (!token) return;
     setIsLoadingHistory(true);
-
-    const providerObj = MAJOR_PROVIDERS.find(
-      (p) => p.name.toLowerCase() === provName.toLowerCase(),
-    );
-    const apiProvider = providerObj
-      ? providerObj.provider
-      : provName.toLowerCase();
+    const providerObj = MAJOR_PROVIDERS.find((p) => p.name.toLowerCase() === provName.toLowerCase());
+    const apiProvider = providerObj ? providerObj.provider : provName.toLowerCase();
 
     try {
-      const res = await fetch(
-        `${getApiBase()}/api/chat-history?ischatehistry=true&provider=${apiProvider}&limit=50`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${getApiBase()}/api/chat-history?ischatehistry=true&provider=${apiProvider}&limit=50`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) {
         const data = await res.json();
         const rawList: HistoryItem[] = data?.data || data?.chats || [];
-
-        // Exact Flutter filter: exclude Multi-Chat
-        const singleModelChats = rawList.filter(
-          (item) => item.is_double !== true && item.isDouble !== true,
-        );
-
+        const singleModelChats = rawList.filter((item) => item.is_double !== true && item.isDouble !== true);
         setHistoryList(singleModelChats);
       }
     } catch (e) {
@@ -448,36 +744,29 @@ function AiChatInner() {
     loadProviderHistory(selectedProvider);
   }, [selectedProvider]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const closeDropdown = () => setOpenSubModelDropdown(false);
     window.addEventListener("click", closeDropdown);
     return () => window.removeEventListener("click", closeDropdown);
   }, []);
 
-  // 🔄 સાઇડબારમાંથી મોડેલ બદલવા માટેનું હેન્ડલર (Smooth in-page switch without full Flutter reload)
   const handleModelSidebarClick = (item: (typeof MAJOR_PROVIDERS)[0]) => {
-    // જો એ જ મોડેલ પર ક્લિક કરે તો નવો ફ્રેશ ચેટ થ્રેડ શરૂ કરવો
     if (item.name.toLowerCase() === selectedProvider.toLowerCase()) {
       setCurrentChatId(null);
       setMessages([]);
       setPrompt("");
       setSelectedFiles([]);
+      if (window.innerWidth < 768) setIsSidebarOpen(false); // <-- AA LINE UMARO
       return;
     }
-
-    // બીજા મોડેલ પર સ્વિચ કરવું
     setSelectedProvider(item.name);
     const models = PROVIDER_MODELS[item.name] || [];
-    if (models.length > 0) {
-      setSelectedModel(models[0]);
-    }
+    if (models.length > 0) setSelectedModel(models[0]);
     setCurrentChatId(null);
     setMessages([]);
     setPrompt("");
     setSelectedFiles([]);
-
-    // URL query param અપડેટ કરવું
+    if (window.innerWidth < 768) setIsSidebarOpen(false); // <-- AA LINE UMARO
     try {
       const url = new URL(window.location.href);
       url.searchParams.set("model", item.name.toLowerCase());
@@ -486,41 +775,23 @@ function AiChatInner() {
     } catch (_) {}
   };
 
-  // Ensure Chat ID in Backend (ischatehistry: true matching Flutter)
-  const ensureChatId = async (
-    provider: string,
-    chatId?: string | null,
-    firstMessageTitle?: string,
-  ) => {
+  const ensureChatId = async (provider: string, chatId?: string | null, firstMessageTitle?: string) => {
     if (chatId) return chatId;
     const token = getAuthToken();
     if (!token) return null;
-
-    const providerObj = MAJOR_PROVIDERS.find(
-      (p) => p.name.toLowerCase() === provider.toLowerCase(),
-    );
-    const apiProvider = providerObj
-      ? providerObj.provider
-      : provider.toLowerCase();
-    const title =
-      firstMessageTitle && firstMessageTitle.length > 0
-        ? firstMessageTitle.length > 30
-          ? `${firstMessageTitle.substring(0, 30)}...`
-          : firstMessageTitle
-        : `Chat: ${provider}`;
+    const providerObj = MAJOR_PROVIDERS.find((p) => p.name.toLowerCase() === provider.toLowerCase());
+    const apiProvider = providerObj ? providerObj.provider : provider.toLowerCase();
+    const title = "starting new chat";
 
     try {
       const res = await fetch(`${getApiBase()}/api/chat-history`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           title: title,
           tags: ["is_model_chat", apiProvider],
           provider: apiProvider,
-          ischatehistry: true, // ✅ MATCHES FLUTTER
+          ischatehistry: true,
         }),
       });
       if (!res.ok) return null;
@@ -537,7 +808,6 @@ function AiChatInner() {
     }
   };
 
-  // Load chat by ID (Carefully parses role to ensure user messages stay on the RIGHT)
   const loadChatById = async (id: string) => {
     const token = getAuthToken();
     if (!token) return;
@@ -551,11 +821,23 @@ function AiChatInner() {
         if (chat && chat.messages) {
           const msgs: ChatMessage[] = chat.messages.map((m: any) => {
             const roleStr = (m.role || m.sender || m.type || "").toLowerCase();
-            const isUser =
-              roleStr === "user" || roleStr === "me" || roleStr === "human";
+            const isUser = roleStr === "user" || roleStr === "me" || roleStr === "human";
+            
+            // Reconstruct search results & followups if saved in metadata
+            let savedSearchResults = [];
+            let savedFollowUps = [];
+            if (m.metadata?.search_results) {
+              savedSearchResults = m.metadata.search_results;
+            }
+            if (m.metadata?.follow_ups) {
+              savedFollowUps = m.metadata.follow_ups;
+            }
+
             return {
               role: isUser ? "user" : "assistant",
               content: m.content || m.text || m.message || "",
+              searchResults: savedSearchResults.length > 0 ? savedSearchResults : undefined,
+              followUps: savedFollowUps.length > 0 ? savedFollowUps : undefined
             };
           });
           setMessages(msgs);
@@ -566,13 +848,166 @@ function AiChatInner() {
     }
   };
 
-  // Build prompt with conversation history context & attached file content
-  const buildPromptWithContext = (
-    currentPrompt: string,
-    historyMessages: ChatMessage[],
-    fileContent?: string,
-  ): string => {
-    // 1. Build conversation turns (similar to Flutter buildPromptWithContextFromDetail)
+  const sanitizeChatTitle = (title?: string | null, fallback = "New Chat") => {
+    if (!title || !title.trim()) return fallback;
+    let out = title.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/<think>/gi, "").replace(/<\/think>/gi, "").replace(/[#*`"']/g, "").replace(/\n+/g, " ").trim();
+    if (out.length > 25) out = out.substring(0, 25).trim();
+    return out.length > 0 ? out : fallback;
+  };
+
+  const generateAndUpdateTitle = async (chatId: string, userPrompt: string, modelId: string) => {
+    const token = getAuthToken();
+    if (!token || !chatId) return;
+    try {
+      const prompt = `${userPrompt} Generate a perfect title for this chat (max 20 characters) from the given chat history. In any case, do not give or mention Markdown format.`;
+      const res = await fetch(`${getApiBase()}/api/tools/ai/title-generate-stream`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ prompt, modelId }),
+      });
+      if (!res.ok) return;
+      const reader = res.body?.getReader();
+      if (!reader) return;
+      const decoder = new TextDecoder();
+      let accumulatedRaw = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        chunk.split("\n").forEach((line) => {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("data:")) {
+            const dataContent = trimmed.replace(/^data:\s*/, "");
+            if (dataContent === "[DONE]") return;
+            try {
+              const parsed = JSON.parse(dataContent);
+              const piece = parsed.chunk ?? parsed.content ?? parsed.text ?? parsed.message ?? "";
+              if (typeof piece === "string") accumulatedRaw += piece;
+            } catch (_) {
+              if (!dataContent.startsWith("{")) accumulatedRaw += dataContent;
+            }
+          }
+        });
+      }
+      const cleanTitle = sanitizeChatTitle(accumulatedRaw, "");
+      if (cleanTitle && cleanTitle.length > 1 && cleanTitle !== "starting new chat") {
+        await fetch(`${getApiBase()}/api/chat-history/${chatId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ title: cleanTitle, ischatehistry: true }),
+        });
+        setHistoryList((prev) => prev.map((item) => (item._id === chatId ? { ...item, title: cleanTitle } : item)));
+        loadProviderHistory(selectedProvider);
+      }
+    } catch (e) {
+      console.error("Failed to generate title:", e);
+    }
+  };
+
+  // Generate Follow-up questions for Perplexity (matching Flutter's lines 3699-3810)
+  const fetchPerplexityFollowUps = async (userPrompt: string, aiLastAnswer: string, chatId?: string | null) => {
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      // Use fast Flash model for instant follow-up generation instead of deep reasoning
+      const fastModelId = "6a756dc990ca2618be6d839c";
+      const followUpPrompt = `System:
+You are an AI assistant. Return ONLY a valid JSON array of 5 concise follow-up questions.
+Format: ["Question 1?", "Question 2?", "Question 3?", "Question 4?", "Question 5?"]
+Do NOT include any introduction, explanations, or thinking process.
+
+User:
+Generate 5 follow-up questions for:
+${userPrompt}
+Context:
+${aiLastAnswer.substring(0, 500)}`;
+
+      const res = await fetch(`${getApiBase()}/api/tools/ai/title-generate-stream`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ prompt: followUpPrompt, modelId: fastModelId }),
+      });
+
+      if (!res.ok) return;
+      const reader = res.body?.getReader();
+      if (!reader) return;
+      const decoder = new TextDecoder();
+      let followUpBuffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        chunk.split("\n").forEach((line) => {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("data:")) {
+            const dataContent = trimmed.replace(/^data:\s*/, "");
+            if (dataContent === "[DONE]") return;
+            try {
+              const parsed = JSON.parse(dataContent);
+              const piece = parsed.chunk ?? parsed.content ?? parsed.text ?? parsed.message ?? "";
+              if (typeof piece === "string") followUpBuffer += piece;
+            } catch (_) {
+              if (!dataContent.startsWith("{")) followUpBuffer += dataContent;
+            }
+          }
+        });
+
+        // Fast opportunistic parsing so questions appear as soon as JSON array closes
+        if (followUpBuffer.includes("]") && followUpBuffer.includes("[")) {
+          try {
+            const cleanCandidate = followUpBuffer
+              .replace(/<think>[\s\S]*?<\/think>/gi, "")
+              .replace(/```json|```/gi, "")
+              .trim();
+            const startIdx = cleanCandidate.indexOf("[");
+            const endIdx = cleanCandidate.lastIndexOf("]");
+            if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+              const arrayCandidate = JSON.parse(cleanCandidate.substring(startIdx, endIdx + 1));
+              if (Array.isArray(arrayCandidate) && arrayCandidate.length > 0) {
+                setMessages((prev) => {
+                  const copy = [...prev];
+                  if (copy.length > 0 && copy[copy.length - 1].role === "assistant") {
+                    copy[copy.length - 1] = {
+                      ...copy[copy.length - 1],
+                      followUps: arrayCandidate.map((q) => String(q)),
+                    };
+                  }
+                  return copy;
+                });
+              }
+            }
+          } catch (_) {}
+        }
+      }
+
+      let cleanJson = followUpBuffer.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/```json|```/gi, "").trim();
+      const startIdx = cleanJson.indexOf("[");
+      const endIdx = cleanJson.lastIndexOf("]");
+      if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+        cleanJson = cleanJson.substring(startIdx, endIdx + 1);
+      }
+      const parsedArray = JSON.parse(cleanJson);
+      if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+        setMessages((prev) => {
+          const copy = [...prev];
+          if (copy.length > 0 && copy[copy.length - 1].role === "assistant") {
+            copy[copy.length - 1] = {
+              ...copy[copy.length - 1],
+              followUps: parsedArray.map((q) => String(q)),
+            };
+          }
+          return copy;
+        });
+      }
+    } catch (e) {
+      console.error("Error generating sequential follow-ups:", e);
+    }
+  };
+
+  // Build Context exactly like Flutter
+  const buildPromptWithContext = (currentPrompt: string, historyMessages: ChatMessage[], fileContent?: string): string => {
     const historyPairs: string[] = [];
     for (let i = 0; i < historyMessages.length; i++) {
       const msg = historyMessages[i];
@@ -583,114 +1018,25 @@ function AiChatInner() {
         }
       }
     }
-
     const lines: string[] = [];
     lines.push(currentPrompt.trim());
-    lines.push(
-      "\n{{historyData}} Please answer casually with emojis, and don't mention anything about markdown or formatting.",
-    );
-
+    lines.push("\n{{historyData}} Please answer casually with emojis, and don't mention anything about markdown or formatting.");
     if (fileContent && fileContent.trim()) {
       lines.push(`\n---\nFile Content:\n${fileContent.trim()}`);
     }
-
     if (historyPairs.length > 0) {
       lines.push("\nConversation:");
-      const recentPairs =
-        historyPairs.length > 6 ? historyPairs.slice(-6) : historyPairs;
-      for (const pair of recentPairs) {
-        lines.push(pair);
-      }
+      const recentPairs = historyPairs.length > 6 ? historyPairs.slice(-6) : historyPairs;
+      for (const pair of recentPairs) lines.push(pair);
     }
-
     return lines.join("\n");
   };
 
-  // Generate / update chat title via backend stream (matching Flutter _logLastUserMessageBeforeExit)
-  const generateAndUpdateTitle = async (
-    chatId: string,
-    userPrompt: string,
-    modelId: string,
-  ) => {
-    const token = getAuthToken();
-    if (!token || !chatId) return;
-
-    try {
-      const prompt = `${userPrompt} Generate a perfect title for this chat (max 20 characters) from the given chat history. In any case, do not give or mention Markdown format.`;
-      const res = await fetch(
-        `${getApiBase()}/api/tools/ai/title-generate-stream`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ prompt, modelId }),
-        },
-      );
-
-      if (!res.ok) return;
-
-      const reader = res.body?.getReader();
-      if (!reader) return;
-      const decoder = new TextDecoder();
-      let newTitle = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        chunk.split("\n").forEach((line) => {
-          const trimmed = line.trim();
-          if (trimmed.startsWith("data:")) {
-            const dataContent = trimmed.replace(/^data:\s*/, "");
-            if (dataContent !== "[DONE]") {
-              try {
-                const parsed = JSON.parse(dataContent);
-                newTitle += parsed.chunk || parsed.text || parsed.content || "";
-              } catch (_) {
-                newTitle += dataContent;
-              }
-            }
-          }
-        });
-      }
-
-      newTitle = newTitle
-        .replace(/[#*`"']/g, "")
-        .replace(/\n+/g, " ")
-        .trim();
-
-      if (newTitle && newTitle.length > 1) {
-        await fetch(`${getApiBase()}/api/chat-history/${chatId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: newTitle.substring(0, 30),
-            ischatehistry: true,
-          }),
-        });
-        loadProviderHistory(selectedProvider);
-      }
-    } catch (e) {
-      console.error("Failed to generate title:", e);
-    }
-  };
-
-  // Handle Stream Generation (ischatehistry: true matching Flutter)
   const handleSendMessage = async (textToSend?: string) => {
     let promptText = (textToSend || prompt).trim();
     if (!promptText && selectedFiles.length === 0) return;
+    if (!promptText && selectedFiles.length > 0) promptText = "Analyze these files";
 
-    // Flutter autofills "Analyze these files" if prompt was empty but files are attached
-    if (!promptText && selectedFiles.length > 0) {
-      promptText = "Analyze these files";
-    }
-
-    // Read attached file text if any (extracting text properly from PDF / docs / text)
     let attachedFileContent = "";
     let displayUserMessage = promptText;
 
@@ -702,10 +1048,7 @@ function AiChatInner() {
             return `📄 ${f.name} (${ext})`;
           })
           .join("\n");
-
-        displayUserMessage = promptText
-          ? `${fileInfoPrefix}\n${promptText}`
-          : fileInfoPrefix;
+        displayUserMessage = promptText ? `${fileInfoPrefix}\n${promptText}` : fileInfoPrefix;
 
         const fileTexts = await Promise.all(
           selectedFiles.map(async (f) => {
@@ -715,7 +1058,7 @@ function AiChatInner() {
             } catch (err: any) {
               return `=== File: ${f.name} (Error extracting text: ${err?.message || err}) ===\n`;
             }
-          }),
+          })
         );
         attachedFileContent = fileTexts.join("\n");
       } catch (e) {
@@ -726,75 +1069,47 @@ function AiChatInner() {
     setPrompt("");
     setSelectedFiles([]);
 
-    const chatId = await ensureChatId(
-      selectedProvider,
-      currentChatId,
-      promptText,
-    );
-
-    // Build final prompt with previous messages & attached file content
-    const promptWithContext = buildPromptWithContext(
-      promptText,
-      messages,
-      attachedFileContent,
-    );
+    const chatId = await ensureChatId(selectedProvider, currentChatId, promptText);
+    const promptWithContext = buildPromptWithContext(promptText, messages, attachedFileContent);
 
     setMessages((prev) => [
       ...prev,
       { role: "user", content: displayUserMessage },
-      { role: "assistant", content: "" },
+      { role: "assistant", content: "", searchResults: [], followUps: [] },
     ]);
     setIsStreaming(true);
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
     const token = getAuthToken();
-
-    const activeModelId = isDeepThinkActive
-      ? "6a756dfd90ca2618be6d83f5"
-      : selectedModel.id;
+    const activeModelId = isDeepThinkActive ? "6a756dfd90ca2618be6d83f5" : selectedModel.id;
 
     try {
       const res = await fetch(`${getApiBase()}/api/tools/ai/general-stream`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           prompt: promptWithContext,
           modelId: activeModelId,
           chatId: chatId,
-          ischatehistry: true, // ✅ MATCHES FLUTTER
+          ischatehistry: true,
           max_tokens: 4000,
           source: "model-chat-text",
           promptId: `${Date.now()}_${selectedProvider}`,
-          system_prompt:
-            "You are a helpful AI assistant in OneChat AI. Follow the user's instructions and provide accurate, helpful, and relevant responses.",
+          system_prompt: "You are a helpful AI assistant in OneChat AI. Follow the user's instructions and provide accurate, helpful, and relevant responses.",
         }),
         signal: controller.signal,
       });
-
-      // Reload chat history after sending message
-      setTimeout(() => {
-        loadProviderHistory(selectedProvider);
-      }, 1000);
 
       if (!res.ok) {
         let errorMsg = `${selectedProvider} is temporarily unavailable (${res.status}).`;
         try {
           const errData = await res.json();
-          if (errData && errData.message) {
-            errorMsg = errData.message;
-          }
+          if (errData && errData.message) errorMsg = errData.message;
         } catch (_) {}
-
         setMessages((prev) => {
           const copy = [...prev];
-          copy[copy.length - 1] = {
-            role: "assistant",
-            content: `⚠️ ${errorMsg}`,
-          };
+          copy[copy.length - 1] = { role: "assistant", content: `⚠️ ${errorMsg}` };
           return copy;
         });
         setIsStreaming(false);
@@ -805,11 +1120,36 @@ function AiChatInner() {
       if (!reader) return;
       const decoder = new TextDecoder();
       let accumulated = "";
+      let parsedSearchResults: SearchResult[] = [];
+      let parsedFollowUps: string[] = [];
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
+
+        // Stream parsing exactly matching Flutter's structure
+        if (chunk.includes("||SEARCH_RESULTS||")) {
+          const parts = chunk.split("||SEARCH_RESULTS||");
+          if (parts[0]) accumulated += parts[0];
+          try {
+            parsedSearchResults = JSON.parse(parts[1].trim());
+          } catch (e) {
+            console.error("Error parsing search results", e);
+          }
+          break; // Usually ends stream
+        }
+
+        if (chunk.includes("||FOLLOW_UPS||")) {
+          const parts = chunk.split("||FOLLOW_UPS||");
+          if (parts[0]) accumulated += parts[0];
+          try {
+            parsedFollowUps = JSON.parse(parts[1].trim());
+          } catch (e) {
+            console.error("Error parsing follow ups", e);
+          }
+          break; 
+        }
 
         chunk.split("\n").forEach((line) => {
           const trimmed = line.trim();
@@ -820,13 +1160,14 @@ function AiChatInner() {
             if (dataContent !== "[DONE]") {
               try {
                 const parsed = JSON.parse(dataContent);
-                let piece =
-                  parsed.chunk ??
-                  parsed.text ??
-                  parsed.content ??
-                  parsed.message ??
-                  "";
-                if (typeof piece === "string") accumulated += piece;
+                if (parsed.type === "search_results" && parsed.search_results) {
+                  parsedSearchResults = parsed.search_results;
+                } else if (parsed.type === "follow_ups" && parsed.follow_ups) {
+                  parsedFollowUps = parsed.follow_ups;
+                } else {
+                  let piece = parsed.chunk ?? parsed.text ?? parsed.content ?? parsed.message ?? "";
+                  if (typeof piece === "string") accumulated += piece;
+                }
               } catch (_) {
                 accumulated += dataContent;
               }
@@ -837,29 +1178,31 @@ function AiChatInner() {
         const cleaned = accumulated.replace(/^:+/, "").trimStart();
         setMessages((prev) => {
           const copy = [...prev];
-          copy[copy.length - 1] = { role: "assistant", content: cleaned };
+          copy[copy.length - 1] = { 
+            role: "assistant", 
+            content: cleaned,
+            searchResults: parsedSearchResults,
+            followUps: parsedFollowUps
+          };
           return copy;
         });
       }
 
-      // Generate & update title in background if this was the first turn or title is default
       if (chatId) {
         generateAndUpdateTitle(chatId, promptText, activeModelId);
+      }
+
+      // Sequential Follow-ups generation for Perplexity (matching Flutter's lines 3699-3810)
+      if (selectedProvider.toLowerCase() === "perplexity" && parsedFollowUps.length === 0) {
+        fetchPerplexityFollowUps(promptText, accumulated, chatId);
       }
     } catch (e: any) {
       if (e.name !== "AbortError") {
         console.error("Stream generation error:", e);
         setMessages((prev) => {
           const copy = [...prev];
-          if (
-            copy.length > 0 &&
-            copy[copy.length - 1].role === "assistant" &&
-            !copy[copy.length - 1].content
-          ) {
-            copy[copy.length - 1] = {
-              role: "assistant",
-              content: "⚠️ Request failed. Please try again.",
-            };
+          if (copy.length > 0 && copy[copy.length - 1].role === "assistant" && !copy[copy.length - 1].content) {
+            copy[copy.length - 1] = { role: "assistant", content: "⚠️ Request failed. Please try again." };
           }
           return copy;
         });
@@ -870,143 +1213,160 @@ function AiChatInner() {
     }
   };
 
+  // Drag and Drop using react-dropzone
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (selectedFiles.length + acceptedFiles.length > 10) {
+      showToast("You can only upload up to 10 files at once");
+      return;
+    }
+    setSelectedFiles(prev => [...prev, ...acceptedFiles]);
+    if (!prompt.trim()) {
+      setPrompt("Analyze these files");
+    }
+  }, [selectedFiles.length, prompt, showToast]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
+    onDrop,
+    noClick: true,
+    noKeyboard: true
+  });
+
+  // Web Speech API for Mic Input
+  const toggleListening = () => {
+    if (isListening) {
+      speechRecognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      showToast("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event: any) => {
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        setPrompt(prev => prev + (prev ? " " : "") + finalTranscript);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error", event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    speechRecognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  };
+
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#08090E] text-white font-sans">
-      {/* 1. LEFT SIDEBAR (EXACT FLUTTER 2ND IMAGE MATCH) */}
-     <div
-        className={`${
-          isSidebarOpen ? "w-[68px] md:w-[240px]" : "w-[68px]"
-        } transition-all duration-300 bg-[#090B14] border-r border-[#1B1F30]/80 flex flex-col shrink-0 relative z-30 overflow-hidden`}
+    <div className="flex h-screen w-screen overflow-hidden bg-[#08090E] text-white font-sans relative" {...getRootProps()}>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-xl bg-[#1E1B38] border border-[#3B3363] text-white text-[13px] font-medium shadow-2xl animate-in fade-in slide-in-from-top-3">
+          {toastMessage}
+        </div>
+      )}
+      
+      {/* DRAG AND DROP OVERLAY */}
+      {isDragActive && (
+        <div className="absolute inset-0 z-50 bg-[#5A4FF3]/10 border-2 border-[#5A4FF3] rounded-2xl flex items-center justify-center pointer-events-none m-4">
+          <div className="bg-white p-6 rounded-2xl flex flex-col items-center shadow-xl">
+             <UploadCloud className="w-12 h-12 text-[#5A4FF3] mb-3" />
+             <p className="text-[#5A4FF3] font-bold text-lg">Drop files here to upload</p>
+             <p className="text-gray-500 text-sm mt-1">Release to attach</p>
+          </div>
+        </div>
+      )}
+
+     {/* MOBILE BACKDROP - Ahiya navu umeryu chhe */}
+      {isSidebarOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/60 z-40 transition-opacity" 
+          onClick={() => setIsSidebarOpen(false)} 
+        />
+      )}
+
+      {/* 1. LEFT SIDEBAR - Classes change karya chhe */}
+     <div 
+        className={`transition-all duration-300 bg-[#090B14] border-r border-[#1B1F30]/80 flex flex-col shrink-0 z-50 overflow-hidden
+          fixed md:relative h-full top-0 left-0
+          ${isSidebarOpen ? "translate-x-0 w-[240px]" : "-translate-x-full md:translate-x-0 md:w-[68px]"}
+        `}
       >
-        {/* Sidebar Header */}
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#1B1F30]/60">
-          {isSidebarOpen && (
-            <span className="hidden md:block font-bold text-[17px] tracking-wide text-white whitespace-nowrap">
-              Chat
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer mx-auto md:ml-auto md:mx-0"
-            title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-          >
+          {/* Ahiya thi hidden md:block nikali didhu che */}
+          {isSidebarOpen && <span className="block font-bold text-[17px] tracking-wide text-white whitespace-nowrap">Chat</span>}
+          <button type="button" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer mx-auto md:ml-auto md:mx-0">
             <Menu className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Top 2 Items: Home & Compare AIs */}
-        <div className="px-2 pt-2 space-y-0.5">
-          <a
-            href="/"
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition"
-          >
+       <div className="px-2 pt-2 space-y-0.5">
+          <a href="/" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition">
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <img
-                src="/assets/images/onechat.png"
-                alt="Home"
-                className="w-full h-full object-contain"
-              />
+              <img src="/assets/images/onechat.png" alt="Home" className="w-full h-full object-contain" />
             </div>
-
-            {isSidebarOpen && <span className="hidden md:block text-[13.5px] whitespace-nowrap">Home</span>}
+            {/* Ahiya thi hidden md:block nikali didhu che */}
+            {isSidebarOpen && <span className="block text-[13.5px] whitespace-nowrap">Home</span>}
           </a>
-          <a
-            href="/compare-ai"
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition"
-          >
+          <a href="/compare-ai" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition">
             <div className="w-5 h-5 flex items-center justify-center shrink-0 text-[#6366F1]">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="m16 3 4 4-4 4" />
-                <path d="M20 7H4" />
-                <path d="m8 21-4-4 4-4" />
-                <path d="M4 17h16" />
-              </svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m16 3 4 4-4 4" /><path d="M20 7H4" /><path d="m8 21-4-4 4-4" /><path d="M4 17h16" /></svg>
             </div>
-            {isSidebarOpen && (
-              <span className="hidden md:block text-[13.5px] whitespace-nowrap">Compare AIs</span>
-            )}
+            {/* Ahiya thi hidden md:block nikali didhu che */}
+            {isSidebarOpen && <span className="block text-[13.5px] whitespace-nowrap">Compare AIs</span>}
           </a>
         </div>
 
-        {/* Major Models List */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5 scrollbar-thin scrollbar-thumb-[#1B1F30]">
+       <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5 scrollbar-thin scrollbar-thumb-[#1B1F30]">
           {MAJOR_PROVIDERS.map((item) => {
-            const isSelected =
-              selectedProvider.toLowerCase() === item.name.toLowerCase();
+            const isSelected = selectedProvider.toLowerCase() === item.name.toLowerCase();
             return (
-              <button
-                key={item.name}
-                type="button"
-                onClick={() => handleModelSidebarClick(item)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition cursor-pointer ${
-                  isSelected
-                    ? "bg-[#6342E8]/25 border border-[#8B5CF6]/40 text-[#C4B5FD] font-semibold"
-                    : "text-gray-300 hover:bg-[#151928] hover:text-white border border-transparent"
-                }`}
-                title={item.name}
-              >
+              <button key={item.name} type="button" onClick={() => handleModelSidebarClick(item)} className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition cursor-pointer ${isSelected ? "bg-[#6342E8]/25 border border-[#8B5CF6]/40 text-[#C4B5FD] font-semibold" : "text-gray-300 hover:bg-[#151928] hover:text-white border border-transparent"}`}>
                 <div className="w-5 h-5 rounded-md flex items-center justify-center shrink-0">
-                  <Image
-                    src={item.icon}
-                    alt={item.name}
-                    width={20}
-                    height={20}
-                    className="object-contain"
-                  />
+                  <Image src={item.icon} alt={item.name} width={20} height={20} className="object-contain" />
                 </div>
-                {isSidebarOpen && (
-                  <span className="hidden md:block text-[13.5px] truncate">{item.name}</span>
-                )}
+                {/* Ahiya thi hidden md:block nikali didhu che */}
+                {isSidebarOpen && <span className="block text-[13.5px] truncate">{item.name}</span>}
               </button>
             );
           })}
-
-          {/* Model History Section (Exact Flutter: "Your <Model> History") */}
-          {isSidebarOpen && (
-            <div className="hidden md:block pt-4 mt-3 border-t border-[#1B1F30]/70">
+         {isSidebarOpen && (
+            <div className="block pt-4 mt-3 border-t border-[#1B1F30]/70">
+              {/* History div mathi pan hidden md:block nikali didhu che jethi mobile ma dekhay */}
               <div className="px-2 mb-2">
-                <span className="text-[12px] font-bold text-white tracking-wide truncate block">
-                  Your {selectedProvider} History
-                </span>
+                <span className="text-[12px] font-bold text-white tracking-wide truncate block">Your {selectedProvider} History</span>
               </div>
-
               {isLoadingHistory ? (
-                <div className="px-3 py-2 text-xs text-gray-500">
-                  Loading history...
-                </div>
+                <div className="px-3 py-2 text-xs text-gray-500">Loading history...</div>
               ) : historyList.length === 0 ? (
-                <div className="px-3 py-2 text-xs text-gray-500">
-                  No recent chats
-                </div>
+                <div className="px-3 py-2 text-xs text-gray-500">No recent chats</div>
               ) : (
                 <div className="space-y-0.5">
                   {historyList.map((hist) => {
                     const isCurrent = currentChatId === hist._id;
                     return (
-                      <button
-                        key={hist._id}
-                        type="button"
-                        onClick={() => {
-                          setCurrentChatId(hist._id);
-                          loadChatById(hist._id);
-                        }}
-                        className={`w-full text-left px-3 py-1.5 rounded-lg text-[13px] transition truncate cursor-pointer ${
-                          isCurrent
-                            ? "bg-[#181C2B] text-white font-medium"
-                            : "text-gray-400 hover:bg-[#121522] hover:text-gray-200"
-                        }`}
-                      >
-                        <span className="truncate block">
-                          {hist.title || "Untitled Chat"}
-                        </span>
+                      <button key={hist._id} type="button" onClick={() => { setCurrentChatId(hist._id); loadChatById(hist._id); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-[13px] transition truncate cursor-pointer ${isCurrent ? "bg-[#181C2B] text-white font-medium" : "text-gray-400 hover:bg-[#121522] hover:text-gray-200"}`}>
+                        <span className="truncate block">{sanitizeChatTitle(hist.title, "Untitled Chat")}</span>
                       </button>
                     );
                   })}
@@ -1017,69 +1377,130 @@ function AiChatInner() {
         </div>
       </div>
 
-      {/* 2. MAIN CHAT AREA (EXACT MATCH WITH FLUTTER IMAGE 1) */}
-      <div className="flex-1 flex flex-col h-full bg-[#08090E] relative overflow-hidden">
-        {/* Messages Viewport */}
+      {/* 2. MAIN CHAT AREA */}
+      <div className="flex-1 flex flex-col h-full bg-[#08090E] relative overflow-hidden w-full md:w-auto">
+        
+        {/* MOBILE HEADER - Navu umeryu chhe */}
+        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#090B14] border-b border-[#1B1F30]/60 z-20">
+          <button onClick={() => setIsSidebarOpen(true)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B]">
+            <Menu className="w-5 h-5" />
+          </button>
+          <span className="font-bold text-[16px] text-white tracking-wide">OneChat AI</span>
+          <div className="w-8"></div> {/* Right side spacing mate */}
+        </div>
+
+        {/* Aa div pachi normal em j rakhvo */}
         <div className="flex-1 overflow-y-auto px-4 md:px-16 lg:px-28 py-8 space-y-6 scrollbar-thin scrollbar-thumb-[#1B1F30]">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto">
               <div className="w-16 h-16 rounded-2xl bg-[#121522] border border-[#252A40] flex items-center justify-center mb-4 shadow-xl">
-                <Image
-                  src={
-                    PROVIDER_ICONS[selectedProvider] ||
-                    "/assets/images/deepseek1.png"
-                  }
-                  alt={selectedProvider}
-                  width={38}
-                  height={38}
-                  className="object-contain"
-                />
+                <Image src={PROVIDER_ICONS[selectedProvider] || "/assets/images/deepseek1.png"} alt={selectedProvider} width={38} height={38} className="object-contain" />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">
-                {selectedProvider}
-              </h2>
-              <p className="text-sm text-gray-400 mb-6">
-                Start chatting with {selectedModel.name}.
-              </p>
+              <h2 className="text-xl font-bold text-white mb-2">{selectedProvider}</h2>
+              <p className="text-sm text-gray-400 mb-6">Start chatting with {selectedModel.name}.</p>
             </div>
           ) : (
             <div className="w-full flex flex-col space-y-6">
               {messages.map((msg, idx) => {
                 const isUser = msg.role === "user";
                 return (
-                  <div
-                    key={idx}
-                    className={`w-full flex ${isUser ? "justify-end" : "justify-start"} group relative`}
-                  >
+                  <div key={idx} className={`w-full flex ${isUser ? "justify-end" : "justify-start"} group relative`}>
                     {isUser ? (
-                      /* USER MESSAGE: EXACT FLUTTER AppThemeColors.activeHomeBg (0xFF1E1B38) PILL ON THE RIGHT */
                       <div className="max-w-[70%] rounded-[18px] px-4 py-2 bg-[#1E1B38] text-[14.5px] text-white shadow-md whitespace-pre-wrap leading-relaxed">
                         {msg.content}
                       </div>
                     ) : (
-                      /* ASSISTANT MESSAGE: ON THE LEFT WITH MODEL HEADER */
-                      <div className="w-full max-w-[850px] space-y-2">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Image
-                            src={
-                              PROVIDER_ICONS[selectedProvider] ||
-                              "/assets/images/deepseek1.png"
-                            }
-                            alt={selectedProvider}
-                            width={18}
-                            height={18}
-                            className="object-contain"
-                          />
-                          <span className="text-xs font-semibold text-gray-300">
-                            {selectedProvider}
-                          </span>
-                        </div>
-                        <FormattedAiResponse content={msg.content} />
-                        {msg.content && !isStreaming && (
-                          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 mt-2">
-                            <CopyButton text={msg.content} />
+                      <div className="w-full max-w-[850px] flex flex-col gap-2">
+                        {/* Main Response Content */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            {(() => {
+                              const isDeepResearch =
+                                selectedProvider.toLowerCase() === "perplexity" &&
+                                (selectedModel.id === "685a28bb6f7240cc72297ee1" ||
+                                  selectedModel.name.toLowerCase().includes("deep research"));
+                              
+                              const iconPath = isDeepResearch
+                                ? "/assets/images/onechat.png"
+                                : PROVIDER_ICONS[selectedProvider] || "/assets/images/deepseek1.png";
+
+                              const headerLabel = isDeepResearch
+                                ? "Deep Research"
+                                : selectedProvider;
+
+                              return (
+                                <>
+                                  <Image
+                                    src={iconPath}
+                                    alt={headerLabel}
+                                    width={18}
+                                    height={18}
+                                    className="object-contain"
+                                  />
+                                  <span className="text-xs font-semibold text-gray-300">
+                                    {headerLabel}
+                                  </span>
+                                </>
+                              );
+                            })()}
                           </div>
-                        )}
+                          <FormattedAiResponse content={msg.content} searchResults={msg.searchResults} />
+                          
+                          {/* Message Action Bar matching Flutter: Copy + Workspace Save + Sources Pill (for Perplexity / searchResults) */}
+                          {msg.content && !isStreaming && (
+                            <div className="flex items-center gap-2 mt-3 pt-1">
+                              <CopyButton text={msg.content} />
+
+                              {/* Perplexity Sources Pill Button (matching Flutter's _buildSourcesPillButton & Image 2) */}
+                              {selectedProvider.toLowerCase() === "perplexity" && msg.searchResults && msg.searchResults.length > 0 && (
+                                <SourcesPillButton
+                                  sources={msg.searchResults}
+                                  onClick={() => setActiveSourcesDrawer(msg.searchResults || null)}
+                                />
+                              )}
+                            </div>
+                          )}
+
+                          {/* Follow-ups rendering exactly like Flutter's _buildFollowUpsList & _buildFollowUpItem */}
+                          {msg.followUps && msg.followUps.length > 0 && !isStreaming && (
+                            <div className="mt-6 mb-2 border border-[#1B1F30] bg-[#121522] rounded-xl overflow-hidden shadow-md">
+                              {/* Header matching Flutter _buildFollowUpsList: question icon + 'Follow-ups' */}
+                              <div className="flex items-center px-4 py-3 border-b border-[#1B1F30] bg-[#121522]">
+                                <span className="text-[#8B5CF6] text-base mr-2 select-none">❓</span>
+                                <span className="text-[14px] font-semibold text-white tracking-wide">
+                                  Follow-ups
+                                </span>
+                              </div>
+
+                              {/* Follow-up Items matching Flutter's exact hover, arrow_forward_rounded, north_east_rounded on hover */}
+                              <div className="divide-y divide-[#1B1F30]">
+                                {msg.followUps.map((q, i) => (
+                                  <button
+                                    key={i}
+                                    type="button"
+                                    onClick={() => {
+                                      setPrompt(q);
+                                      handleSendMessage(q);
+                                    }}
+                                    className="w-full text-left flex items-center justify-between px-4 py-3 bg-transparent hover:bg-[#22273D] transition-colors duration-150 cursor-pointer group"
+                                  >
+                                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                      {/* Left Arrow: Icons.arrow_forward_rounded (textSecondary -> primaryPurpleLight on hover) */}
+                                      <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#8B5CF6] shrink-0 transition-colors duration-150" />
+                                      {/* Question Text: 14px font-medium (textSecondary -> textPrimary on hover) */}
+                                      <span className="text-[14px] font-medium text-[#94A3B8] group-hover:text-white transition-colors duration-150 leading-snug line-clamp-2">
+                                        {q}
+                                      </span>
+                                    </div>
+
+                                    {/* Right Arrow: Icons.north_east_rounded (fades in on hover) */}
+                                    <ArrowUpRight className="w-3.5 h-3.5 text-[#8B5CF6] opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0 ml-2" />
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1090,146 +1511,148 @@ function AiChatInner() {
           )}
         </div>
 
-        {/* 3. FLUTTER-STYLE SEARCH INPUT CONTAINER (PILL DESIGN EXACT MATCH) */}
+        {/* 3. SEARCH INPUT CONTAINER (Model Specific - Matches Flutter search_Input_widget.dart) */}
         <div className="px-4 pb-6 pt-2 bg-[#08090E] flex flex-col items-center">
-          {/* File attachment preview */}
-          {selectedFiles.length > 0 && (
-            <div className="w-full max-w-[700px] flex gap-2 overflow-x-auto pb-2">
-              {selectedFiles.map((file, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 bg-[#181C2B] border border-[#252A40] px-3 py-1.5 rounded-full text-xs text-gray-200"
-                >
-                  <span className="truncate max-w-[120px]">{file.name}</span>
-                  <button
-                    onClick={() => setSelectedFiles([])}
-                    className="text-gray-400 hover:text-red-400"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="w-full max-w-[700px] bg-[#0E111C] border border-[#252A40] rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.3)] px-4 py-1.5 flex items-center gap-3">
-            {/* 1. Left Plus (+) Button */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  setSelectedFiles([e.target.files[0]]);
-                  // Autofill "Analyze these files" if prompt is empty (matching Flutter's _autofillFilePromptIfNeeded)
-                  if (!prompt.trim()) {
-                    setPrompt("Analyze these files");
-                  }
-                }
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0"
-              title="Add photos & files"
-            >
-              <Plus className="w-6 h-6 stroke-[1.75]" />
-            </button>
-
-            {/* DeepThink toggle for DeepSeek */}
-            {selectedProvider === "DeepSeek" && (
-              <button
-                type="button"
-                onClick={() => setIsDeepThinkActive(!isDeepThinkActive)}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition cursor-pointer shrink-0 ${
-                  isDeepThinkActive
-                    ? "bg-[#2563EB]/25 text-[#60A5FA] border border-[#3B82F6]/50"
-                    : "bg-[#141A2D] text-gray-300 hover:bg-[#1C243E] border border-[#232B45]"
-                }`}
-              >
-                <Brain className="w-3.5 h-3.5" />
-                <span>DeepThink</span>
-              </button>
-            )}
-
-            {/* 2. Text Input (Centered, single-line pill style) */}
-            <input
-              type="text"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              placeholder="Ask anything"
-              className="flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4] py-1.5"
-              disabled={isStreaming}
-            />
-
-            {/* 3. Right: Model Dropdown */}
-            <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenSubModelDropdown(!openSubModelDropdown);
-                }}
-                className="flex items-center gap-1 text-[13.5px] font-normal text-white/90 hover:text-white transition cursor-pointer px-1 py-1"
-              >
-                <span className="truncate max-w-[120px]">{selectedModel.name}</span>
-                <ChevronDown className="w-4 h-4 text-white/70" />
-              </button>
-
-              {openSubModelDropdown && (
-                <div className="absolute bottom-full right-0 mb-3 w-56 bg-[#121522] border border-[#252A40] rounded-2xl shadow-2xl py-2 z-50">
-                  {(PROVIDER_MODELS[selectedProvider] || []).map((m) => (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedModel(m);
-                        setOpenSubModelDropdown(false);
-                      }}
-                      className="w-full text-left px-3.5 py-2 text-xs transition flex items-center justify-between text-gray-200 hover:bg-[#181C2B] hover:text-white cursor-pointer"
-                    >
-                      <span className="truncate">{m.name}</span>
-                      {selectedModel.id === m.id && (
-                        <span className="text-[#6366F1]">✓</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* 4. Mic Icon */}
-            <button
-              type="button"
-              className="text-white/60 hover:text-white transition cursor-pointer shrink-0"
-              title="Speech to text"
-            >
-              <Mic className="w-5 h-5 stroke-[1.75]" />
-            </button>
-
-            {/* 5. Send Arrow Button (Circular Purple/Gray button) */}
-            <button
-              type="button"
-              onClick={() => handleSendMessage()}
-              disabled={!prompt.trim() || isStreaming}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${
-                prompt.trim() && !isStreaming
-                  ? "bg-[#5A4FF3] text-white hover:bg-[#4F46E5]"
-                  : "bg-[#181C2B] text-white/35 cursor-not-allowed"
-              }`}
-            >
-              <ArrowUp className="w-4 h-4 stroke-[2.2]" />
-            </button>
-          </div>
+          <input {...getInputProps()} />
+          <ModelSpecificSearchInput
+            selectedProvider={selectedProvider}
+            selectedModel={selectedModel}
+            onModelSelect={(m) => setSelectedModel(m)}
+            prompt={prompt}
+            setPrompt={setPrompt}
+            selectedFiles={selectedFiles}
+            onRemoveFile={(idx) =>
+              setSelectedFiles((prev) => prev.filter((_, i) => i !== idx))
+            }
+            onAddFiles={(files) => setSelectedFiles((prev) => [...prev, ...files])}
+            isStreaming={isStreaming}
+            onSendMessage={(overridePrompt) => handleSendMessage(overridePrompt)}
+            isDeepThinkActive={isDeepThinkActive}
+            setIsDeepThinkActive={setIsDeepThinkActive}
+            isListening={isListening}
+            toggleListening={toggleListening}
+            onShowToast={showToast}
+          />
         </div>
+
+        {/* 4. SLIDING SOURCES DRAWER (Matching Image 3 and Flutter's SourcesDrawer / SourcesPanelContent) */}
+        {activeSourcesDrawer && (
+          <div className="fixed inset-0 z-50 flex justify-end">
+            {/* Backdrop click to close */}
+            <div
+              className="absolute inset-0 bg-black/40 backdrop-blur-[1px] transition-opacity cursor-pointer"
+              onClick={() => setActiveSourcesDrawer(null)}
+            />
+
+            {/* Sliding Drawer Container */}
+            <div className="relative w-full max-w-[420px] h-full bg-[#0E101D] border-l border-[#1C2033] shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-250">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#1C2033] bg-[#0E101D]">
+                <div className="flex items-center gap-2.5">
+                  <SourcesChainLinkSvg />
+                  <span className="text-[17px] font-semibold text-white tracking-tight">
+                    Sources
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#1E2130] text-[12px] font-medium text-[#8E95A5]">
+                    {activeSourcesDrawer.length}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveSourcesDrawer(null)}
+                  className="p-1 rounded-lg text-[#8E95A5] hover:text-white hover:bg-[#1A1F33] transition cursor-pointer"
+                  title="Close sources"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Source Items List */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-[#1C2033]">
+                {activeSourcesDrawer.map((source, idx) => {
+                  const domain =
+                    source.domain?.replace(/^www\./, "") ||
+                    (() => {
+                      try {
+                        return new URL(source.url).hostname.replace(/^www\./, "");
+                      } catch {
+                        return source.url || "";
+                      }
+                    })();
+                  const faviconUrl = domain
+                    ? `https://www.google.com/s2/favicons?sz=64&domain=${domain}`
+                    : "";
+
+                  return (
+                    <a
+                      key={idx}
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-3.5 rounded-xl bg-[#121422] border border-[#1C2033] hover:bg-[#171A2A] hover:border-[#2D334D] transition group cursor-pointer"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Index Badge (1, 2, 3...) */}
+                        <div className="w-[22px] h-[22px] rounded-[6px] bg-[#1F2233] flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="text-[11px] font-semibold text-[#8E95A5]">
+                            {idx + 1}
+                          </span>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          {/* Row 1: Favicon + Domain + External Link Icon */}
+                          <div className="flex items-center justify-between gap-2 mb-1.5">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-[18px] h-[18px] rounded bg-white flex items-center justify-center overflow-hidden shrink-0">
+                                {faviconUrl ? (
+                                  <img
+                                    src={faviconUrl}
+                                    alt={domain}
+                                    className="w-full h-full object-contain"
+                                    onError={(e) => {
+                                      (e.target as HTMLElement).style.display = "none";
+                                      const parent = (e.target as HTMLElement).parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<span style="font-size:10px;font-weight:700;color:#9386FF">${(domain.charAt(0) || "S").toUpperCase()}</span>`;
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <span className="text-[10px] font-bold text-[#9386FF]">
+                                    {(domain.charAt(0) || "S").toUpperCase()}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[12px] text-[#8E95A5] truncate font-normal">
+                                {domain}
+                              </span>
+                            </div>
+
+                            <ExternalLink className="w-3.5 h-3.5 text-[#6B7280] group-hover:text-[#9386FF] transition shrink-0" />
+                          </div>
+
+                          {/* Row 2: Headline / Title in Purple #9386FF */}
+                          <h4 className="text-[13.5px] font-medium text-[#9386FF] group-hover:text-[#B4A8FF] leading-snug line-clamp-2 transition mb-1">
+                            {source.title}
+                          </h4>
+
+                          {/* Row 3: Description / Snippet */}
+                          {(source.snippet || (source as any).content) && (
+                            <p className="text-[12px] text-[#7E8494] line-clamp-3 leading-relaxed">
+                              {source.snippet || (source as any).content}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
