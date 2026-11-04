@@ -1046,7 +1046,7 @@ function CompareAiContent() {
       onDrop={handleDrop}
     >
       {/* Top Header Bar */}
-      <header className="min-h-12 py-2 px-3 sm:px-4 flex items-center justify-between gap-2 bg-[#0F1123] border-b border-[#1E223D] shrink-0 relative z-30 select-none">
+      <header className="min-h-12 py-2 px-3 sm:px-4 flex items-center justify-between gap-2   shrink-0 relative z-30 mt-2">
         <div className="flex items-center shrink-0">
           <button
             onClick={() => {
@@ -1066,11 +1066,11 @@ function CompareAiContent() {
           </button>
         </div>
 
-        <div className="flex-1 text-center px-1 min-w-0">
-          <h1 className="text-xs sm:text-sm md:text-base font-semibold text-white tracking-wide truncate">
-            Compare AI Models Side by Side
-          </h1>
-        </div>
+       <div className="flex-1 text-center px-1 min-w-0">
+  <h1 className="text-[16px] sm:text-xl md:text-2xl font-extrabold text-white tracking-wide leading-tight break-words">
+    Compare AI Models Side by Side
+  </h1>
+</div>
 
         <div className="w-8 sm:w-20 shrink-0" />
       </header>
