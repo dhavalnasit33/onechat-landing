@@ -84,6 +84,7 @@ interface SearchResult {
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  imageUrl?: string;
   searchResults?: SearchResult[];
   followUps?: string[];
   isThinking?: boolean;
@@ -872,6 +873,7 @@ function AiChatInner() {
             return {
               role: isUser ? "user" : "assistant",
               content: m.content || m.text || m.message || "",
+              imageUrl: m.imageUrl || m.image_url || m.metadata?.imageUrl || m.metadata?.image_url,
               searchResults: savedSearchResults.length > 0 ? savedSearchResults : undefined,
               followUps: savedFollowUps.length > 0 ? savedFollowUps : undefined
             };
@@ -1070,38 +1072,64 @@ ${aiLastAnswer.substring(0, 500)}`;
     return lines.join("\n");
   };
 
+  const isImageFile = (file: File) => {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    return ["png", "jpg", "jpeg", "webp", "gif", "heic"].includes(ext) || file.type.startsWith("image/");
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleSendMessage = async (textToSend?: string) => {
     let promptText = (textToSend || prompt).trim();
     if (!promptText && selectedFiles.length === 0) return;
-    if (!promptText && selectedFiles.length > 0) promptText = "Analyze these files";
 
     let attachedFileContent = "";
-    let displayUserMessage = promptText;
+    let activeImage: string | null = null;
+    const filesToProcess = [...selectedFiles];
 
-    if (selectedFiles.length > 0) {
+    if (filesToProcess.length > 0) {
       try {
-        const fileInfoPrefix = selectedFiles
-          .map((f) => {
-            const ext = (f.name.split(".").pop() || "").toUpperCase();
-            return `📄 ${f.name} (${ext})`;
-          })
-          .join("\n");
-        displayUserMessage = promptText ? `${fileInfoPrefix}\n${promptText}` : fileInfoPrefix;
-
-        const fileTexts = await Promise.all(
-          selectedFiles.map(async (f) => {
-            try {
-              const text = await extractTextFromFile(f);
-              return `=== File: ${f.name} ===\n${text}\n`;
-            } catch (err: any) {
-              return `=== File: ${f.name} (Error extracting text: ${err?.message || err}) ===\n`;
+        let combinedText = "";
+        for (const file of filesToProcess) {
+          if (isImageFile(file)) {
+            if (!activeImage) {
+              activeImage = await fileToBase64(file);
             }
-          })
-        );
-        attachedFileContent = fileTexts.join("\n");
+            combinedText += `\n\n--- Attached Image: ${file.name} ---`;
+          } else {
+            try {
+              const text = await extractTextFromFile(file);
+              combinedText += `\n\n--- Attached File: ${file.name} ---\n${text}`;
+            } catch (err: any) {
+              combinedText += `\n\n=== File: ${file.name} (Error extracting text: ${err?.message || err}) ===\n`;
+            }
+          }
+        }
+        attachedFileContent = combinedText.trim();
       } catch (e) {
         console.error("Error reading attached file:", e);
       }
+    }
+
+    // Auto-prompt when only file or image is sent without text
+    if (!promptText && activeImage) {
+      promptText = "What is in this image? Please describe and analyze it.";
+    } else if (!promptText && attachedFileContent) {
+      promptText = "Analyze these files";
+    }
+
+    // Visual Display for User message bubble
+    let displayUserMessage = promptText;
+    if (filesToProcess.length > 0) {
+      const fileNames = filesToProcess.map((f) => `📎 ${f.name}`).join("\n");
+      displayUserMessage = displayUserMessage ? `${fileNames}\n\n${displayUserMessage}` : fileNames;
     }
 
     setPrompt("");
@@ -1112,7 +1140,7 @@ ${aiLastAnswer.substring(0, 500)}`;
 
     setMessages((prev) => [
       ...prev,
-      { role: "user", content: displayUserMessage },
+      { role: "user", content: displayUserMessage, imageUrl: activeImage || undefined },
       { role: "assistant", content: "", searchResults: [], followUps: [] },
     ]);
     setIsStreaming(true);
@@ -1126,19 +1154,24 @@ ${aiLastAnswer.substring(0, 500)}`;
     const activeModelId = isDeepThinkActive ? proModel.id : selectedModel.id;
 
     try {
+      const payload: Record<string, any> = {
+        prompt: promptWithContext,
+        modelId: activeModelId,
+        chatId: chatId,
+        ischatehistry: true,
+        max_tokens: 4000,
+        source: "model-chat-text",
+        promptId: `${Date.now()}_${selectedProvider}`,
+        system_prompt: "You are a helpful AI assistant in OneChat AI. Follow the user's instructions and provide accurate, helpful, and relevant responses.",
+      };
+      if (activeImage) {
+        payload.imageUrl = activeImage;
+      }
+
       const res = await fetch(`${getApiBase()}/api/tools/ai/general-stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          prompt: promptWithContext,
-          modelId: activeModelId,
-          chatId: chatId,
-          ischatehistry: true,
-          max_tokens: 4000,
-          source: "model-chat-text",
-          promptId: `${Date.now()}_${selectedProvider}`,
-          system_prompt: "You are a helpful AI assistant in OneChat AI. Follow the user's instructions and provide accurate, helpful, and relevant responses.",
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       });
 
@@ -1148,6 +1181,17 @@ ${aiLastAnswer.substring(0, 500)}`;
           const errData = await res.json();
           if (errData && errData.message) errorMsg = errData.message;
         } catch (_) {}
+
+        const lowerMsg = errorMsg.toLowerCase();
+        if (
+          lowerMsg.includes("support image") ||
+          lowerMsg.includes("image input") ||
+          lowerMsg.includes("filter by image") ||
+          lowerMsg.includes("no endpoints found that support image")
+        ) {
+          errorMsg = "This model does not support image analysis. Please try a vision-supported model like ChatGPT, Gemini, Claude, or Grok.";
+        }
+
         setMessages((prev) => {
           const copy = [...prev];
           copy[copy.length - 1] = { role: "assistant", content: `⚠️ ${errorMsg}` };
@@ -1261,8 +1305,9 @@ ${aiLastAnswer.substring(0, 500)}`;
       return;
     }
     setSelectedFiles(prev => [...prev, ...acceptedFiles]);
-    if (!prompt.trim()) {
-      setPrompt("Analyze these files");
+    if (!prompt.trim() || prompt.trim() === "Analyze these files") {
+      const hasImg = acceptedFiles.some(isImageFile);
+      setPrompt(hasImg ? "Analyze these files" : "Analyze these files");
     }
   }, [selectedFiles.length, prompt, showToast]);
 
@@ -1448,6 +1493,15 @@ ${aiLastAnswer.substring(0, 500)}`;
                   <div key={idx} className={`w-full flex ${isUser ? "justify-end" : "justify-start"} group relative`}>
                     {isUser ? (
                       <div className="max-w-[70%] rounded-[18px] px-4 py-2 bg-[#1E1B38] text-[14.5px] text-white shadow-md whitespace-pre-wrap leading-relaxed">
+                        {msg.imageUrl && (
+                          <div className="mb-2.5 overflow-hidden rounded-xl border border-[#252A40] bg-black/40">
+                            <img
+                              src={msg.imageUrl}
+                              alt="Attached preview"
+                              className="max-h-56 w-full object-contain rounded-lg"
+                            />
+                          </div>
+                        )}
                         {msg.content}
                       </div>
                     ) : (

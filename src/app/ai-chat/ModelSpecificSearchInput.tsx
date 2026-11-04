@@ -14,7 +14,6 @@ import {
   FileText,
   Search,
   SlidersHorizontal,
-  Activity,
   Edit3,
   GraduationCap,
   Code2,
@@ -22,6 +21,8 @@ import {
   Lightbulb,
   Paperclip,
   Code,
+  SendHorizontal,
+  AudioLinesIcon,
 } from "lucide-react";
 import { AIModelItem, PROVIDER_MODELS } from "@/constants/providerModelsHelper";
 
@@ -170,7 +171,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
       if (standardModel) onModelSelect(standardModel);
     }
   };
-
+  const isImageFile = (file: File) => {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    return ["png", "jpg", "jpeg", "webp",].includes(ext) || file.type.startsWith("image/");
+  };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const filesArr = Array.from(e.target.files);
@@ -181,7 +185,11 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         return;
       }
       onAddFiles(filesArr);
-      if (!prompt.trim()) setPrompt("Analyze these files");
+      if (!prompt.trim() || prompt.trim() === "Analyze these files") {
+        const hasImg = filesArr.some(isImageFile);
+        setPrompt(hasImg ? "Analyze these files" : "Analyze these files");
+      }
+      e.target.value = "";
     }
   };
 
@@ -193,22 +201,36 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
     if (selectedFiles.length === 0) return null;
     return (
       <div className="w-full flex gap-2 overflow-x-auto pb-2 mb-2">
-        {selectedFiles.map((file, idx) => (
-          <div
-            key={idx}
-            className="flex items-center gap-2 bg-[#181C2B] border border-[#252A40] px-3 py-1.5 rounded-full text-xs text-gray-200 shrink-0"
-          >
-            <FileText className="w-3.5 h-3.5 text-blue-400" />
-            <span className="truncate max-w-[120px]">{file.name}</span>
-            <button
-              type="button"
-              onClick={() => onRemoveFile(idx)}
-              className="text-gray-400 hover:text-red-400 ml-1 cursor-pointer"
+        {selectedFiles.map((file, idx) => {
+          const isImg = isImageFile(file);
+          return (
+            <div
+              key={idx}
+              className="flex items-center gap-2 bg-[#181C2B] border border-[#252A40] px-3 py-1.5 rounded-full text-xs text-gray-200 shrink-0"
             >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
+              {isImg ? (
+                <div className="w-5 h-5 rounded overflow-hidden relative shrink-0 bg-black/50 flex items-center justify-center">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              )}
+              <span className="truncate max-w-[120px]">{file.name}</span>
+              <button
+                type="button"
+                onClick={() => onRemoveFile(idx)}
+                className="text-gray-400 hover:text-red-400 ml-1 cursor-pointer"
+                title="Remove file"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -233,41 +255,101 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         <button
           type="button"
           onClick={() => setOpenModelDropdown(!openModelDropdown)}
-          className={`flex items-center gap-1.5 text-xs font-medium cursor-pointer transition py-1.5 px-3 rounded-xl border border-transparent ${
-            customBtnClass || "hover:bg-white/5"
-          } ${customTextClass || "text-gray-300 hover:text-white"}`}
+          className={`flex items-center gap-1.5 text-xs font-medium cursor-pointer transition py-1.5 px-3 rounded-xl border border-transparent ${customBtnClass || "hover:bg-white/5"
+            } ${customTextClass || "text-gray-300 hover:text-white"}`}
         >
-          <span className="max-w-[130px] md:max-w-[170px] truncate font-medium">
+          <span className="max-w-[65px] sm:max-w-[130px] md:max-w-[170px] truncate font-medium">
             {selectedModel?.name || "Select Model"}
           </span>
           <ChevronDown className="w-3.5 h-3.5 opacity-70" />
         </button>
 
         {openModelDropdown && (
-          <div
-            className="absolute bottom-full right-0 mb-2 w-60 bg-[#121524] border border-[#252A40] rounded-xl shadow-2xl py-2 z-50 max-h-64 overflow-y-auto"
-            onMouseLeave={() => setOpenModelDropdown(false)}
-          >
-            <div className="px-3 py-1.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
-              Select Model
+          <>
+            <div
+              className="fixed inset-0 z-[9998] md:hidden"
+              onClick={() => setOpenModelDropdown(false)}
+            />
+
+            <div
+              className="
+        fixed z-[9999]
+        bottom-[90px]
+        left-1/2 -translate-x-1/2
+        w-[calc(100vw-32px)]
+        max-w-[320px]
+        max-h-[40dvh]
+        overflow-y-auto
+        overscroll-contain
+        bg-[#121524]
+        border border-[#252A40]
+        rounded-xl shadow-2xl py-2
+        md:hidden
+      "
+            >
+              <div className="px-3 py-1.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
+                Select Model
+              </div>
+
+              {availableModels.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => {
+                    onModelSelect(m);
+                    setOpenModelDropdown(false);
+                  }}
+                  className={`w-full text-left px-3 py-3 text-xs flex items-center justify-between transition hover:bg-[#1D2237] ${m.id === selectedModel?.id
+                      ? "text-purple-400 bg-purple-500/10 font-medium"
+                      : "text-gray-200"
+                    }`}
+                >
+                  <span className="truncate">{m.name}</span>
+                  {m.id === selectedModel?.id && (
+                    <span className="text-[10px] text-purple-400">●</span>
+                  )}
+                </button>
+              ))}
             </div>
-            {availableModels.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => {
-                  onModelSelect(m);
-                  setOpenModelDropdown(false);
-                }}
-                className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between transition hover:bg-[#1D2237] ${
-                  m.id === selectedModel?.id ? "text-purple-400 bg-purple-500/10 font-medium" : "text-gray-200"
-                }`}
-              >
-                <span className="truncate">{m.name}</span>
-                {m.id === selectedModel?.id && <span className="text-[10px] text-purple-400">●</span>}
-              </button>
-            ))}
-          </div>
+
+            {/* Desktop: Original dropdown position */}
+            <div
+              className="
+        hidden md:block
+        absolute bottom-full right-0 mb-2
+        w-60 max-w-[calc(100vw-32px)]
+        bg-[#121524]
+        border border-[#252A40]
+        rounded-xl shadow-2xl py-2
+        z-[9999]
+        max-h-64 overflow-y-auto
+      "
+              onMouseLeave={() => setOpenModelDropdown(false)}
+            >
+              <div className="px-3 py-1.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
+                Select Model
+              </div>
+              {availableModels.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => {
+                    onModelSelect(m);
+                    setOpenModelDropdown(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between transition hover:bg-[#1D2237] ${m.id === selectedModel?.id
+                      ? "text-purple-400 bg-purple-500/10 font-medium"
+                      : "text-gray-200"
+                    }`}
+                >
+                  <span className="truncate">{m.name}</span>
+                  {m.id === selectedModel?.id && (
+                    <span className="text-[10px] text-purple-400">●</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </>
         )}
       </div>
     );
@@ -294,9 +376,8 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
 
         {isAttachMenuOpen && (
           <div
-            className={`absolute bottom-full ${
-              align === "right" ? "right-0" : "left-0"
-            } mb-2.5 z-50 w-52 bg-[#121624] border border-[#252A40] rounded-2xl shadow-2xl p-1.5 flex flex-col gap-0.5`}
+            className={`absolute bottom-full ${align === "right" ? "right-0" : "left-0"
+              } mb-2.5 z-50 w-52 bg-[#121624] border border-[#252A40] rounded-2xl shadow-2xl p-1.5 flex flex-col gap-0.5`}
           >
             <button
               type="button"
@@ -402,8 +483,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               <button
                 type="button"
                 onClick={toggleListening}
-                className={`p-2 rounded-full transition cursor-pointer ${
-                  isListening ? "text-red-400" : "text-white/60 hover:text-white"
+                className={`p-2 rounded-full transition cursor-pointer ${isListening ? "text-red-400" : "text-white/60 hover:text-white"
                 }`}
               >
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -413,11 +493,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => onSendMessage()}
                 disabled={!canSend}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${
-                  canSend ? "bg-[#4285F4] text-white hover:bg-[#3367D6]" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${canSend ? "bg-[#4285F4] text-white hover:bg-[#3367D6]" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
                 }`}
               >
-                <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                <SendHorizontal className="w-4 h-4 stroke-[2.5]" />
               </button>
             </div>
           </div>
@@ -575,10 +654,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => onSendMessage()}
                 disabled={!canSend}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition cursor-pointer ${
-                  canSend
-                    ? "bg-[#D97757] text-white hover:bg-[#C26547]"
-                    : "bg-[#181C2B] text-white/35 cursor-not-allowed border border-[#252A40]"
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition cursor-pointer ${canSend                  ? "bg-[#D97757] text-white hover:bg-[#C26547]"                  : "bg-[#181C2B] text-white/35 cursor-not-allowed border border-[#252A40]"
                 }`}
                 title="Send"
               >
@@ -624,7 +700,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center gap-2.5 mt-4 flex-wrap">
+          <div className="w-full flex items-center justify-center gap-2.5 mt-4 overflow-x-auto overflow-y-hidden scrollbar-hide">
             {claudeChips.map((chip) => {
               const Icon = chip.icon;
               return (
@@ -632,7 +708,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                   key={chip.label}
                   type="button"
                   onClick={() => setActiveClaudeCategory(chip.label)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111422] border border-[#252A40] text-xs font-medium text-gray-200 hover:text-white hover:bg-[#1A1F33] transition cursor-pointer shadow-sm"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111422] border border-[#252A40] text-xs font-medium text-gray-200 text-nowrap hover:text-white hover:bg-[#1A1F33] transition cursor-pointer shadow-sm"
                 >
                   <Icon className="w-3.5 h-3.5 text-gray-300" />
                   <span>{chip.label}</span>
@@ -656,7 +732,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
     return (
       <div className="w-full max-w-[720px] flex flex-col items-center">
         {renderHiddenFileInput()}
-        <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[24px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] p-4 flex flex-col min-h-[140px] justify-between">
+        <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[24px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] p-0 flex flex-col min-h-[140px] justify-between">
           {renderFilesStrip()}
 
           <textarea
@@ -670,20 +746,19 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               }
             }}
             placeholder="Message DeepSeek..."
-            className="w-full bg-transparent border-none outline-none text-white text-[16px] placeholder-[#8E92A4] resize-none"
+            className="p-4 w-full bg-transparent border-none outline-none text-white text-[16px] placeholder-[#8E92A4] resize-none"
             disabled={isStreaming}
           />
 
-          <div className="flex items-center justify-between pt-3 mt-2 flex-wrap gap-2">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between py-3 mt-2 gap-0 sm:gap-2 px-2">
+            <div className="flex items-center gap-0.5 sm:gap-2">
               {/* DeepThink (R1) Button */}
               <button
                 type="button"
                 onClick={handleDeepThinkToggle}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition cursor-pointer ${
-                  isDeepThinkActive
-                    ? "bg-[#4D6BFE]/20 text-[#6D87FE] border-[#4D6BFE]"
-                    : "bg-[#181C2B] text-white/70 border-[#252A40] hover:text-white"
+                className={`flex items-center gap-0 sm:gsp-1.5 px-1 sm:px-3 py-1.5 rounded-full text-xs font-medium border transition cursor-pointer ${isDeepThinkActive
+                  ? "bg-[#4D6BFE]/20 text-[#6D87FE] border-[#4D6BFE]"
+                  : "bg-[#181C2B] text-white/70 border-[#252A40] hover:text-white"
                 }`}
               >
                 <Brain className="w-3.5 h-3.5" />
@@ -693,14 +768,17 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               {/* Search Button */}
               <button
                 type="button"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-[#181C2B] text-white/70 border-[#252A40] hover:text-white transition cursor-pointer"
+                onClick={() =>
+                  router.push('/web-search')
+                }
+                className="flex items-center gap-0 sm:gap-1.5 px-1 sm:px-3 py-1.5 rounded-full text-xs font-medium border bg-[#181C2B] text-white/70 border-[#252A40] hover:text-white transition cursor-pointer"
               >
                 <Globe className="w-3.5 h-3.5" />
                 <span>Search</span>
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0 sm:gap-2">
               {renderModelDropdown()}
 
               {/* Direct Attach File Pin matching Image 4 */}
@@ -717,8 +795,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => onSendMessage()}
                 disabled={!canSend}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${
-                  canSend ? "bg-[#4D6BFE] text-white hover:bg-[#3D5BEE]" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+                className={`w-7 sm:w-9 h-7 sm:h-9 rounded-full flex items-center justify-center transition cursor-pointer ${canSend ? "bg-[#4D6BFE] text-white hover:bg-[#3D5BEE]" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
                 }`}
               >
                 <ArrowUp className="w-4 h-4 stroke-[2.5]" />
@@ -762,7 +839,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               }
             }}
             placeholder="Ask Anything..."
-            className="flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4]"
+            className="min-w-0 w-full bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4] landing-5"
             disabled={isStreaming}
           />
 
@@ -775,11 +852,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             type="button"
             onClick={() => onSendMessage()}
             disabled={!canSend}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${
-              canSend
-                ? "bg-gradient-to-r from-[#0064E0] via-[#6B4EFF] to-[#D62F7F] text-white shadow-md hover:opacity-90"
-                : "bg-[#181C2B] text-white/35 cursor-not-allowed"
-            }`}
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${canSend
+              ? "bg-gradient-to-r from-[#0064E0] via-[#6B4EFF] to-[#D62F7F] text-white shadow-md hover:opacity-90"
+              : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+           }`}
             title="Send"
           >
             <ArrowUp className="w-4 h-4 stroke-[2.5]" />
@@ -845,22 +921,11 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={toggleListening}
-                  className={`p-2 rounded-full transition cursor-pointer ${
-                    isListening ? "text-red-400" : "text-white/50 hover:text-white"
-                  }`}
-                >
-                  {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                </button>
-
-                <button
-                  type="button"
                   onClick={() => onSendMessage()}
                   disabled={!canSend}
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition cursor-pointer ${
-                    canSend
-                      ? "bg-white text-black hover:bg-gray-200 shadow-md"
-                      : "bg-[#141829] text-white/30 border border-[#22273F] cursor-not-allowed"
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center transition cursor-pointer ${canSend
+                    ? "bg-white text-black hover:bg-gray-200 shadow-md"
+                    : "bg-[#141829] text-white/30 border border-[#22273F] cursor-not-allowed"
                   }`}
                   title="Send message"
                 >
@@ -885,9 +950,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
   if (providerKey === "perplexity" || providerKey === "deep_research") {
     const isDirectDeepResearch = providerKey === "deep_research";
     return (
+      // <div className="w-full max-w-[720px] flex flex-col items-center">
       <div className="w-full max-w-[720px] flex flex-col items-center">
         {renderHiddenFileInput()}
-        <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[26px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] p-3.5 flex flex-col min-h-[120px] justify-between">
+        <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[26px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] p-3 sm:p-3.5 flex flex-col min-h-[120px] justify-between">
           {renderFilesStrip()}
 
           <textarea
@@ -901,22 +967,18 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               }
             }}
             placeholder="Ask anything..."
-            className="w-full bg-transparent border-none outline-none text-white text-[15.5px] placeholder-[#8E92A4] resize-none px-2 pt-1 min-h-[46px]"
+            className="w-full min-w-0 flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4] resize-none px-2 pt-1 min-h-[46px]"
             disabled={isStreaming}
           />
 
-          <div className="flex items-center justify-between pt-2 mt-1 flex-wrap gap-2">
+          <div className="flex items-center justify-between pt-2 mt-1 gap-2">
             {/* Left: Joint icon toggle matching Flutter's _buildJointToggle */}
             <div className="flex items-center h-[34px] p-0.5 bg-[#141829] border border-[#22273F] rounded-[10px]">
               {/* 1. Search Icon */}
               <button
                 type="button"
                 onClick={() => handlePerplexityToggle(false)}
-                className={`w-8 h-[28px] rounded-[7px] flex items-center justify-center transition cursor-pointer ${
-                  !isPerplexityDeep && !isDirectDeepResearch
-                    ? "bg-[#20808D] text-white shadow-sm"
-                    : "text-gray-400 hover:text-white"
-                }`}
+                className={`w-8 h-[28px] rounded-[7px] flex items-center justify-center transition cursor-pointer ${!isPerplexityDeep && !isDirectDeepResearch                 ? "bg-[#20808D] text-white shadow-sm"                 : "text-gray-400 hover:text-white"               }`}
                 title="Search: Get fast answers to everyday questions"
               >
                 <Search className="w-4 h-4 stroke-[2]" />
@@ -926,10 +988,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               <button
                 type="button"
                 onClick={() => handlePerplexityToggle(true)}
-                className={`w-8 h-[28px] rounded-[7px] flex items-center justify-center transition cursor-pointer ml-0.5 ${
-                  isPerplexityDeep || isDirectDeepResearch
-                    ? "bg-[#20808D] text-white shadow-sm"
-                    : "text-gray-400 hover:text-white"
+                className={`w-8 h-[28px] rounded-[7px] flex items-center justify-center transition cursor-pointer ml-0.5 ${isPerplexityDeep || isDirectDeepResearch                  ? "bg-[#20808D] text-white shadow-sm"                  : "text-gray-400 hover:text-white"
                 }`}
                 title="Deep research: Create in-depth reports with more sources and reasoning"
               >
@@ -972,8 +1031,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               <button
                 type="button"
                 onClick={toggleListening}
-                className={`p-1.5 rounded-full transition cursor-pointer ${
-                  isListening ? "text-red-400" : "text-white/60 hover:text-white"
+                className={`p-1.5 rounded-full transition cursor-pointer ${isListening ? "text-red-400" : "text-white/60 hover:text-white"
                 }`}
                 title="Voice input"
               >
@@ -984,10 +1042,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => onSendMessage()}
                 disabled={!canSend}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${
-                  canSend
-                    ? "bg-[#20808D] text-white hover:bg-[#186670] shadow-md"
-                    : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${canSend                  ? "bg-[#20808D] text-white hover:bg-[#186670] shadow-md"                  : "bg-[#181C2B] text-white/35 cursor-not-allowed"
                 }`}
                 title="Send"
               >
@@ -1026,7 +1081,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             disabled={isStreaming}
           />
 
-          <div className="flex items-center justify-between pt-3 mt-2 border-t border-[#1C2033]/50">
+          <div className="flex items-center justify-between pt-3 mt-2 border-[#1C2033]/50">
             {renderAttachMenu(
               "w-9 h-9 rounded-full border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer",
               <Plus className="w-4 h-4 stroke-[1.75]" />
@@ -1039,8 +1094,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => onSendMessage()}
                 disabled={!canSend}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${
-                  canSend ? "bg-white text-black hover:bg-gray-200" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${canSend ? "bg-white text-black hover:bg-gray-200" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
                 }`}
               >
                 <ArrowUp className="w-4 h-4 stroke-[2.5]" />
@@ -1079,7 +1133,9 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               }
             }}
             placeholder="Type / for quick access"
-            className="flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4]"
+            style={{ minWidth: 0 }}
+            // className="flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4]"
+            className="flex-1 min-w-0 w-full bg-transparent border-none outline-none text-white text-[14px] sm:text-[15px] placeholder-[#8E92A4] leading-5"
             disabled={isStreaming}
           />
 
@@ -1120,7 +1176,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         {renderHiddenFileInput()}
         {renderFilesStrip()}
 
-        <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[30px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] px-3 py-1.5 flex items-center gap-3">
+        <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[30px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] px-3 py-1.5 flex items-center gap-1 sm:gap-3">
           {renderAttachMenu(
             "w-10 h-10 rounded-full bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0",
             <Plus className="w-5 h-5 stroke-[1.75]" />
@@ -1137,7 +1193,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               }
             }}
             placeholder="How can I help you today?"
-            className="flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4]"
+            className="min-w-0 w-full flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4] landing-5"
             disabled={isStreaming}
           />
 
@@ -1146,8 +1202,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
           <button
             type="button"
             onClick={toggleListening}
-            className={`p-1.5 rounded-full transition cursor-pointer shrink-0 ${
-              isListening ? "text-red-400" : "text-white/60 hover:text-white"
+            className={`p-1.5 rounded-full transition cursor-pointer shrink-0 ${isListening ? "text-red-400" : "text-white/60 hover:text-white"
             }`}
           >
             {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -1157,12 +1212,11 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             type="button"
             onClick={() => onSendMessage()}
             disabled={!canSend}
-            className={`w-10 h-10 rounded-full bg-[#6B52D6] hover:bg-[#5B42C6] flex items-center justify-center text-white transition cursor-pointer shrink-0 ${
-              canSend ? "opacity-100" : "opacity-80"
+            className={`w-10 h-10 rounded-full bg-[#6B52D6] hover:bg-[#5B42C6] flex items-center justify-center text-white transition cursor-pointer shrink-0 ${canSend ? "opacity-100" : "opacity-80"
             }`}
             title="Send"
           >
-            {hasText ? <ArrowUp className="w-4 h-4 stroke-[2.5]" /> : <Activity className="w-4 h-4" />}
+            {hasText ? <ArrowUp className="w-4 h-4 stroke-[2.5]" /> : <AudioLinesIcon className="w-4 h-4" />}
           </button>
         </div>
       </div>
@@ -1195,7 +1249,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             disabled={isStreaming}
           />
 
-          <div className="flex items-center justify-between pt-3 mt-2 border-t border-[#1C2033]/50">
+          <div className="flex items-center justify-between pt-3 mt-2 border-[#1C2033]/50">
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -1204,13 +1258,6 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 title="Attach files"
               >
                 <Paperclip className="w-4 h-4 stroke-[1.75]" />
-              </button>
-              <button
-                type="button"
-                className="w-9 h-9 rounded-lg bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
-                title="MiniMax Parameters"
-              >
-                <SlidersHorizontal className="w-4 h-4 stroke-[1.75]" />
               </button>
             </div>
 
@@ -1221,8 +1268,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => onSendMessage()}
                 disabled={!canSend}
-                className={`w-9 h-9 rounded-lg flex items-center justify-center transition cursor-pointer ${
-                  canSend ? "bg-white text-black hover:bg-gray-200" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+                className={`w-9 h-9 rounded-lg flex items-center justify-center transition cursor-pointer ${canSend ? "bg-white text-black hover:bg-gray-200" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
                 }`}
               >
                 <ArrowUp className="w-4 h-4 stroke-[2.5]" />
@@ -1260,7 +1306,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             disabled={isStreaming}
           />
 
-          <div className="flex items-center justify-between pt-3 mt-2 border-t border-[#1C2033]/50">
+          <div className="flex items-center justify-between pt-3 mt-2 border-[#1C2033]/50">
             <div className="flex items-center gap-3">
               {renderAttachMenu(
                 "text-white/70 hover:text-white transition cursor-pointer",
@@ -1268,6 +1314,9 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               )}
               <button
                 type="button"
+                onClick={() =>
+                  router.push('/web-search')
+                }
                 className="text-white/70 hover:text-white transition cursor-pointer"
                 title="Web Search"
               >
@@ -1282,8 +1331,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 type="button"
                 onClick={() => onSendMessage()}
                 disabled={!canSend}
-                className={`w-9 h-9 rounded-lg flex items-center justify-center transition cursor-pointer ${
-                  canSend ? "bg-white text-black hover:bg-gray-200" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+                className={`w-9 h-9 rounded-lg flex items-center justify-center transition cursor-pointer ${canSend ? "bg-white text-black hover:bg-gray-200" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
                 }`}
               >
                 <ArrowUp className="w-4 h-4 stroke-[2.5]" />
@@ -1305,7 +1353,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         {renderHiddenFileInput()}
         {renderFilesStrip()}
 
-        <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[24px] shadow-[0_2px_10px_rgba(0,0,0,0.3)] px-3.5 py-1.5 flex items-center gap-3">
+        <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[24px] shadow-[0_2px_10px_rgba(0,0,0,0.3)] px-3.5 py-1.5 flex items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -1326,7 +1374,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
               }
             }}
             placeholder="How can I help you today?"
-            className="flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4]"
+            className="min-w-0 w-full flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4] landing-5"
             disabled={isStreaming}
           />
 
@@ -1335,8 +1383,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
           <button
             type="button"
             onClick={toggleListening}
-            className={`p-1.5 rounded-full transition cursor-pointer shrink-0 ${
-              isListening ? "text-red-400" : "text-white/60 hover:text-white"
+            className={`p-1.5 rounded-full transition cursor-pointer shrink-0 ${isListening ? "text-red-400" : "text-white/60 hover:text-white"
             }`}
           >
             {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -1346,8 +1393,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             type="button"
             onClick={() => onSendMessage()}
             disabled={!canSend}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${
-              canSend ? "bg-white text-black hover:bg-gray-200" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${canSend ? "bg-white text-black hover:bg-gray-200" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
             }`}
           >
             <ArrowUp className="w-4 h-4 stroke-[2.5]" />
@@ -1383,7 +1429,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             }
           }}
           placeholder="Ask anything"
-          className="flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4] py-1.5"
+          className="min-w-0 w-full flex-1 bg-transparent border-none outline-none text-white text-[15px] placeholder-[#8E92A4] py-1.5 landing-5"
           disabled={isStreaming}
         />
 
@@ -1402,8 +1448,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
           type="button"
           onClick={() => onSendMessage()}
           disabled={!canSend}
-          className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${
-            canSend ? "bg-[#5A4FF3] text-white hover:bg-[#4F46E5]" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
+          className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${canSend ? "bg-[#5A4FF3] text-white hover:bg-[#4F46E5]" : "bg-[#181C2B] text-white/35 cursor-not-allowed"
           }`}
         >
           <ArrowUp className="w-4 h-4 stroke-[2.2]" />
