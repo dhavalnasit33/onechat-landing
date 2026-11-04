@@ -815,12 +815,8 @@ function AiChatInner() {
     setPrompt("");
     setSelectedFiles([]);
     if (window.innerWidth < 768) setIsSidebarOpen(false); // <-- AA LINE UMARO
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.set("model", item.name.toLowerCase());
-      url.searchParams.delete("chatId");
-      window.history.pushState({}, "", url.toString());
-    } catch (_) {}
+    const targetRoute = item.route || `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
+    window.location.href = targetRoute;
   };
 
   const ensureChatId = async (provider: string, chatId?: string | null, firstMessageTitle?: string) => {
@@ -1368,7 +1364,7 @@ ${aiLastAnswer.substring(0, 500)}`;
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#1B1F30]/60">
           {/* Ahiya thi hidden md:block nikali didhu che */}
           {isSidebarOpen && <span className="block font-bold text-[17px] tracking-wide text-white whitespace-nowrap">Chat</span>}
-          <button type="button" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer mx-auto md:ml-auto md:mx-0">
+         <button type="button" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer ml-auto md:ml-auto md:ml-0">
             <Menu className="w-4 h-4" />
           </button>
         </div>

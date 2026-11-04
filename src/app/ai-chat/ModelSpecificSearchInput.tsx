@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Plus,
   Mic,
@@ -19,6 +20,8 @@ import {
   Code2,
   Coffee,
   Lightbulb,
+  Paperclip,
+  Code,
 } from "lucide-react";
 import { AIModelItem, PROVIDER_MODELS } from "@/constants/providerModelsHelper";
 
@@ -60,7 +63,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
   toggleListening,
   onShowToast,
 }) => {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const attachMenuRef = useRef<HTMLDivElement | null>(null);
+  const [isAttachMenuOpen, setIsAttachMenuOpen] = useState(false);
   const [openModelDropdown, setOpenModelDropdown] = useState(false);
   const [geminiMode, setGeminiMode] = useState<"default" | "write" | "plan" | "research" | "learn">("default");
   const [isPerplexityDeep, setIsPerplexityDeep] = useState(false);
@@ -98,6 +104,37 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
       }
     }
   }, [selectedModel.slug, selectedModel.name, selectedProvider]);
+
+  useEffect(() => {
+    setIsAttachMenuOpen(false);
+  }, [selectedProvider, selectedModel]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        attachMenuRef.current &&
+        !attachMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsAttachMenuOpen(false);
+      }
+    };
+    if (isAttachMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isAttachMenuOpen]);
+
+  const handleOpenFileInput = () => {
+    setIsAttachMenuOpen(false);
+    fileInputRef.current?.click();
+  };
+
+  const handleNavigateCoding = () => {
+    setIsAttachMenuOpen(false);
+    router.push("/coding");
+  };
 
   const handleDeepThinkToggle = () => {
     const nextState = !isDeepThinkActive;
@@ -236,6 +273,54 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
     );
   };
 
+  // Reusable Attach / Plus Button Popover (Image 2 style)
+  const renderAttachMenu = (
+    buttonClassName: string,
+    icon: React.ReactNode = <Plus className="w-5 h-5 stroke-[1.75]" />,
+    // title: string = "Add photos & files",
+    title: string = "Show menu",
+    align: "left" | "right" = "left"
+  ) => {
+    return (
+      <div className="relative shrink-0" ref={attachMenuRef}>
+        <button
+          type="button"
+          onClick={() => setIsAttachMenuOpen((prev) => !prev)}
+          className={buttonClassName}
+          title={title}
+        >
+          {icon}
+        </button>
+
+        {isAttachMenuOpen && (
+          <div
+            className={`absolute bottom-full ${
+              align === "right" ? "right-0" : "left-0"
+            } mb-2.5 z-50 w-52 bg-[#121624] border border-[#252A40] rounded-2xl shadow-2xl p-1.5 flex flex-col gap-0.5`}
+          >
+            <button
+              type="button"
+              onClick={handleOpenFileInput}
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] font-medium text-gray-200 hover:text-white hover:bg-white/10 transition cursor-pointer text-left"
+            >
+              <Paperclip className="w-4 h-4 text-white/80 shrink-0" />
+              <span>Add photos & files</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNavigateCoding}
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] font-medium text-gray-200 hover:text-white hover:bg-white/10 transition cursor-pointer text-left"
+            >
+              <Code className="w-4 h-4 text-white/80 shrink-0" />
+              <span>Coding</span>
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const providerKey = selectedProvider.toLowerCase().trim();
 
   // ==========================================
@@ -306,14 +391,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
           />
 
           <div className="flex items-center justify-between mt-3 pt-2">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-9 h-9 rounded-full bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
-              title="Add photos & files"
-            >
+            {renderAttachMenu(
+              "w-9 h-9 rounded-full bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer",
               <Plus className="w-5 h-5 stroke-[1.75]" />
-            </button>
+            )}
 
             <div className="flex items-center gap-2">
               {renderModelDropdown()}
@@ -478,14 +559,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
 
           <div className="flex items-center justify-between pt-3 mt-2">
             {/* [+] Button (Square with rounded corners, dark chip style) */}
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-9 h-9 rounded-xl bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
-              title="Add photos & files"
-            >
+            {renderAttachMenu(
+              "w-9 h-9 rounded-xl bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer",
               <Plus className="w-5 h-5 stroke-[2]" />
-            </button>
+            )}
 
             {/* Right: Model Selector Pill + Terracotta Send Button */}
             <div className="flex items-center gap-2.5">
@@ -599,15 +676,6 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
 
           <div className="flex items-center justify-between pt-3 mt-2 flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-9 h-9 rounded-full bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
-                title="Add photos & files"
-              >
-                <Plus className="w-5 h-5 stroke-[1.75]" />
-              </button>
-
               {/* DeepThink (R1) Button */}
               <button
                 type="button"
@@ -619,21 +687,30 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 }`}
               >
                 <Brain className="w-3.5 h-3.5" />
-                <span>DeepThink (R1)</span>
+                <span>DeepThink</span>
+              </button>
+
+              {/* Search Button */}
+              <button
+                type="button"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-[#181C2B] text-white/70 border-[#252A40] hover:text-white transition cursor-pointer"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>Search</span>
               </button>
             </div>
 
             <div className="flex items-center gap-2">
               {renderModelDropdown()}
 
+              {/* Direct Attach File Pin matching Image 4 */}
               <button
                 type="button"
-                onClick={toggleListening}
-                className={`p-2 rounded-full transition cursor-pointer ${
-                  isListening ? "text-red-400" : "text-white/60 hover:text-white"
-                }`}
+                onClick={() => fileInputRef.current?.click()}
+                className="p-1.5 rounded-full text-white/70 hover:text-white transition cursor-pointer"
+                title="Attach files"
               >
-                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                <Paperclip className="w-4 h-4 stroke-[1.75]" />
               </button>
 
               <button
@@ -669,14 +746,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         {renderFilesStrip()}
 
         <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[28px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] px-3 py-2 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-9 h-9 rounded-full bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0"
-            title="Add photos & files"
-          >
+          {renderAttachMenu(
+            "w-9 h-9 rounded-full bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0",
             <Plus className="w-5 h-5 stroke-[1.75]" />
-          </button>
+          )}
 
           <input
             type="text"
@@ -757,14 +830,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             <div className="flex items-center justify-between pt-3 mt-2">
               <div className="flex items-center gap-2.5">
                 {/* [+] Button (dark rounded-lg container) */}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-9 h-9 rounded-lg bg-[#141829] border border-[#22273F] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
-                  title="Add photos & files"
-                >
+                {renderAttachMenu(
+                  "w-9 h-9 rounded-lg bg-[#141829] border border-[#22273F] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer",
                   <Plus className="w-5 h-5 stroke-[1.75]" />
-                </button>
+                )}
 
                 {/* Model Selector Pill (dark pill with subtle border and chevron) */}
                 {renderModelDropdown(
@@ -890,25 +959,14 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 )
               )}
 
-              {/* Attach File Clip matching Flutter's attach_file */}
+              {/* Attach File Clip matching Image 2 */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="p-1.5 rounded-full text-white/70 hover:text-white transition cursor-pointer"
                 title="Attach files"
               >
-                <svg
-                  width="19"
-                  height="19"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                </svg>
+                <Paperclip className="w-4 h-4 stroke-[1.75]" />
               </button>
 
               <button
@@ -969,14 +1027,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
           />
 
           <div className="flex items-center justify-between pt-3 mt-2 border-t border-[#1C2033]/50">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-9 h-9 rounded-full border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
-              title="Add photos & files"
-            >
+            {renderAttachMenu(
+              "w-9 h-9 rounded-full border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer",
               <Plus className="w-4 h-4 stroke-[1.75]" />
-            </button>
+            )}
 
             <div className="flex items-center gap-3">
               {renderModelDropdown()}
@@ -1009,14 +1063,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         {renderFilesStrip()}
 
         <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] px-3 py-2 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-9 h-9 rounded-lg bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0"
-            title="Add photos & files"
-          >
+          {renderAttachMenu(
+            "w-9 h-9 rounded-lg bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0",
             <Plus className="w-4 h-4 stroke-[1.75]" />
-          </button>
+          )}
 
           <input
             type="text"
@@ -1071,14 +1121,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
         {renderFilesStrip()}
 
         <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-[30px] shadow-[0_4px_16px_rgba(0,0,0,0.3)] px-3 py-1.5 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-10 h-10 rounded-full bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0"
-            title="Add photos & files"
-          >
+          {renderAttachMenu(
+            "w-10 h-10 rounded-full bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0",
             <Plus className="w-5 h-5 stroke-[1.75]" />
-          </button>
+          )}
 
           <input
             type="text"
@@ -1157,7 +1203,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
                 className="w-9 h-9 rounded-lg bg-[#181C2B] border border-[#252A40] flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
                 title="Attach files"
               >
-                <Plus className="w-4 h-4 stroke-[1.75]" />
+                <Paperclip className="w-4 h-4 stroke-[1.75]" />
               </button>
               <button
                 type="button"
@@ -1216,14 +1262,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
 
           <div className="flex items-center justify-between pt-3 mt-2 border-t border-[#1C2033]/50">
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="text-white/70 hover:text-white transition cursor-pointer"
-                title="Add photos & files"
-              >
+              {renderAttachMenu(
+                "text-white/70 hover:text-white transition cursor-pointer",
                 <Plus className="w-5 h-5 stroke-[1.75]" />
-              </button>
+              )}
               <button
                 type="button"
                 className="text-white/70 hover:text-white transition cursor-pointer"
@@ -1270,7 +1312,7 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
             className="text-white/70 hover:text-white transition cursor-pointer shrink-0"
             title="Attach files"
           >
-            <Plus className="w-5 h-5 stroke-[1.75]" />
+            <Paperclip className="w-5 h-5 stroke-[1.75]" />
           </button>
 
           <input
@@ -1325,14 +1367,10 @@ export const ModelSpecificSearchInput: React.FC<SearchInputProps> = ({
       {renderFilesStrip()}
 
       <div className="w-full bg-[#0E111C] border border-[#252A40] rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.3)] px-4 py-1.5 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0"
-          title="Add photos & files"
-        >
+        {renderAttachMenu(
+          "w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer shrink-0",
           <Plus className="w-6 h-6 stroke-[1.75]" />
-        </button>
+        )}
 
         <input
           type="text"

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, Suspense, DragEvent } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -22,6 +22,7 @@ import {
   Zap,
   Image as ImageIcon,
   Paperclip,
+  ArrowLeft,
 } from "lucide-react";
 import { extractTextFromFile } from "@/lib/extractFileText";
 import {
@@ -505,6 +506,7 @@ function CopyButton({ text }: { text: string }) {
 
 function CompareAiContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Plans & Limits State[cite: 1]
   const [userPlan, setUserPlan] = useState<string>("basic");
@@ -1046,11 +1048,41 @@ function CompareAiContent() {
    
   return (
     <div 
-      className="flex flex-col h-screen w-screen overflow-hidden bg-[#08090E] text-white select-none relative"
+      className="flex flex-col h-screen w-screen overflow-hidden bg-[#08090E] text-white select-text relative"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
+      {/* Top Header Bar */}
+      <header className="min-h-12 py-2 px-3 sm:px-4 flex items-center justify-between gap-2 bg-[#0F1123] border-b border-[#1E223D] shrink-0 relative z-30 select-none">
+        <div className="flex items-center shrink-0">
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin)) {
+                  router.back();
+                  return;
+                }
+                router.push("/");
+              }
+            }}
+            className="cursor-pointer flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#261D5A] border border-[#3B3363] text-[#A78BFA] text-[12px] sm:text-[13px] font-semibold hover:bg-[#322774] transition shrink-0"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span className="hidden xs:inline sm:inline">Back to Home</span>
+            <span className="inline xs:hidden sm:hidden">Home</span>
+          </button>
+        </div>
+
+        <div className="flex-1 text-center px-1 min-w-0">
+          <h1 className="text-xs sm:text-sm md:text-base font-semibold text-white tracking-wide truncate">
+            Compare AI Models Side by Side
+          </h1>
+        </div>
+
+        <div className="w-8 sm:w-20 shrink-0" />
+      </header>
+
       {/* Drag & Drop Overlay */}
       {isDragging && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#5048E5]/20 backdrop-blur-sm border-4 border-dashed border-[#5048E5] m-4 rounded-3xl">
@@ -1082,7 +1114,7 @@ function CompareAiContent() {
 
             if (isCollapsed) {
               return (
-                <div key={pane.provider + index} style={{ width: "65px", minWidth: "65px", transition: "all 0.45s" }} className="flex flex-col items-center h-full rounded-[12px] bg-[#121522] border border-[#252A40] py-3.5 px-1.5 shrink-0 shadow-xl">
+                <div key={pane.provider + index} style={{ width: "65px", minWidth: "65px", transition: "all 0.45s" }} className="flex flex-col items-center h-full rounded-[12px] bg-[#121522] border border-[#252A40] py-3.5 px-1.5 shrink-0 shadow-xl select-none">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3">
                     <Image src={PROVIDER_ICONS[pane.provider] || "/assets/images/home_chatGPT.png"} alt={pane.provider} width={24} height={24} className="rounded object-contain opacity-70" />
                   </div>
@@ -1135,7 +1167,7 @@ function CompareAiContent() {
                 <div className="flex flex-col h-full rounded-[12px] bg-[#121522] overflow-hidden relative">
                   
                   {/* Header */}
-                  <div className="flex items-center justify-between px-3.5 py-2 bg-[#0E101A] border-b border-[#1B1F30] relative z-20">
+                  <div className="flex items-center justify-between px-3.5 py-2 bg-[#0E101A] border-b border-[#1B1F30] relative z-20 select-none">
                     <div className="flex items-center gap-2.5 flex-1 min-w-0">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
                         <Image src={PROVIDER_ICONS[pane.provider] || "/assets/images/home_chatGPT.png"} alt={pane.provider} width={26} height={26} className="rounded object-contain" />
@@ -1224,7 +1256,7 @@ function CompareAiContent() {
                   ) : (
                     <div 
                       ref={(el) => { paneScrollRefs.current[pane.provider] = el; }}
-                      className="flex-1 overflow-y-auto px-5 py-4 space-y-6 scrollbar-thin scrollbar-thumb-[#1B1F30] relative scroll-smooth"
+                      className="flex-1 overflow-y-auto px-5 py-4 space-y-6 scrollbar-thin scrollbar-thumb-[#1B1F30] relative scroll-smooth select-text"
                     >
                       {pane.messages.length === 0 ? (
                         <div className="h-full flex items-center justify-center text-gray-500 text-sm">Waiting for prompt...</div>
@@ -1302,7 +1334,7 @@ function CompareAiContent() {
       </div>
 
       {/* BOTTOM INPUT BOX */}
-      <div className="px-4 pb-3 pt-1 bg-[#08090E]">
+      <div className="px-4 pb-3 pt-1 bg-[#08090E] select-none">
         <div className="max-w-[800px] mx-auto rounded-[24px] p-[1.5px] bg-gradient-to-r from-[#4285F4] via-[#EA4335] via-[#FBBC05] to-[#34A853] shadow-2xl">
           <div className="bg-[#0E111C] rounded-[22.5px] px-4 py-3 flex flex-col gap-2 border border-[#252A40]">
             
