@@ -20,7 +20,7 @@ import {
   Maximize2,
   X,
 } from "lucide-react";
-
+import { getApiServerBase } from "@/lib/apiBase";
 const C1Component = dynamic(
   () => import("@thesysai/genui-sdk").then((mod) => mod.C1Component),
   { ssr: false }
@@ -38,19 +38,7 @@ interface SharedItemData {
   createdAt: string;
 }
 
-function getApiServerBase(): string {
-  const envBase =
-    process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
-  if (envBase) return envBase.replace(/\/api\/?$/, "");
 
-  if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    return host === "localhost" || host === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "https://api.onechatai.ai";
-  }
-  return "https://api.onechatai.ai";
-}
 
 export default function SharedReportPage() {
   const params = useParams();

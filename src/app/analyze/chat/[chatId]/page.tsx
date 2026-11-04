@@ -33,6 +33,7 @@ import {
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { C1MessageItem } from "@/components/C1MessageItem";
+import { getApiServerBase } from "@/lib/apiBase";
 
 // 1. Dynamically import react-pdf components to prevent SSR 'document is not defined' errors
 const Document = dynamic(
@@ -111,20 +112,6 @@ interface ChatSession {
   };
   files?: ChatFileItem[];
   messages: Message[];
-}
-
-function getApiServerBase(): string {
-  const envBase =
-    process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
-  if (envBase) return envBase.replace(/\/api\/?$/, "");
-
-  if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    return host === "localhost" || host === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "https://api.onechatai.ai";
-  }
-  return "https://api.onechatai.ai";
 }
 
 function getAuthToken(): string {

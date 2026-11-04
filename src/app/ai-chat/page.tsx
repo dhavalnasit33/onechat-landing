@@ -26,6 +26,7 @@ import {
 import { PROVIDER_MODELS, AIModelItem } from "@/constants/providerModelsHelper";
 import { extractTextFromFile } from "@/lib/extractFileText";
 import { ModelSpecificSearchInput } from "./ModelSpecificSearchInput";
+import { getApiBase } from "@/lib/apiBase";
 
 // Type declarations for Web Speech API
 declare global {
@@ -121,16 +122,7 @@ function getAuthToken(): string {
   return "";
 }
 
-function getApiBase(): string {
-  const envBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
-  if (envBase) return envBase.replace(/\/api\/?$/, "");
-  if (typeof window !== "undefined") {
-    return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "https://api.onechatai.ai";
-  }
-  return "https://api.onechatai.ai";
-}
+
 
 function resolveProviderAndModel(param: string | null): { providerName: string; modelItem: AIModelItem } {
   const defaultProvider = "ChatGPT";

@@ -29,6 +29,7 @@ import {
   PROVIDER_MODELS,
   AIModelItem,
 } from "@/constants/providerModelsHelper";
+import { getApiBase } from "@/lib/apiBase";
 
 interface SearchResult {
   title: string;
@@ -123,16 +124,7 @@ function getAuthToken(): string {
   return "";
 }
 
-function getApiBase(): string {
-  const envBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
-  if (envBase) return envBase.replace(/\/api\/?$/, "");
-  if (typeof window !== "undefined") {
-    return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? "http://localhost:5000"
-      : "https://api.onechatai.ai";
-  }
-  return "https://api.onechatai.ai";
-}
+
 
 // Citation Badge and Hover Popup Card (matching ai-chat)
 function CitationBadgeHover({
