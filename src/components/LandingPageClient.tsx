@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import Navbar from "./Navbar";
 import Hero from "./Hero";
 import Wanttocreate from "./Wanttocreate";
@@ -37,6 +38,7 @@ const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 const InterestModal = dynamic(() => import("./InterestModal"), { ssr: false });
 
 export default function LandingPageClient() {
+  const router = useRouter();
   const [interestOpen, setInterestOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -49,10 +51,8 @@ export default function LandingPageClient() {
       setInterestOpen(false);
       setAuthOpen(true);
     } else {
-      // Signup flow: Landing Page CTA -> Interest Selection -> Registration -> Pricing
-      setAuthMode("signup");
-      setAuthOpen(false);
-      setInterestOpen(true);
+      // Direct CTA Flow: Seamless client-side navigation without page reload
+      router.push("/multi-chat");
     }
   };
 
@@ -69,9 +69,8 @@ export default function LandingPageClient() {
           setInterestOpen(false);
           setAuthOpen(true);
         } else {
-          setAuthMode("signup");
-          setAuthOpen(false);
-          setInterestOpen(true);
+          // Direct CTA Flow: Seamless client-side navigation without page reload
+          router.push("/multi-chat");
         }
       },
       mode,
