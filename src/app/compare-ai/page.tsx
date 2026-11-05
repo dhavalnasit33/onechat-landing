@@ -771,6 +771,32 @@ function CompareAiContent() {
     }
   };
 
+  // Build Context matching ai-chat's exact format and emojis
+  const buildPromptWithContext = (currentPrompt: string, historyMessages: ChatMessage[], fileContent?: string): string => {
+    const historyPairs: string[] = [];
+    for (let i = 0; i < historyMessages.length; i++) {
+      const msg = historyMessages[i];
+      if (msg.role === "user" && i + 1 < historyMessages.length) {
+        const nextMsg = historyMessages[i + 1];
+        if (nextMsg.role === "assistant" && nextMsg.content) {
+          historyPairs.push(`User: ${msg.content}\nAI: ${nextMsg.content}`);
+        }
+      }
+    }
+    const lines: string[] = [];
+    lines.push(currentPrompt.trim());
+    lines.push("\n{{historyData}} Please answer casually with emojis, and mention anything about markdown or formatting.");
+    if (fileContent && fileContent.trim()) {
+      lines.push(`\n---\nFile Content:\n${fileContent.trim()}`);
+    }
+    if (historyPairs.length > 0) {
+      lines.push("\nConversation:");
+      const recentPairs = historyPairs.length > 6 ? historyPairs.slice(-6) : historyPairs;
+      for (const pair of recentPairs) lines.push(pair);
+    }
+    return lines.join("\n");
+  };
+
   const streamToPane = async (
     promptText: string,
     paneIndex: number,
@@ -779,7 +805,8 @@ function CompareAiContent() {
     currentChatId?: string,
     promptId?: string,
     imageUrl?: string | null,
-    displayContent?: string
+    displayContent?: string,
+    fileContent?: string
   ) => {
     const token = getAuthToken();
     const base = getApiBase();
@@ -788,6 +815,8 @@ function CompareAiContent() {
     let chatId = await ensureChatId(provider, currentChatId);
 
     const userMsgContent = displayContent || promptText;
+    const historyMsgs = providerPanes[paneIndex]?.messages || [];
+    const promptWithContext = buildPromptWithContext(promptText, historyMsgs, fileContent);
 
     setProviderPanes((prev) => {
       if (!prev[paneIndex]) return prev;
@@ -810,7 +839,7 @@ function CompareAiContent() {
 
     try {
       const payload: Record<string, any> = {
-        prompt: promptText,
+        prompt: promptWithContext,
         modelId: modelItem.id,
         chatId: chatId,
         ischatehistry: false,
@@ -963,11 +992,7 @@ function CompareAiContent() {
 
     if (!finalPrompt && selectedFiles.length === 0 && !activeImage) return;
 
-    // File Context Construction (Flutter exact)
-    let promptToSend = finalPrompt;
-    if (fileContext) {
-      promptToSend = `CURRENT ATTACHED FILE CONTENT:\n${fileContext}\n\nUSER INSTRUCTION:\n${finalPrompt}\n\n(IMPORTANT: Focus your analysis strictly on the CURRENT ATTACHED FILE CONTENT provided above.)`;
-    }
+    const currentFileContent = fileContext;
 
     // Visual Display for User message bubble
     let displayContent = finalPrompt;
@@ -1000,7 +1025,7 @@ function CompareAiContent() {
       if (pane.isEnabled) {
         if (isModelAccessible(pane.provider, pane.selectedModel.name)) {
           const modelPromptId = `${batchPromptId}_${pane.provider}`;
-          streamToPane(promptToSend, idx, pane.provider, pane.selectedModel, pane.chatId, modelPromptId, activeImage, displayContent);
+          streamToPane(finalPrompt, idx, pane.provider, pane.selectedModel, pane.chatId, modelPromptId, activeImage, displayContent, currentFileContent);
         }
       }
     });
@@ -1267,7 +1292,10 @@ function CompareAiContent() {
                                       />
                                     </div>
                                   )}
-                                  {msg.content.replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, '').trim()}
+                                  {msg.content
+                                    .replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, '')
+                                    .replace(/\{\{historyData\}\}[\s\S]*?(?:formatting\.)/i, '')
+                                    .trim()}
                                 </div>
                               ) : (
                                 <div className="w-full text-gray-100 selection:bg-purple-600">

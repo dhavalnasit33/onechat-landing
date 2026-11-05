@@ -432,15 +432,32 @@ function CitationBadgeHover({
   );
 }
 
-// Markdown with Citations component matching Flutter's exact Typography & Styles
+// Markdown with Citations component matching ai-chat's exact Typography & Styles
 function FormattedAiResponse({
   content,
+  isStreaming,
   searchResults,
 }: {
   content: string;
+  isStreaming?: boolean;
   searchResults?: SearchResult[];
 }) {
   if (!content) {
+    if (isStreaming) {
+      return (
+        <div className="flex items-center gap-1.5 py-2">
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#8B5CF6] animate-pulse" />
+          <span
+            className="inline-block w-2.5 h-2.5 rounded-full bg-[#8B5CF6] animate-pulse"
+            style={{ animationDelay: "150ms" }}
+          />
+          <span
+            className="inline-block w-2.5 h-2.5 rounded-full bg-[#8B5CF6] animate-pulse"
+            style={{ animationDelay: "300ms" }}
+          />
+        </div>
+      );
+    }
     return (
       <div className="flex items-center gap-1.5 py-2">
         <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#8B5CF6] animate-pulse" />
@@ -1092,7 +1109,7 @@ ${aiLastAnswer.substring(0, 500)}`;
     }
     const lines: string[] = [];
     lines.push(currentPrompt.trim());
-    lines.push("\n{{historyData}} Please answer casually with emojis, and don't mention anything about markdown or formatting.");
+    lines.push("\n{{historyData}} Please answer casually with emojis, and mention anything about markdown or formatting.");
     if (fileContent && fileContent.trim()) {
       lines.push(`\n---\nFile Content:\n${fileContent.trim()}`);
     }
@@ -1597,7 +1614,11 @@ ${aiLastAnswer.substring(0, 500)}`;
                               );
                             })()}
                           </div>
-                          <FormattedAiResponse content={msg.content} searchResults={msg.searchResults} />
+                          <FormattedAiResponse 
+                            content={msg.content} 
+                            isStreaming={isStreaming && idx === messages.length - 1}
+                            searchResults={msg.searchResults} 
+                          />
                           
                           {/* Message Action Bar matching Flutter: Copy + Workspace Save + Sources Pill (for Perplexity / searchResults) */}
                           {msg.content && !isStreaming && (
