@@ -361,24 +361,24 @@ function FormattedAiResponse({
           ),
           // Tables matching Flutter's exact Markdown table styling with borders and padding
           table: ({ node, ...props }) => (
-            <div className="w-full overflow-x-auto my-4 rounded-xl border border-[#1B1F30] bg-[#0E101D]">
-              <table className="w-full border-collapse text-left text-[14px]" {...props} />
+            <div className="w-full overflow-x-auto my-3 rounded-xl border border-[#2D3352] bg-[#0E101D] shadow-md scrollbar-thin scrollbar-thumb-[#252A40]">
+              <table className="w-full min-w-full border-collapse text-left text-[13px]" {...props} />
             </div>
           ),
           thead: ({ node, ...props }) => (
-            <thead className="bg-[#121524] border-b border-[#1B1F30] text-white font-semibold" {...props} />
+            <thead className="bg-[#181C30] border-b border-[#2D3352] text-white font-bold" {...props} />
           ),
           tbody: ({ node, ...props }) => (
-            <tbody className="divide-y divide-[#1B1F30]/70" {...props} />
+            <tbody className="divide-y divide-[#2D3352]/70" {...props} />
           ),
           tr: ({ node, ...props }) => (
-            <tr className="hover:bg-[#161A2C]/60 transition" {...props} />
+            <tr className="hover:bg-[#161A2C]/80 transition-colors" {...props} />
           ),
           th: ({ node, ...props }) => (
-            <th className="px-4 py-3 font-semibold text-white tracking-wide border-r border-[#1B1F30] last:border-r-0" {...props} />
+            <th className="px-3.5 py-2.5 font-bold text-white tracking-wide border-r border-[#2D3352] last:border-r-0 whitespace-nowrap" {...props} />
           ),
           td: ({ node, ...props }) => (
-            <td className="px-4 py-3.5 text-[#E2E8F0] leading-relaxed border-r border-[#1B1F30] last:border-r-0 align-top" {...props} />
+            <td className="px-3.5 py-2.5 text-[#E2E8F0] leading-snug border-r border-[#2D3352] last:border-r-0 align-middle" {...props} />
           ),
           p: ({ node, children, ...props }) => {
             // Render children with custom citation detection
@@ -443,20 +443,28 @@ function FormattedAiResponse({
             </li>
           ),
           strong: ({ node, ...props }) => (
-            <strong className="font-bold text-white" {...props} />
+            <strong className="font-bold text-white tracking-wide" {...props} />
           ),
-          code: ({ node, inline, ...props }: any) => {
+          em: ({ node, ...props }) => (
+            <em className="italic text-white" {...props} />
+          ),
+          pre: ({ children }: any) => <>{children}</>,
+          code: ({ node, inline, className, children, ...props }: any) => {
             if (inline) {
               return (
                 <code
-                  className="px-1.5 py-0.5 rounded bg-[#181C2B] text-[#E0A8FF] font-mono text-[13px] border border-[#252A40]"
+                  className="px-1.5 py-0.5 rounded bg-[#181C2B] text-[#C4B5FD] font-mono text-[13px] border border-[#2D3352]"
                   {...props}
-                />
+                >
+                  {children}
+                </code>
               );
             }
             return (
-              <pre className="p-3.5 rounded-xl bg-[#0F111C] border border-[#22273D] overflow-x-auto text-[13px] text-gray-200 my-3 font-mono">
-                <code {...props} />
+              <pre className="p-3.5 rounded-xl bg-[#0F111C] border border-[#2D3352] overflow-x-auto text-[13px] text-gray-200 my-3 font-mono scrollbar-thin scrollbar-thumb-[#252A40]">
+                <code className={className} {...props}>
+                  {children}
+                </code>
               </pre>
             );
           },
@@ -785,7 +793,7 @@ function CompareAiContent() {
     }
     const lines: string[] = [];
     lines.push(currentPrompt.trim());
-    lines.push("\n{{historyData}} Please answer casually with emojis, and mention anything about markdown or formatting.");
+    lines.push("\n{{historyData}} Please answer casually with emojis, and don't mention anything about markdown or formatting.");
     if (fileContent && fileContent.trim()) {
       lines.push(`\n---\nFile Content:\n${fileContent.trim()}`);
     }
