@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useDropzone } from "react-dropzone";
@@ -21,7 +21,8 @@ import {
   UploadCloud,
   ExternalLink,
   ArrowRight,
-  ArrowUpRight
+  ArrowUpRight,
+  ArrowLeft
 } from "lucide-react";
 import { PROVIDER_MODELS, AIModelItem } from "@/constants/providerModelsHelper";
 import { extractTextFromFile } from "@/lib/extractFileText";
@@ -615,6 +616,7 @@ function FormattedAiResponse({
 
 function AiChatInner() {
   const searchParams = useSearchParams();
+    const router = useRouter();
 
   // State to track if current session is specifically Deep Research tab
   const [isDeepResearchMode, setIsDeepResearchMode] = useState<boolean>(() => {
@@ -741,17 +743,47 @@ function AiChatInner() {
 
   useEffect(() => {
     if (hasAutoTriggeredRef.current) return;
+
+    // 1. Initial Prompt (LocalStorage / Cookie / Query)
+    const storagePrompt = typeof window !== "undefined" ? localStorage.getItem("chat_initial_prompt") : null;
     const cookiePrompt = getCookie("chat_initial_prompt");
     const queryPrompt = searchParams.get("prompt");
-    const promptToTrigger = (cookiePrompt || queryPrompt || "").trim();
-    if (promptToTrigger) {
+    const promptToTrigger = (storagePrompt || cookiePrompt || queryPrompt || "").trim();
+
+    // 2. Initial Image (LocalStorage for Live Production, Hash fallback for local port testing)
+    let initialImage = typeof window !== "undefined" ? localStorage.getItem("chat_initial_image") : null;
+    if (!initialImage && typeof window !== "undefined" && window.location.hash.includes("img=")) {
+      try {
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        initialImage = hashParams.get("img");
+      } catch (_) {}
+    }
+
+    // 3. Initial Extracted File Content & Filenames (LocalStorage)
+    const initialFileContent = typeof window !== "undefined" ? localStorage.getItem("chat_initial_file_content") : null;
+    const initialFilenames = typeof window !== "undefined" ? localStorage.getItem("chat_initial_filenames") : null;
+
+    if (promptToTrigger || initialImage || initialFileContent) {
       hasAutoTriggeredRef.current = true;
+
+      // 🔥 IMMEDIATE REMOVAL: Clear from localStorage and Cookie as soon as retrieved!
       deleteCookie("chat_initial_prompt");
+      deleteCookie("chat_initial_image_url");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("chat_initial_prompt");
+        localStorage.removeItem("chat_initial_image");
+        localStorage.removeItem("chat_initial_file_content");
+        localStorage.removeItem("chat_initial_filenames");
+      }
+
       // Clean URL: Replace messy long URL with clean /ai-chat
       try {
         window.history.replaceState({}, "", "/ai-chat");
       } catch (_) {}
-      setTimeout(() => handleSendMessage(promptToTrigger), 300);
+
+      setTimeout(() => {
+        handleSendMessage(promptToTrigger, initialImage, initialFileContent, initialFilenames);
+      }, 300);
     }
   }, [selectedModel]);
 
@@ -1086,12 +1118,17 @@ ${aiLastAnswer.substring(0, 500)}`;
     });
   };
 
-  const handleSendMessage = async (textToSend?: string) => {
+  const handleSendMessage = async (
+    textToSend?: string,
+    overrideImage?: string | null,
+    overrideFileContent?: string | null,
+    overrideFilenames?: string | null
+  ) => {
     let promptText = (textToSend || prompt).trim();
-    if (!promptText && selectedFiles.length === 0) return;
+    if (!promptText && selectedFiles.length === 0 && !overrideImage && !overrideFileContent) return;
 
-    let attachedFileContent = "";
-    let activeImage: string | null = null;
+    let attachedFileContent = overrideFileContent || "";
+    let activeImage: string | null = overrideImage || null;
     const filesToProcess = [...selectedFiles];
 
     if (filesToProcess.length > 0) {
@@ -1112,22 +1149,26 @@ ${aiLastAnswer.substring(0, 500)}`;
             }
           }
         }
-        attachedFileContent = combinedText.trim();
+        attachedFileContent = (attachedFileContent ? attachedFileContent + "\n" : "") + combinedText.trim();
       } catch (e) {
         console.error("Error reading attached file:", e);
       }
     }
 
-    // Auto-prompt when only file or image is sent without text
-    if (!promptText && activeImage) {
-      promptText = "What is in this image? Please describe and analyze it.";
-    } else if (!promptText && attachedFileContent) {
-      promptText = "Analyze these files";
+    // Auto-clean Flutter prefix "📄 filenames" if present
+    if (activeImage) {
+      const cleanPrompt = promptText.replace(/^📄[^\n]+\n*/, "").trim();
+      promptText = cleanPrompt || "What is in this image? Please describe and analyze it.";
+    } else if (attachedFileContent) {
+      const cleanPrompt = promptText.replace(/^📄[^\n]+\n*/, "").trim();
+      promptText = cleanPrompt || "Analyze these files";
     }
 
     // Visual Display for User message bubble
     let displayUserMessage = promptText;
-    if (filesToProcess.length > 0) {
+    if (overrideFilenames) {
+      displayUserMessage = `📎 ${overrideFilenames}\n\n${promptText}`;
+    } else if (filesToProcess.length > 0) {
       const fileNames = filesToProcess.map((f) => `📎 ${f.name}`).join("\n");
       displayUserMessage = displayUserMessage ? `${fileNames}\n\n${displayUserMessage}` : fileNames;
     }
@@ -1311,7 +1352,7 @@ ${aiLastAnswer.substring(0, 500)}`;
     }
   }, [selectedFiles.length, prompt, showToast]);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     noClick: true,
     noKeyboard: true
@@ -1400,8 +1441,24 @@ ${aiLastAnswer.substring(0, 500)}`;
       >
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#1B1F30]/60">
           {/* Ahiya thi hidden md:block nikali didhu che */}
-          {isSidebarOpen && <span className="block font-bold text-[17px] tracking-wide text-white whitespace-nowrap">Chat</span>}
-         <button type="button" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer ml-auto md:ml-auto md:ml-0">
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin)) {
+                  router.back();
+                  return;
+                }
+                router.push("/");
+              }
+            }}
+            className="cursor-pointer flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#261D5A] border border-[#3B3363] text-[#A78BFA] text-[12px] sm:text-[13px] font-semibold hover:bg-[#322774] transition shrink-0"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span className="hidden xs:inline sm:inline">Back to Home</span>
+            <span className="inline xs:hidden sm:hidden">Home</span>
+          </button>
+
+          <button type="button" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer ml-auto md:ml-auto md:ml-0">
             <Menu className="w-4 h-4" />
           </button>
         </div>
@@ -1490,7 +1547,7 @@ ${aiLastAnswer.substring(0, 500)}`;
               {messages.map((msg, idx) => {
                 const isUser = msg.role === "user";
                 return (
-                  <div key={idx} className={`w-full flex ${isUser ? "justify-end" : "justify-start"} group relative`}>
+                  <div key={idx} className={`w-full flex ${isUser ? "justify-end" : "justify-center"} group relative`}>
                     {isUser ? (
                       <div className="max-w-[70%] rounded-[18px] px-4 py-2 bg-[#1E1B38] text-[14.5px] text-white shadow-md whitespace-pre-wrap leading-relaxed">
                         {msg.imageUrl && (
