@@ -1300,10 +1300,12 @@ function CompareAiContent() {
                                       />
                                     </div>
                                   )}
-                                  {msg.content
-                                    .replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, '')
-                                    .replace(/\{\{historyData\}\}[\s\S]*?(?:formatting\.)/i, '')
-                                    .trim()}
+                                 {msg.content
+    .replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, '')
+    .replace(/\{\{historyData\}\}[\s\S]*?(?:formatting\.)/i, '')
+    .replace(/\{\{historyData\}\}[^\n]*/gi, '')
+    .replace(/\n*Conversation:[\s\S]*/i, '')
+    .trim()}
                                 </div>
                               ) : (
                                 <div className="w-full text-gray-100 selection:bg-purple-600">

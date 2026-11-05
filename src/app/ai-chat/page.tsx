@@ -927,9 +927,10 @@ function AiChatInner() {
               savedFollowUps = m.metadata.follow_ups;
             }
 
+            const rawContent = m.content || m.text || m.message || "";
             return {
               role: isUser ? "user" : "assistant",
-              content: m.content || m.text || m.message || "",
+              content: isUser ? sanitizeUserMessage(rawContent) : rawContent,
               imageUrl: m.imageUrl || m.image_url || m.metadata?.imageUrl || m.metadata?.image_url,
               searchResults: savedSearchResults.length > 0 ? savedSearchResults : undefined,
               followUps: savedFollowUps.length > 0 ? savedFollowUps : undefined
@@ -941,6 +942,16 @@ function AiChatInner() {
     } catch (e) {
       console.error("Failed to load chat:", e);
     }
+  };
+
+  const sanitizeUserMessage = (text: string): string => {
+    if (!text) return "";
+    return text
+      .replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, "")
+      .replace(/\{\{historyData\}\}[\s\S]*?(?:formatting\.)/i, "")
+      .replace(/\{\{historyData\}\}[^\n]*/gi, "")
+      .replace(/\n*Conversation:[\s\S]*/i, "")
+      .trim();
   };
 
   const sanitizeChatTitle = (title?: string | null, fallback = "New Chat") => {
@@ -1575,16 +1586,16 @@ ${aiLastAnswer.substring(0, 500)}`;
                   <div key={idx} className={`w-full flex ${isUser ? "justify-end" : "justify-center"} group relative`}>
                     {isUser ? (
                       <div className="max-w-[70%] rounded-[18px] px-4 py-2 bg-[#1E1B38] text-[14.5px] text-white shadow-md whitespace-pre-wrap leading-relaxed">
-                        {msg.imageUrl && (
-                          <div className="mb-2.5 overflow-hidden rounded-xl border border-[#252A40] bg-black/40">
-                            <img
-                              src={msg.imageUrl}
-                              alt="Attached preview"
-                              className="max-h-56 w-full object-contain rounded-lg"
-                            />
-                          </div>
-                        )}
-                        {msg.content}
+                       {msg.imageUrl && (
+    <div className="mb-2.5 overflow-hidden rounded-xl border border-[#252A40] bg-black/40">
+      <img
+        src={msg.imageUrl}
+        alt="Attached preview"
+        className="max-h-56 w-full object-contain rounded-lg"
+      />
+    </div>
+  )}
+  {sanitizeUserMessage(msg.content)}
                       </div>
                     ) : (
                       <div className="w-full max-w-[850px] flex flex-col gap-2">
