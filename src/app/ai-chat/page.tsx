@@ -1178,8 +1178,10 @@ useEffect(() => {
     if (!text) return "";
     const cleaned = text
       .replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, "")
+      .replace(/Please answer casually with emojis[^\n]*/gi, "")
       .replace(/\{\{historyData\}\}[\s\S]*?(?:formatting\.)/i, "")
       .replace(/\{\{historyData\}\}[^\n]*/gi, "")
+      .replace(/---\nFile Content:[\s\S]*/i, "")
       .replace(/\n*Conversation:[\s\S]*/i, "")
       .trim();
     // જો Regex બધું જ ઉડાડી દે તો મૂળ text બતાવો
