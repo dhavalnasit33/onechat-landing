@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef, Suspense, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  Suspense,
+  useCallback,
+} from "react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
@@ -22,7 +28,7 @@ import {
   ExternalLink,
   ArrowRight,
   ArrowUpRight,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 import { PROVIDER_MODELS, AIModelItem } from "@/constants/providerModelsHelper";
 import { extractTextFromFile } from "@/lib/extractFileText";
@@ -39,21 +45,111 @@ declare global {
 
 // 15 Major Models list
 export const MAJOR_PROVIDERS = [
-  { name: "ChatGPT", route: "/chatgpt", provider: "openai", icon: "/assets/images/home_chatGPT.png", defaultModel: "GPT 5.6 Terra" },
-  { name: "Gemini", route: "/gemini", provider: "google", icon: "/assets/images/home_gemini.png", defaultModel: "Gemini 2.5 Flash" },
-  { name: "Claude", route: "/claude", provider: "anthropic", icon: "/assets/images/claude1.png", defaultModel: "Claude Sonnet 5" },
-  { name: "DeepSeek", route: "/deepseek", provider: "deepseek", icon: "/assets/images/deepseek1.png", defaultModel: "DeepSeek V4 Pro" },
-  { name: "Llama", route: "/llama", provider: "meta", icon: "/assets/images/home_meta_ai.png", defaultModel: "Llama 4 Maverick" },
-  { name: "Meta Muse", route: "/muse", provider: "muse", icon: "/assets/images/muse-logo.png", defaultModel: "Meta Muse Pro" },
-  { name: "Grok", route: "/grok", provider: "xai", icon: "/assets/images/grok-icon.png", defaultModel: "Grok 4.20" },
-  { name: "Perplexity", route: "/perplexity", provider: "perplexity", icon: "/assets/images/home_perplexity.png", defaultModel: "Sonar" },
-  { name: "Kimi", route: "/kimi", provider: "kimi", icon: "/assets/images/kimi-icon.png", defaultModel: "Kimi K3" },
-  { name: "Mistral", route: "/mistral", provider: "mistral", icon: "/assets/images/mistral1.png", defaultModel: "Mistral Small 2603" },
-  { name: "Qwen", route: "/qwen", provider: "qwen", icon: "/assets/images/qwen1.png", defaultModel: "Qwen 3.8 27B" },
-  { name: "MiniMax", route: "/minimax", provider: "minimax", icon: "/assets/images/minimax1.png", defaultModel: "MiniMax M3" },
-  { name: "MiMo", route: "/mimo", provider: "mimo", icon: "/assets/images/mimo1.png", defaultModel: "MiMo V2.5 Pro" },
-  { name: "GLM", route: "/glm", provider: "glm", icon: "/assets/images/glm1.png", defaultModel: "GLM 5.3" },
-  { name: "Nemotron", route: "/nemotron", provider: "nemotron", icon: "/assets/images/nemotron1.png", defaultModel: "NVIDIA Nemotron 3..." },
+  {
+    name: "ChatGPT",
+    route: "/chatgpt",
+    provider: "openai",
+    icon: "/assets/images/home_chatGPT.png",
+    defaultModel: "GPT 5.6 Terra",
+  },
+  {
+    name: "Gemini",
+    route: "/gemini",
+    provider: "google",
+    icon: "/assets/images/home_gemini.png",
+    defaultModel: "Gemini 2.5 Flash",
+  },
+  {
+    name: "Claude",
+    route: "/claude",
+    provider: "anthropic",
+    icon: "/assets/images/claude1.png",
+    defaultModel: "Claude Sonnet 5",
+  },
+  {
+    name: "DeepSeek",
+    route: "/deepseek",
+    provider: "deepseek",
+    icon: "/assets/images/deepseek1.png",
+    defaultModel: "DeepSeek V4 Pro",
+  },
+  {
+    name: "Llama",
+    route: "/llama",
+    provider: "meta",
+    icon: "/assets/images/home_meta_ai.png",
+    defaultModel: "Llama 4 Maverick",
+  },
+  {
+    name: "Meta Muse",
+    route: "/muse",
+    provider: "muse",
+    icon: "/assets/images/muse-logo.png",
+    defaultModel: "Meta Muse Pro",
+  },
+  {
+    name: "Grok",
+    route: "/grok",
+    provider: "xai",
+    icon: "/assets/images/grok-icon.png",
+    defaultModel: "Grok 4.20",
+  },
+  {
+    name: "Perplexity",
+    route: "/perplexity",
+    provider: "perplexity",
+    icon: "/assets/images/home_perplexity.png",
+    defaultModel: "Sonar",
+  },
+  {
+    name: "Kimi",
+    route: "/kimi",
+    provider: "kimi",
+    icon: "/assets/images/kimi-icon.png",
+    defaultModel: "Kimi K3",
+  },
+  {
+    name: "Mistral",
+    route: "/mistral",
+    provider: "mistral",
+    icon: "/assets/images/mistral1.png",
+    defaultModel: "Mistral Small 2603",
+  },
+  {
+    name: "Qwen",
+    route: "/qwen",
+    provider: "qwen",
+    icon: "/assets/images/qwen1.png",
+    defaultModel: "Qwen 3.8 27B",
+  },
+  {
+    name: "MiniMax",
+    route: "/minimax",
+    provider: "minimax",
+    icon: "/assets/images/minimax1.png",
+    defaultModel: "MiniMax M3",
+  },
+  {
+    name: "MiMo",
+    route: "/mimo",
+    provider: "mimo",
+    icon: "/assets/images/mimo1.png",
+    defaultModel: "MiMo V2.5 Pro",
+  },
+  {
+    name: "GLM",
+    route: "/glm",
+    provider: "glm",
+    icon: "/assets/images/glm1.png",
+    defaultModel: "GLM 5.3",
+  },
+  {
+    name: "Nemotron",
+    route: "/nemotron",
+    provider: "nemotron",
+    icon: "/assets/images/nemotron1.png",
+    defaultModel: "NVIDIA Nemotron 3...",
+  },
 ];
 
 export const PROVIDER_ICONS: Record<string, string> = {
@@ -124,24 +220,37 @@ function getAuthToken(): string {
   return "";
 }
 
-
-
-function resolveProviderAndModel(param: string | null): { providerName: string; modelItem: AIModelItem } {
+function resolveProviderAndModel(param: string | null): {
+  providerName: string;
+  modelItem: AIModelItem;
+} {
   const defaultProvider = "ChatGPT";
-  const defaultModel = PROVIDER_MODELS["ChatGPT"]?.[0] || { name: "GPT 5.6 Terra", id: "6a756be690ca2618be6d5f91", slug: "gpt-5.6-terra", icon: "assets/images/chatgpt1.png" };
+  const defaultModel = PROVIDER_MODELS["ChatGPT"]?.[0] || {
+    name: "GPT 5.6 Terra",
+    id: "6a756be690ca2618be6d5f91",
+    slug: "gpt-5.6-terra",
+    icon: "assets/images/chatgpt1.png",
+  };
   if (!param) return { providerName: defaultProvider, modelItem: defaultModel };
-  
+
   const p = param.trim().toLowerCase();
   for (const prov of Object.keys(PROVIDER_MODELS)) {
     const list = PROVIDER_MODELS[prov] || [];
     for (const item of list) {
-      if (item.slug.toLowerCase() === p || item.name.toLowerCase() === p || item.id.toLowerCase() === p) {
+      if (
+        item.slug.toLowerCase() === p ||
+        item.name.toLowerCase() === p ||
+        item.id.toLowerCase() === p
+      ) {
         return { providerName: prov, modelItem: item };
       }
     }
   }
-  
-  const provMatch = MAJOR_PROVIDERS.find((item) => item.name.toLowerCase() === p || item.provider.toLowerCase() === p);
+
+  const provMatch = MAJOR_PROVIDERS.find(
+    (item) =>
+      item.name.toLowerCase() === p || item.provider.toLowerCase() === p,
+  );
   if (provMatch) {
     const list = PROVIDER_MODELS[provMatch.name] || [];
     return { providerName: provMatch.name, modelItem: list[0] || defaultModel };
@@ -259,8 +368,16 @@ function CopyButton({ text }: { text: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <button onClick={handleCopy} className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-[#181C2B] transition cursor-pointer" title="Copy">
-      {copied ? <CheckCheck className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+    <button
+      onClick={handleCopy}
+      className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-[#181C2B] transition cursor-pointer"
+      title="Copy"
+    >
+      {copied ? (
+        <CheckCheck className="w-3.5 h-3.5 text-green-400" />
+      ) : (
+        <Copy className="w-3.5 h-3.5" />
+      )}
     </button>
   );
 }
@@ -290,7 +407,9 @@ function CitationBadgeHover({
     source?.domain?.replace(/^www\./, "") ||
     (() => {
       try {
-        return source?.url ? new URL(source.url).hostname.replace(/^www\./, "") : "";
+        return source?.url
+          ? new URL(source.url).hostname.replace(/^www\./, "")
+          : "";
       } catch {
         return source?.url || "";
       }
@@ -309,7 +428,8 @@ function CitationBadgeHover({
   }
   if (!displayDomain) displayDomain = `${index}`;
 
-  const badgeLabel = extraCount > 0 ? `${displayDomain} +${extraCount}` : displayDomain;
+  const badgeLabel =
+    extraCount > 0 ? `${displayDomain} +${extraCount}` : displayDomain;
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -359,7 +479,9 @@ function CitationBadgeHover({
                 <button
                   type="button"
                   disabled={activeSubIndex === 0}
-                  onClick={() => setActiveSubIndex((prev) => Math.max(0, prev - 1))}
+                  onClick={() =>
+                    setActiveSubIndex((prev) => Math.max(0, prev - 1))
+                  }
                   className="w-5 h-5 rounded hover:bg-gray-100 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-transparent"
                 >
                   ‹
@@ -371,7 +493,9 @@ function CitationBadgeHover({
                   type="button"
                   disabled={activeSubIndex === sources.length - 1}
                   onClick={() =>
-                    setActiveSubIndex((prev) => Math.min(sources.length - 1, prev + 1))
+                    setActiveSubIndex((prev) =>
+                      Math.min(sources.length - 1, prev + 1),
+                    )
                   }
                   className="w-5 h-5 rounded hover:bg-gray-100 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-transparent"
                 >
@@ -475,8 +599,14 @@ function FormattedAiResponse({
 
   // Format thinking tags for DeepSeek
   let formattedContent = content;
-  if (formattedContent.includes("<think>") && !formattedContent.includes("</think>")) {
-    formattedContent = formattedContent.replace("<think>", "### 🧠 Thinking...\n\n---\n\n");
+  if (
+    formattedContent.includes("<think>") &&
+    !formattedContent.includes("</think>")
+  ) {
+    formattedContent = formattedContent.replace(
+      "<think>",
+      "### 🧠 Thinking...\n\n---\n\n",
+    );
   } else {
     formattedContent = formattedContent
       .replace(/<think>/g, "### 🧠 Thinking Process\n\n---\n\n")
@@ -485,10 +615,7 @@ function FormattedAiResponse({
 
   // Turn [1] or [1][2] citations into our citation tokens
   // Matching Flutter's _linkifyReferences and [cite:X]
-  formattedContent = formattedContent.replace(
-    /\[(\d+)\]/g,
-    "[cite:$1]"
-  );
+  formattedContent = formattedContent.replace(/\[(\d+)\]/g, "[cite:$1]");
 
   return (
     <div className="prose prose-invert max-w-none text-[15.5px] leading-[1.7] font-normal text-[#E2E8F0] selection:bg-purple-600/40">
@@ -497,37 +624,64 @@ function FormattedAiResponse({
         components={{
           // Headings matching Flutter's typography (h1: 24px bold, h2: 20px w800, h3: 18px w600)
           h1: ({ node, ...props }) => (
-            <h1 className="text-[24px] font-bold text-white mt-6 mb-3 tracking-tight leading-snug" {...props} />
+            <h1
+              className="text-[24px] font-bold text-white mt-6 mb-3 tracking-tight leading-snug"
+              {...props}
+            />
           ),
           h2: ({ node, ...props }) => (
-            <h2 className="text-[20px] font-extrabold text-white mt-5 mb-2.5 tracking-tight leading-snug" {...props} />
+            <h2
+              className="text-[20px] font-extrabold text-white mt-5 mb-2.5 tracking-tight leading-snug"
+              {...props}
+            />
           ),
           h3: ({ node, ...props }) => (
-            <h3 className="text-[18px] font-bold text-white mt-4 mb-2 tracking-tight leading-snug" {...props} />
+            <h3
+              className="text-[18px] font-bold text-white mt-4 mb-2 tracking-tight leading-snug"
+              {...props}
+            />
           ),
           h4: ({ node, ...props }) => (
-            <h4 className="text-[17px] font-semibold text-white mt-3.5 mb-1.5" {...props} />
+            <h4
+              className="text-[17px] font-semibold text-white mt-3.5 mb-1.5"
+              {...props}
+            />
           ),
           // Tables matching Flutter's exact Markdown table styling with borders and padding
           table: ({ node, ...props }) => (
             <div className="w-full overflow-x-auto my-3 rounded-xl border border-[#2D3352] bg-[#0E101D] shadow-md scrollbar-thin scrollbar-thumb-[#252A40]">
-              <table className="w-full min-w-full border-collapse text-left text-[13px]" {...props} />
+              <table
+                className="w-full min-w-full border-collapse text-left text-[13px]"
+                {...props}
+              />
             </div>
           ),
           thead: ({ node, ...props }) => (
-            <thead className="bg-[#181C30] border-b border-[#2D3352] text-white font-bold" {...props} />
+            <thead
+              className="bg-[#181C30] border-b border-[#2D3352] text-white font-bold"
+              {...props}
+            />
           ),
           tbody: ({ node, ...props }) => (
             <tbody className="divide-y divide-[#2D3352]/70" {...props} />
           ),
           tr: ({ node, ...props }) => (
-            <tr className="hover:bg-[#161A2C]/80 transition-colors" {...props} />
+            <tr
+              className="hover:bg-[#161A2C]/80 transition-colors"
+              {...props}
+            />
           ),
           th: ({ node, ...props }) => (
-            <th className="px-3.5 py-2.5 font-bold text-white tracking-wide border-r border-[#2D3352] last:border-r-0 whitespace-nowrap" {...props} />
+            <th
+              className="px-3.5 py-2.5 font-bold text-white tracking-wide border-r border-[#2D3352] last:border-r-0 whitespace-nowrap"
+              {...props}
+            />
           ),
           td: ({ node, ...props }) => (
-            <td className="px-3.5 py-2.5 text-[#E2E8F0] leading-snug border-r border-[#2D3352] last:border-r-0 align-middle" {...props} />
+            <td
+              className="px-3.5 py-2.5 text-[#E2E8F0] leading-snug border-r border-[#2D3352] last:border-r-0 align-middle"
+              {...props}
+            />
           ),
           p: ({ node, children, ...props }) => {
             // Render children with custom citation detection
@@ -560,10 +714,16 @@ function FormattedAiResponse({
             );
           },
           ul: ({ node, ...props }) => (
-            <ul className="list-disc pl-5 mb-3.5 space-y-1.5 text-[#E2E8F0]" {...props} />
+            <ul
+              className="list-disc pl-5 mb-3.5 space-y-1.5 text-[#E2E8F0]"
+              {...props}
+            />
           ),
           ol: ({ node, ...props }) => (
-            <ol className="list-decimal pl-5 mb-3.5 space-y-1.5 text-[#E2E8F0]" {...props} />
+            <ol
+              className="list-decimal pl-5 mb-3.5 space-y-1.5 text-[#E2E8F0]"
+              {...props}
+            />
           ),
           li: ({ node, children, ...props }) => (
             <li className="leading-[1.7]" {...props}>
@@ -641,7 +801,7 @@ function FormattedAiResponse({
 
 function AiChatInner() {
   const searchParams = useSearchParams();
-    const router = useRouter();
+  const router = useRouter();
 
   // State to track if current session is specifically Deep Research tab
   const [isDeepResearchMode, setIsDeepResearchMode] = useState<boolean>(() => {
@@ -664,29 +824,43 @@ function AiChatInner() {
       provParam?.toLowerCase() === "sonar-deep-research" ||
       provParam?.toLowerCase() === "deep_research" ||
       provParam?.toLowerCase() === "deep-research" ||
-      (typeof document !== "undefined" && getCookie("chat_deep_research_mode") === "true")
+      (typeof document !== "undefined" &&
+        getCookie("chat_deep_research_mode") === "true")
     ) {
       const perplexityModels = PROVIDER_MODELS["Perplexity"] || [];
-      const deepModel = perplexityModels.find(
-        (m) => m.slug === "sonar-deep-research" || m.name.toLowerCase().includes("deep research")
-      ) || perplexityModels[0];
+      const deepModel =
+        perplexityModels.find(
+          (m) =>
+            m.slug === "sonar-deep-research" ||
+            m.name.toLowerCase().includes("deep research"),
+        ) || perplexityModels[0];
       return { providerName: "Perplexity", modelItem: deepModel };
     }
     return resolveProviderAndModel(provParam);
   })();
 
-  const [selectedProvider, setSelectedProvider] = useState<string>(initialResolved.providerName);
-  const [selectedModel, setSelectedModel] = useState<AIModelItem>(initialResolved.modelItem);
+  const [selectedProvider, setSelectedProvider] = useState<string>(
+    initialResolved.providerName,
+  );
+  const [selectedModel, setSelectedModel] = useState<AIModelItem>(
+    initialResolved.modelItem,
+  );
   const [openSubModelDropdown, setOpenSubModelDropdown] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDeepThinkActive, setIsDeepThinkActive] = useState(false);
 
   // Chat State
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+const [isMounted, setIsMounted] = useState(false);
+useEffect(() => {
+  setIsMounted(true);
+}, []);
   const [isStreaming, setIsStreaming] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
-  const [activeSourcesDrawer, setActiveSourcesDrawer] = useState<SearchResult[] | null>(null);
+  const [activeSourcesDrawer, setActiveSourcesDrawer] = useState<
+    SearchResult[] | null
+  >(null);
 
   // Voice State
   const [isListening, setIsListening] = useState(false);
@@ -711,7 +885,7 @@ function AiChatInner() {
   // Files & Drag Drop
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const hasAutoTriggeredRef = useRef(false);
@@ -748,9 +922,12 @@ function AiChatInner() {
     if (isDeep) {
       setIsDeepResearchMode(true);
       const perplexityModels = PROVIDER_MODELS["Perplexity"] || [];
-      const deepModel = perplexityModels.find(
-        (m) => m.slug === "sonar-deep-research" || m.name.toLowerCase().includes("deep research")
-      ) || perplexityModels[0];
+      const deepModel =
+        perplexityModels.find(
+          (m) =>
+            m.slug === "sonar-deep-research" ||
+            m.name.toLowerCase().includes("deep research"),
+        ) || perplexityModels[0];
       setSelectedProvider("Perplexity");
       setSelectedModel(deepModel);
     } else if (provParam) {
@@ -770,23 +947,46 @@ function AiChatInner() {
     if (hasAutoTriggeredRef.current) return;
 
     // 1. Initial Prompt (LocalStorage / Cookie / Query)
-    const storagePrompt = typeof window !== "undefined" ? localStorage.getItem("chat_initial_prompt") : null;
+    const storagePrompt =
+      typeof window !== "undefined"
+        ? localStorage.getItem("chat_initial_prompt")
+        : null;
     const cookiePrompt = getCookie("chat_initial_prompt");
     const queryPrompt = searchParams.get("prompt");
-    const promptToTrigger = (storagePrompt || cookiePrompt || queryPrompt || "").trim();
+    const promptToTrigger = (
+      storagePrompt ||
+      cookiePrompt ||
+      queryPrompt ||
+      ""
+    ).trim();
 
     // 2. Initial Image (LocalStorage for Live Production, Hash fallback for local port testing)
-    let initialImage = typeof window !== "undefined" ? localStorage.getItem("chat_initial_image") : null;
-    if (!initialImage && typeof window !== "undefined" && window.location.hash.includes("img=")) {
+    let initialImage =
+      typeof window !== "undefined"
+        ? localStorage.getItem("chat_initial_image")
+        : null;
+    if (
+      !initialImage &&
+      typeof window !== "undefined" &&
+      window.location.hash.includes("img=")
+    ) {
       try {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hashParams = new URLSearchParams(
+          window.location.hash.substring(1),
+        );
         initialImage = hashParams.get("img");
       } catch (_) {}
     }
 
     // 3. Initial Extracted File Content & Filenames (LocalStorage)
-    const initialFileContent = typeof window !== "undefined" ? localStorage.getItem("chat_initial_file_content") : null;
-    const initialFilenames = typeof window !== "undefined" ? localStorage.getItem("chat_initial_filenames") : null;
+    const initialFileContent =
+      typeof window !== "undefined"
+        ? localStorage.getItem("chat_initial_file_content")
+        : null;
+    const initialFilenames =
+      typeof window !== "undefined"
+        ? localStorage.getItem("chat_initial_filenames")
+        : null;
 
     if (promptToTrigger || initialImage || initialFileContent) {
       hasAutoTriggeredRef.current = true;
@@ -806,9 +1006,12 @@ function AiChatInner() {
         window.history.replaceState({}, "", "/ai-chat");
       } catch (_) {}
 
-      setTimeout(() => {
-        handleSendMessage(promptToTrigger, initialImage, initialFileContent, initialFilenames);
-      }, 300);
+      handleSendMessage(
+        promptToTrigger,
+        initialImage,
+        initialFileContent,
+        initialFilenames,
+      );
     }
   }, [selectedModel]);
 
@@ -816,17 +1019,26 @@ function AiChatInner() {
     const token = getAuthToken();
     if (!token) return;
     setIsLoadingHistory(true);
-    const providerObj = MAJOR_PROVIDERS.find((p) => p.name.toLowerCase() === provName.toLowerCase());
-    const apiProvider = providerObj ? providerObj.provider : provName.toLowerCase();
+    const providerObj = MAJOR_PROVIDERS.find(
+      (p) => p.name.toLowerCase() === provName.toLowerCase(),
+    );
+    const apiProvider = providerObj
+      ? providerObj.provider
+      : provName.toLowerCase();
 
     try {
-      const res = await fetch(`${getApiBase()}/api/chat-history?ischatehistry=true&provider=${apiProvider}&limit=50`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${getApiBase()}/api/chat-history?ischatehistry=true&provider=${apiProvider}&limit=50`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (res.ok) {
         const data = await res.json();
         const rawList: HistoryItem[] = data?.data || data?.chats || [];
-        const singleModelChats = rawList.filter((item) => item.is_double !== true && item.isDouble !== true);
+        const singleModelChats = rawList.filter(
+          (item) => item.is_double !== true && item.isDouble !== true,
+        );
         setHistoryList(singleModelChats);
       }
     } catch (e) {
@@ -865,22 +1077,34 @@ function AiChatInner() {
     setPrompt("");
     setSelectedFiles([]);
     if (window.innerWidth < 768) setIsSidebarOpen(false); // <-- AA LINE UMARO
-    const targetRoute = item.route || `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
+    const targetRoute =
+      item.route || `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
     window.location.href = targetRoute;
   };
 
-  const ensureChatId = async (provider: string, chatId?: string | null, firstMessageTitle?: string) => {
+  const ensureChatId = async (
+    provider: string,
+    chatId?: string | null,
+    firstMessageTitle?: string,
+  ) => {
     if (chatId) return chatId;
     const token = getAuthToken();
     if (!token) return null;
-    const providerObj = MAJOR_PROVIDERS.find((p) => p.name.toLowerCase() === provider.toLowerCase());
-    const apiProvider = providerObj ? providerObj.provider : provider.toLowerCase();
+    const providerObj = MAJOR_PROVIDERS.find(
+      (p) => p.name.toLowerCase() === provider.toLowerCase(),
+    );
+    const apiProvider = providerObj
+      ? providerObj.provider
+      : provider.toLowerCase();
     const title = "starting new chat";
 
     try {
       const res = await fetch(`${getApiBase()}/api/chat-history`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           title: title,
           tags: ["is_model_chat", apiProvider],
@@ -915,8 +1139,9 @@ function AiChatInner() {
         if (chat && chat.messages) {
           const msgs: ChatMessage[] = chat.messages.map((m: any) => {
             const roleStr = (m.role || m.sender || m.type || "").toLowerCase();
-            const isUser = roleStr === "user" || roleStr === "me" || roleStr === "human";
-            
+            const isUser =
+              roleStr === "user" || roleStr === "me" || roleStr === "human";
+
             // Reconstruct search results & followups if saved in metadata
             let savedSearchResults = [];
             let savedFollowUps = [];
@@ -931,9 +1156,14 @@ function AiChatInner() {
             return {
               role: isUser ? "user" : "assistant",
               content: isUser ? sanitizeUserMessage(rawContent) : rawContent,
-              imageUrl: m.imageUrl || m.image_url || m.metadata?.imageUrl || m.metadata?.image_url,
-              searchResults: savedSearchResults.length > 0 ? savedSearchResults : undefined,
-              followUps: savedFollowUps.length > 0 ? savedFollowUps : undefined
+              imageUrl:
+                m.imageUrl ||
+                m.image_url ||
+                m.metadata?.imageUrl ||
+                m.metadata?.image_url,
+              searchResults:
+                savedSearchResults.length > 0 ? savedSearchResults : undefined,
+              followUps: savedFollowUps.length > 0 ? savedFollowUps : undefined,
             };
           });
           setMessages(msgs);
@@ -946,31 +1176,48 @@ function AiChatInner() {
 
   const sanitizeUserMessage = (text: string): string => {
     if (!text) return "";
-    return text
+    const cleaned = text
       .replace(/CURRENT ATTACHED FILE CONTENT[\s\S]*USER INSTRUCTION:\n/g, "")
       .replace(/\{\{historyData\}\}[\s\S]*?(?:formatting\.)/i, "")
       .replace(/\{\{historyData\}\}[^\n]*/gi, "")
       .replace(/\n*Conversation:[\s\S]*/i, "")
       .trim();
+    // જો Regex બધું જ ઉડાડી દે તો મૂળ text બતાવો
+    return cleaned || text;
   };
-
   const sanitizeChatTitle = (title?: string | null, fallback = "New Chat") => {
     if (!title || !title.trim()) return fallback;
-    let out = title.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/<think>/gi, "").replace(/<\/think>/gi, "").replace(/[#*`"']/g, "").replace(/\n+/g, " ").trim();
+    let out = title
+      .replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .replace(/<think>/gi, "")
+      .replace(/<\/think>/gi, "")
+      .replace(/[#*`"']/g, "")
+      .replace(/\n+/g, " ")
+      .trim();
     if (out.length > 25) out = out.substring(0, 25).trim();
     return out.length > 0 ? out : fallback;
   };
 
-  const generateAndUpdateTitle = async (chatId: string, userPrompt: string, modelId: string) => {
+  const generateAndUpdateTitle = async (
+    chatId: string,
+    userPrompt: string,
+    modelId: string,
+  ) => {
     const token = getAuthToken();
     if (!token || !chatId) return;
     try {
       const prompt = `${userPrompt} Generate a perfect title for this chat (max 20 characters) from the given chat history. In any case, do not give or mention Markdown format.`;
-      const res = await fetch(`${getApiBase()}/api/tools/ai/title-generate-stream`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ prompt, modelId }),
-      });
+      const res = await fetch(
+        `${getApiBase()}/api/tools/ai/title-generate-stream`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ prompt, modelId }),
+        },
+      );
       if (!res.ok) return;
       const reader = res.body?.getReader();
       if (!reader) return;
@@ -987,7 +1234,12 @@ function AiChatInner() {
             if (dataContent === "[DONE]") return;
             try {
               const parsed = JSON.parse(dataContent);
-              const piece = parsed.chunk ?? parsed.content ?? parsed.text ?? parsed.message ?? "";
+              const piece =
+                parsed.chunk ??
+                parsed.content ??
+                parsed.text ??
+                parsed.message ??
+                "";
               if (typeof piece === "string") accumulatedRaw += piece;
             } catch (_) {
               if (!dataContent.startsWith("{")) accumulatedRaw += dataContent;
@@ -996,13 +1248,24 @@ function AiChatInner() {
         });
       }
       const cleanTitle = sanitizeChatTitle(accumulatedRaw, "");
-      if (cleanTitle && cleanTitle.length > 1 && cleanTitle !== "starting new chat") {
+      if (
+        cleanTitle &&
+        cleanTitle.length > 1 &&
+        cleanTitle !== "starting new chat"
+      ) {
         await fetch(`${getApiBase()}/api/chat-history/${chatId}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ title: cleanTitle, ischatehistry: true }),
         });
-        setHistoryList((prev) => prev.map((item) => (item._id === chatId ? { ...item, title: cleanTitle } : item)));
+        setHistoryList((prev) =>
+          prev.map((item) =>
+            item._id === chatId ? { ...item, title: cleanTitle } : item,
+          ),
+        );
         loadProviderHistory(selectedProvider);
       }
     } catch (e) {
@@ -1011,14 +1274,22 @@ function AiChatInner() {
   };
 
   // Generate Follow-up questions for Perplexity (matching Flutter's lines 3699-3810)
-  const fetchPerplexityFollowUps = async (userPrompt: string, aiLastAnswer: string, chatId?: string | null) => {
+  const fetchPerplexityFollowUps = async (
+    userPrompt: string,
+    aiLastAnswer: string,
+    chatId?: string | null,
+  ) => {
     const token = getAuthToken();
     if (!token) return;
 
     try {
       // Find fast Flash model dynamically from PROVIDER_MODELS helper instead of hardcoded ID
       const deepSeekModels = PROVIDER_MODELS["DeepSeek"] || [];
-      const flashModel = deepSeekModels.find((m) => m.slug?.includes("flash") || m.name.toLowerCase().includes("flash")) || deepSeekModels[0];
+      const flashModel =
+        deepSeekModels.find(
+          (m) =>
+            m.slug?.includes("flash") || m.name.toLowerCase().includes("flash"),
+        ) || deepSeekModels[0];
       const fastModelId = flashModel?.id || "6a756dc990ca2618be6d839c";
       const followUpPrompt = `System:
 You are an AI assistant. Return ONLY a valid JSON array of 5 concise follow-up questions.
@@ -1031,11 +1302,20 @@ ${userPrompt}
 Context:
 ${aiLastAnswer.substring(0, 500)}`;
 
-      const res = await fetch(`${getApiBase()}/api/tools/ai/title-generate-stream`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ prompt: followUpPrompt, modelId: fastModelId }),
-      });
+      const res = await fetch(
+        `${getApiBase()}/api/tools/ai/title-generate-stream`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            prompt: followUpPrompt,
+            modelId: fastModelId,
+          }),
+        },
+      );
 
       if (!res.ok) return;
       const reader = res.body?.getReader();
@@ -1054,7 +1334,12 @@ ${aiLastAnswer.substring(0, 500)}`;
             if (dataContent === "[DONE]") return;
             try {
               const parsed = JSON.parse(dataContent);
-              const piece = parsed.chunk ?? parsed.content ?? parsed.text ?? parsed.message ?? "";
+              const piece =
+                parsed.chunk ??
+                parsed.content ??
+                parsed.text ??
+                parsed.message ??
+                "";
               if (typeof piece === "string") followUpBuffer += piece;
             } catch (_) {
               if (!dataContent.startsWith("{")) followUpBuffer += dataContent;
@@ -1072,11 +1357,16 @@ ${aiLastAnswer.substring(0, 500)}`;
             const startIdx = cleanCandidate.indexOf("[");
             const endIdx = cleanCandidate.lastIndexOf("]");
             if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-              const arrayCandidate = JSON.parse(cleanCandidate.substring(startIdx, endIdx + 1));
+              const arrayCandidate = JSON.parse(
+                cleanCandidate.substring(startIdx, endIdx + 1),
+              );
               if (Array.isArray(arrayCandidate) && arrayCandidate.length > 0) {
                 setMessages((prev) => {
                   const copy = [...prev];
-                  if (copy.length > 0 && copy[copy.length - 1].role === "assistant") {
+                  if (
+                    copy.length > 0 &&
+                    copy[copy.length - 1].role === "assistant"
+                  ) {
                     copy[copy.length - 1] = {
                       ...copy[copy.length - 1],
                       followUps: arrayCandidate.map((q) => String(q)),
@@ -1090,7 +1380,10 @@ ${aiLastAnswer.substring(0, 500)}`;
         }
       }
 
-      let cleanJson = followUpBuffer.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/```json|```/gi, "").trim();
+      let cleanJson = followUpBuffer
+        .replace(/<think>[\s\S]*?<\/think>/gi, "")
+        .replace(/```json|```/gi, "")
+        .trim();
       const startIdx = cleanJson.indexOf("[");
       const endIdx = cleanJson.lastIndexOf("]");
       if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
@@ -1115,7 +1408,11 @@ ${aiLastAnswer.substring(0, 500)}`;
   };
 
   // Build Context exactly like Flutter
-  const buildPromptWithContext = (currentPrompt: string, historyMessages: ChatMessage[], fileContent?: string): string => {
+  const buildPromptWithContext = (
+    currentPrompt: string,
+    historyMessages: ChatMessage[],
+    fileContent?: string,
+  ): string => {
     const historyPairs: string[] = [];
     for (let i = 0; i < historyMessages.length; i++) {
       const msg = historyMessages[i];
@@ -1127,14 +1424,19 @@ ${aiLastAnswer.substring(0, 500)}`;
       }
     }
     const lines: string[] = [];
-    lines.push(currentPrompt.trim());
-    lines.push("\n{{historyData}} Please answer casually with emojis, and don't mention anything about markdown or formatting.");
+    if (currentPrompt.trim()) {
+      lines.push(currentPrompt.trim());
+    }
+    lines.push(
+      "Please answer casually with emojis, and don't mention anything about markdown or formatting.",
+    );
     if (fileContent && fileContent.trim()) {
       lines.push(`\n---\nFile Content:\n${fileContent.trim()}`);
     }
     if (historyPairs.length > 0) {
       lines.push("\nConversation:");
-      const recentPairs = historyPairs.length > 6 ? historyPairs.slice(-6) : historyPairs;
+      const recentPairs =
+        historyPairs.length > 6 ? historyPairs.slice(-6) : historyPairs;
       for (const pair of recentPairs) lines.push(pair);
     }
     return lines.join("\n");
@@ -1142,7 +1444,10 @@ ${aiLastAnswer.substring(0, 500)}`;
 
   const isImageFile = (file: File) => {
     const ext = file.name.split(".").pop()?.toLowerCase() || "";
-    return ["png", "jpg", "jpeg", "webp", "gif", "heic"].includes(ext) || file.type.startsWith("image/");
+    return (
+      ["png", "jpg", "jpeg", "webp", "gif", "heic"].includes(ext) ||
+      file.type.startsWith("image/")
+    );
   };
 
   const fileToBase64 = (file: File): Promise<string> => {
@@ -1158,10 +1463,16 @@ ${aiLastAnswer.substring(0, 500)}`;
     textToSend?: string,
     overrideImage?: string | null,
     overrideFileContent?: string | null,
-    overrideFilenames?: string | null
+    overrideFilenames?: string | null,
   ) => {
     let promptText = (textToSend || prompt).trim();
-    if (!promptText && selectedFiles.length === 0 && !overrideImage && !overrideFileContent) return;
+    if (
+      !promptText &&
+      selectedFiles.length === 0 &&
+      !overrideImage &&
+      !overrideFileContent
+    )
+      return;
 
     let attachedFileContent = overrideFileContent || "";
     let activeImage: string | null = overrideImage || null;
@@ -1185,7 +1496,9 @@ ${aiLastAnswer.substring(0, 500)}`;
             }
           }
         }
-        attachedFileContent = (attachedFileContent ? attachedFileContent + "\n" : "") + combinedText.trim();
+        attachedFileContent =
+          (attachedFileContent ? attachedFileContent + "\n" : "") +
+          combinedText.trim();
       } catch (e) {
         console.error("Error reading attached file:", e);
       }
@@ -1194,7 +1507,8 @@ ${aiLastAnswer.substring(0, 500)}`;
     // Auto-clean Flutter prefix "📄 filenames" if present
     if (activeImage) {
       const cleanPrompt = promptText.replace(/^📄[^\n]+\n*/, "").trim();
-      promptText = cleanPrompt || "What is in this image? Please describe and analyze it.";
+      promptText =
+        cleanPrompt || "What is in this image? Please describe and analyze it.";
     } else if (attachedFileContent) {
       const cleanPrompt = promptText.replace(/^📄[^\n]+\n*/, "").trim();
       promptText = cleanPrompt || "Analyze these files";
@@ -1206,28 +1520,56 @@ ${aiLastAnswer.substring(0, 500)}`;
       displayUserMessage = `📎 ${overrideFilenames}\n\n${promptText}`;
     } else if (filesToProcess.length > 0) {
       const fileNames = filesToProcess.map((f) => `📎 ${f.name}`).join("\n");
-      displayUserMessage = displayUserMessage ? `${fileNames}\n\n${displayUserMessage}` : fileNames;
+      displayUserMessage = displayUserMessage
+        ? `${fileNames}\n\n${displayUserMessage}`
+        : fileNames;
     }
 
     setPrompt("");
     setSelectedFiles([]);
 
-    const chatId = await ensureChatId(selectedProvider, currentChatId, promptText);
-    const promptWithContext = buildPromptWithContext(promptText, messages, attachedFileContent);
-
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: displayUserMessage, imageUrl: activeImage || undefined },
-      { role: "assistant", content: "", searchResults: [], followUps: [] },
-    ]);
-    setIsStreaming(true);
-
+   setMessages((prev) => {
+      // જો પહેલેથી જ ইনিશિઅલ સ્ટેટમાં આવી ગયો હોય તો ડુપ્લિકેટ ના થાય
+      if (prev.length > 0 && prev[prev.length - 1].role === "assistant" && !prev[prev.length - 1].content) {
+        return prev;
+      }
+      return [
+        ...prev,
+        {
+          role: "user",
+          content: displayUserMessage,
+          imageUrl: activeImage || undefined,
+        },
+        { role: "assistant", content: "", searchResults: [], followUps: [] },
+      ];
+    });
+    // હવે બેકએન્ડમાંથી chatId લાવો:
+    const chatId = await ensureChatId(
+      selectedProvider,
+      currentChatId,
+      promptText,
+    );
+    const promptWithContext = buildPromptWithContext(
+      promptText,
+      messages,
+      attachedFileContent,
+    );
+      setIsStreaming(true); 
     const controller = new AbortController();
     abortControllerRef.current = controller;
     const token = getAuthToken();
     const deepSeekModels = PROVIDER_MODELS["DeepSeek"] || [];
-    const proModel = deepSeekModels.find((m) => m.slug?.includes("pro") || m.name.toLowerCase().includes("pro")) || deepSeekModels[0];
-    const flashModel = deepSeekModels.find((m) => m.slug?.includes("flash") || m.name.toLowerCase().includes("flash")) || deepSeekModels[1] || selectedModel;
+    const proModel =
+      deepSeekModels.find(
+        (m) => m.slug?.includes("pro") || m.name.toLowerCase().includes("pro"),
+      ) || deepSeekModels[0];
+    const flashModel =
+      deepSeekModels.find(
+        (m) =>
+          m.slug?.includes("flash") || m.name.toLowerCase().includes("flash"),
+      ) ||
+      deepSeekModels[1] ||
+      selectedModel;
     const activeModelId = isDeepThinkActive ? proModel.id : selectedModel.id;
 
     try {
@@ -1239,7 +1581,8 @@ ${aiLastAnswer.substring(0, 500)}`;
         max_tokens: 4000,
         source: "model-chat-text",
         promptId: `${Date.now()}_${selectedProvider}`,
-        system_prompt: "You are a helpful AI assistant in OneChat AI. Follow the user's instructions and provide accurate, helpful, and relevant responses.",
+        system_prompt:
+          "You are a helpful AI assistant in OneChat AI. Follow the user's instructions and provide accurate, helpful, and relevant responses.",
       };
       if (activeImage) {
         payload.imageUrl = activeImage;
@@ -1247,7 +1590,10 @@ ${aiLastAnswer.substring(0, 500)}`;
 
       const res = await fetch(`${getApiBase()}/api/tools/ai/general-stream`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(payload),
         signal: controller.signal,
       });
@@ -1266,12 +1612,16 @@ ${aiLastAnswer.substring(0, 500)}`;
           lowerMsg.includes("filter by image") ||
           lowerMsg.includes("no endpoints found that support image")
         ) {
-          errorMsg = "This model does not support image analysis. Please try a vision-supported model like ChatGPT, Gemini, Claude, or Grok.";
+          errorMsg =
+            "This model does not support image analysis. Please try a vision-supported model like ChatGPT, Gemini, Claude, or Grok.";
         }
 
         setMessages((prev) => {
           const copy = [...prev];
-          copy[copy.length - 1] = { role: "assistant", content: `⚠️ ${errorMsg}` };
+          copy[copy.length - 1] = {
+            role: "assistant",
+            content: `⚠️ ${errorMsg}`,
+          };
           return copy;
         });
         setIsStreaming(false);
@@ -1310,7 +1660,7 @@ ${aiLastAnswer.substring(0, 500)}`;
           } catch (e) {
             console.error("Error parsing follow ups", e);
           }
-          break; 
+          break;
         }
 
         chunk.split("\n").forEach((line) => {
@@ -1327,7 +1677,12 @@ ${aiLastAnswer.substring(0, 500)}`;
                 } else if (parsed.type === "follow_ups" && parsed.follow_ups) {
                   parsedFollowUps = parsed.follow_ups;
                 } else {
-                  let piece = parsed.chunk ?? parsed.text ?? parsed.content ?? parsed.message ?? "";
+                  let piece =
+                    parsed.chunk ??
+                    parsed.text ??
+                    parsed.content ??
+                    parsed.message ??
+                    "";
                   if (typeof piece === "string") accumulated += piece;
                 }
               } catch (_) {
@@ -1340,11 +1695,11 @@ ${aiLastAnswer.substring(0, 500)}`;
         const cleaned = accumulated.replace(/^:+/, "").trimStart();
         setMessages((prev) => {
           const copy = [...prev];
-          copy[copy.length - 1] = { 
-            role: "assistant", 
+          copy[copy.length - 1] = {
+            role: "assistant",
             content: cleaned,
             searchResults: parsedSearchResults,
-            followUps: parsedFollowUps
+            followUps: parsedFollowUps,
           };
           return copy;
         });
@@ -1355,7 +1710,10 @@ ${aiLastAnswer.substring(0, 500)}`;
       }
 
       // Sequential Follow-ups generation for Perplexity (matching Flutter's lines 3699-3810)
-      if (selectedProvider.toLowerCase() === "perplexity" && parsedFollowUps.length === 0) {
+      if (
+        selectedProvider.toLowerCase() === "perplexity" &&
+        parsedFollowUps.length === 0
+      ) {
         fetchPerplexityFollowUps(promptText, accumulated, chatId);
       }
     } catch (e: any) {
@@ -1363,8 +1721,15 @@ ${aiLastAnswer.substring(0, 500)}`;
         console.error("Stream generation error:", e);
         setMessages((prev) => {
           const copy = [...prev];
-          if (copy.length > 0 && copy[copy.length - 1].role === "assistant" && !copy[copy.length - 1].content) {
-            copy[copy.length - 1] = { role: "assistant", content: "⚠️ Request failed. Please try again." };
+          if (
+            copy.length > 0 &&
+            copy[copy.length - 1].role === "assistant" &&
+            !copy[copy.length - 1].content
+          ) {
+            copy[copy.length - 1] = {
+              role: "assistant",
+              content: "⚠️ Request failed. Please try again.",
+            };
           }
           return copy;
         });
@@ -1376,22 +1741,25 @@ ${aiLastAnswer.substring(0, 500)}`;
   };
 
   // Drag and Drop using react-dropzone
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (selectedFiles.length + acceptedFiles.length > 10) {
-      showToast("You can only upload up to 10 files at once");
-      return;
-    }
-    setSelectedFiles(prev => [...prev, ...acceptedFiles]);
-    if (!prompt.trim() || prompt.trim() === "Analyze these files") {
-      const hasImg = acceptedFiles.some(isImageFile);
-      setPrompt(hasImg ? "Analyze these files" : "Analyze these files");
-    }
-  }, [selectedFiles.length, prompt, showToast]);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (selectedFiles.length + acceptedFiles.length > 10) {
+        showToast("You can only upload up to 10 files at once");
+        return;
+      }
+      setSelectedFiles((prev) => [...prev, ...acceptedFiles]);
+      if (!prompt.trim() || prompt.trim() === "Analyze these files") {
+        const hasImg = acceptedFiles.some(isImageFile);
+        setPrompt(hasImg ? "Analyze these files" : "Analyze these files");
+      }
+    },
+    [selectedFiles.length, prompt, showToast],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     noClick: true,
-    noKeyboard: true
+    noKeyboard: true,
   });
 
   // Web Speech API for Mic Input
@@ -1402,7 +1770,8 @@ ${aiLastAnswer.substring(0, 500)}`;
       return;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       showToast("Speech recognition is not supported in this browser.");
       return;
@@ -1411,17 +1780,17 @@ ${aiLastAnswer.substring(0, 500)}`;
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = true;
-    recognition.lang = 'en-US';
+    recognition.lang = "en-US";
 
     recognition.onresult = (event: any) => {
-      let finalTranscript = '';
+      let finalTranscript = "";
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
           finalTranscript += event.results[i][0].transcript;
         }
       }
       if (finalTranscript) {
-        setPrompt(prev => prev + (prev ? " " : "") + finalTranscript);
+        setPrompt((prev) => prev + (prev ? " " : "") + finalTranscript);
       }
     };
 
@@ -1439,113 +1808,192 @@ ${aiLastAnswer.substring(0, 500)}`;
     setIsListening(true);
   };
 
-
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#08090E] text-white font-sans relative" {...getRootProps()}>
+    <div
+      className="flex h-screen w-screen overflow-hidden bg-[#08090E] text-white font-sans relative"
+      {...getRootProps()}
+    >
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-xl bg-[#1E1B38] border border-[#3B3363] text-white text-[13px] font-medium shadow-2xl animate-in fade-in slide-in-from-top-3">
           {toastMessage}
         </div>
       )}
-      
+
       {/* DRAG AND DROP OVERLAY */}
       {isDragActive && (
         <div className="absolute inset-0 z-50 bg-[#5A4FF3]/10 border-2 border-[#5A4FF3] rounded-2xl flex items-center justify-center pointer-events-none m-4">
           <div className="bg-white p-6 rounded-2xl flex flex-col items-center shadow-xl">
-             <UploadCloud className="w-12 h-12 text-[#5A4FF3] mb-3" />
-             <p className="text-[#5A4FF3] font-bold text-lg">Drop files here to upload</p>
-             <p className="text-gray-500 text-sm mt-1">Release to attach</p>
+            <UploadCloud className="w-12 h-12 text-[#5A4FF3] mb-3" />
+            <p className="text-[#5A4FF3] font-bold text-lg">
+              Drop files here to upload
+            </p>
+            <p className="text-gray-500 text-sm mt-1">Release to attach</p>
           </div>
         </div>
       )}
 
-     {/* MOBILE BACKDROP - Ahiya navu umeryu chhe */}
+      {/* MOBILE BACKDROP - Ahiya navu umeryu chhe */}
       {isSidebarOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black/60 z-40 transition-opacity" 
-          onClick={() => setIsSidebarOpen(false)} 
+        <div
+          className="md:hidden fixed inset-0 bg-black/60 z-40 transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* 1. LEFT SIDEBAR - Classes change karya chhe */}
-     <div 
+      <div
         className={`transition-all duration-300 bg-[#090B14] border-r border-[#1B1F30]/80 flex flex-col shrink-0 z-50 overflow-hidden
           fixed md:relative h-full top-0 left-0
           ${isSidebarOpen ? "translate-x-0 w-[240px]" : "-translate-x-full md:translate-x-0 md:w-[68px]"}
         `}
       >
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#1B1F30]/60">
-          {/* Ahiya thi hidden md:block nikali didhu che */}
-          <button
-            onClick={() => {
-              if (typeof window !== "undefined") {
-                if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin)) {
-                  router.back();
-                  return;
+        <div
+          className={`flex items-center border-b border-[#1B1F30]/60 py-3.5 ${isSidebarOpen ? "justify-between px-4" : "justify-center px-2"}`}
+        >
+          {/* 1. જ્યારે સાઇડબાર OPEN હોય ત્યારે જ "Back to Home" બટન દેખાશે */}
+          {isSidebarOpen && (
+            <button
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  if (
+                    window.history.length > 1 &&
+                    document.referrer &&
+                    document.referrer.startsWith(window.location.origin)
+                  ) {
+                    router.back();
+                    return;
+                  }
+                  router.push("/");
                 }
-                router.push("/");
-              }
-            }}
-            className="cursor-pointer flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#261D5A] border border-[#3B3363] text-[#A78BFA] text-[12px] sm:text-[13px] font-semibold hover:bg-[#322774] transition shrink-0"
+              }}
+              className="cursor-pointer flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#261D5A] border border-[#3B3363] text-[#A78BFA] text-[12px] sm:text-[13px] font-semibold hover:bg-[#322774] transition shrink-0"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Home</span>
+            </button>
+          )}
+          {/* 2. સાઇડબાર Toggle (Maximize / Minimize) બટન - હંમેશાં દેખાશે */}
+          <button
+            type="button"
+            title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer flex items-center justify-center"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline sm:inline">Back to Home</span>
-            <span className="inline xs:hidden sm:hidden">Home</span>
-          </button>
-
-          <button type="button" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B] transition cursor-pointer ml-auto md:ml-auto md:ml-0">
             <Menu className="w-4 h-4" />
           </button>
         </div>
 
-       <div className="px-2 pt-2 space-y-0.5">
-          <a href="/" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition">
+        <div className="px-2 pt-2 space-y-0.5">
+          <a
+            href="/"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition"
+          >
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <img src="/assets/images/onechat.png" alt="Home" className="w-full h-full object-contain" />
+              <img
+                src="/assets/images/onechat.png"
+                alt="Home"
+                className="w-full h-full object-contain"
+              />
             </div>
             {/* Ahiya thi hidden md:block nikali didhu che */}
-            {isSidebarOpen && <span className="block text-[13.5px] whitespace-nowrap">Home</span>}
+            {isSidebarOpen && (
+              <span className="block text-[13.5px] whitespace-nowrap">
+                Home
+              </span>
+            )}
           </a>
-          <a href="/multi-chat" className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition">
+          <a
+            href="/multi-chat"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:bg-[#151928] hover:text-white transition"
+          >
             <div className="w-5 h-5 flex items-center justify-center shrink-0 text-[#6366F1]">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m16 3 4 4-4 4" /><path d="M20 7H4" /><path d="m8 21-4-4 4-4" /><path d="M4 17h16" /></svg>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="m16 3 4 4-4 4" />
+                <path d="M20 7H4" />
+                <path d="m8 21-4-4 4-4" />
+                <path d="M4 17h16" />
+              </svg>
             </div>
             {/* Ahiya thi hidden md:block nikali didhu che */}
-            {isSidebarOpen && <span className="block text-[13.5px] whitespace-nowrap">Compare AIs</span>}
+            {isSidebarOpen && (
+              <span className="block text-[13.5px] whitespace-nowrap">
+                Compare AIs
+              </span>
+            )}
           </a>
         </div>
 
-       <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5 scrollbar-thin scrollbar-thumb-[#1B1F30]">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5 scrollbar-thin scrollbar-thumb-[#1B1F30]">
           {MAJOR_PROVIDERS.map((item) => {
-            const isSelected = !isDeepResearchMode && selectedProvider.toLowerCase() === item.name.toLowerCase();
+            const isSelected =
+              !isDeepResearchMode &&
+              selectedProvider.toLowerCase() === item.name.toLowerCase();
             return (
-              <button key={item.name} type="button" onClick={() => handleModelSidebarClick(item)} className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition cursor-pointer ${isSelected ? "bg-[#6342E8]/25 border border-[#8B5CF6]/40 text-[#C4B5FD] font-semibold" : "text-gray-300 hover:bg-[#151928] hover:text-white border border-transparent"}`}>
+              <button
+                key={item.name}
+                type="button"
+                onClick={() => handleModelSidebarClick(item)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition cursor-pointer ${isSelected ? "bg-[#6342E8]/25 border border-[#8B5CF6]/40 text-[#C4B5FD] font-semibold" : "text-gray-300 hover:bg-[#151928] hover:text-white border border-transparent"}`}
+              >
                 <div className="w-5 h-5 rounded-md flex items-center justify-center shrink-0">
-                  <Image src={item.icon} alt={item.name} width={20} height={20} className="object-contain" />
+                  <Image
+                    src={item.icon}
+                    alt={item.name}
+                    width={20}
+                    height={20}
+                    className="object-contain"
+                  />
                 </div>
                 {/* Ahiya thi hidden md:block nikali didhu che */}
-                {isSidebarOpen && <span className="block text-[13.5px] truncate">{item.name}</span>}
+                {isSidebarOpen && (
+                  <span className="block text-[13.5px] truncate">
+                    {item.name}
+                  </span>
+                )}
               </button>
             );
           })}
-         {isSidebarOpen && (
+          {isSidebarOpen && (
             <div className="block pt-4 mt-3 border-t border-[#1B1F30]/70">
               {/* History div mathi pan hidden md:block nikali didhu che jethi mobile ma dekhay */}
               <div className="px-2 mb-2">
-                <span className="text-[12px] font-bold text-white tracking-wide truncate block">Your {selectedProvider} History</span>
+                <span className="text-[12px] font-bold text-white tracking-wide truncate block">
+                  Your {selectedProvider} History
+                </span>
               </div>
               {isLoadingHistory ? (
-                <div className="px-3 py-2 text-xs text-gray-500">Loading history...</div>
+                <div className="px-3 py-2 text-xs text-gray-500">
+                  Loading history...
+                </div>
               ) : historyList.length === 0 ? (
-                <div className="px-3 py-2 text-xs text-gray-500">No recent chats</div>
+                <div className="px-3 py-2 text-xs text-gray-500">
+                  No recent chats
+                </div>
               ) : (
                 <div className="space-y-0.5">
                   {historyList.map((hist) => {
                     const isCurrent = currentChatId === hist._id;
                     return (
-                      <button key={hist._id} type="button" onClick={() => { setCurrentChatId(hist._id); loadChatById(hist._id); }} className={`w-full text-left px-3 py-1.5 rounded-lg text-[13px] transition truncate cursor-pointer ${isCurrent ? "bg-[#181C2B] text-white font-medium" : "text-gray-400 hover:bg-[#121522] hover:text-gray-200"}`}>
-                        <span className="truncate block">{sanitizeChatTitle(hist.title, "Untitled Chat")}</span>
+                      <button
+                        key={hist._id}
+                        type="button"
+                        onClick={() => {
+                          setCurrentChatId(hist._id);
+                          loadChatById(hist._id);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 rounded-lg text-[13px] transition truncate cursor-pointer ${isCurrent ? "bg-[#181C2B] text-white font-medium" : "text-gray-400 hover:bg-[#121522] hover:text-gray-200"}`}
+                      >
+                        <span className="truncate block">
+                          {sanitizeChatTitle(hist.title, "Untitled Chat")}
+                        </span>
                       </button>
                     );
                   })}
@@ -1558,44 +2006,57 @@ ${aiLastAnswer.substring(0, 500)}`;
 
       {/* 2. MAIN CHAT AREA */}
       <div className="flex-1 flex flex-col h-full bg-[#08090E] relative overflow-hidden w-full md:w-auto">
-        
         {/* MOBILE HEADER - Navu umeryu chhe */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#090B14] border-b border-[#1B1F30]/60 z-20">
-          <button onClick={() => setIsSidebarOpen(true)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B]">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#181C2B]"
+          >
             <Menu className="w-5 h-5" />
           </button>
-          <span className="font-bold text-[16px] text-white tracking-wide">OneChat AI</span>
+          <span className="font-bold text-[16px] text-white tracking-wide">
+            OneChat AI
+          </span>
           <div className="w-8"></div> {/* Right side spacing mate */}
         </div>
 
         {/* Aa div pachi normal em j rakhvo */}
         <div className="flex-1 overflow-y-auto px-4 md:px-16 lg:px-28 py-8 space-y-6 scrollbar-thin scrollbar-thumb-[#1B1F30]">
-          {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto">
-              <div className="w-16 h-16 rounded-2xl bg-[#121522] border border-[#252A40] flex items-center justify-center mb-4 shadow-xl">
-                <Image src={PROVIDER_ICONS[selectedProvider] || "/assets/images/deepseek1.png"} alt={selectedProvider} width={38} height={38} className="object-contain" />
-              </div>
-              <h2 className="text-xl font-bold text-white mb-2">{selectedProvider}</h2>
-              <p className="text-sm text-gray-400 mb-6">Start chatting with {selectedModel.name}.</p>
-            </div>
-          ) : (
+         {messages.length === 0 && !isStreaming && !hasAutoTriggeredRef.current ? (
+  <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto">
+    <div className="w-16 h-16 rounded-2xl bg-[#121522] border border-[#252A40] flex items-center justify-center mb-4 shadow-xl">
+      <Image
+        src={PROVIDER_ICONS[selectedProvider] || "/assets/images/deepseek1.png"}
+        alt={selectedProvider}
+        width={38}
+        height={38}
+        className="object-contain"
+      />
+    </div>
+    <h2 className="text-xl font-bold text-white mb-2">{selectedProvider}</h2>
+    <p className="text-sm text-gray-400 mb-6">Start chatting with {selectedModel.name}.</p>
+  </div>
+) : (
             <div className="w-full flex flex-col space-y-6">
               {messages.map((msg, idx) => {
                 const isUser = msg.role === "user";
                 return (
-                  <div key={idx} className={`w-full flex ${isUser ? "justify-end" : "justify-center"} group relative`}>
+                  <div
+                    key={idx}
+                    className={`w-full flex ${isUser ? "justify-end" : "justify-center"} group relative`}
+                  >
                     {isUser ? (
                       <div className="max-w-[70%] rounded-[18px] px-4 py-2 bg-[#1E1B38] text-[14.5px] text-white shadow-md whitespace-pre-wrap leading-relaxed">
-                       {msg.imageUrl && (
-    <div className="mb-2.5 overflow-hidden rounded-xl border border-[#252A40] bg-black/40">
-      <img
-        src={msg.imageUrl}
-        alt="Attached preview"
-        className="max-h-56 w-full object-contain rounded-lg"
-      />
-    </div>
-  )}
-  {sanitizeUserMessage(msg.content)}
+                        {msg.imageUrl && (
+                          <div className="mb-2.5 overflow-hidden rounded-xl border border-[#252A40] bg-black/40">
+                            <img
+                              src={msg.imageUrl}
+                              alt="Attached preview"
+                              className="max-h-56 w-full object-contain rounded-lg"
+                            />
+                          </div>
+                        )}
+                        {sanitizeUserMessage(msg.content)}
                       </div>
                     ) : (
                       <div className="w-full max-w-[850px] flex flex-col gap-2">
@@ -1605,13 +2066,18 @@ ${aiLastAnswer.substring(0, 500)}`;
                             {(() => {
                               const isDeepResearch =
                                 isDeepResearchMode ||
-                                (selectedProvider.toLowerCase() === "perplexity" &&
-                                  (selectedModel.slug === "sonar-deep-research" ||
-                                    selectedModel.name.toLowerCase().includes("deep research")));
-                              
+                                (selectedProvider.toLowerCase() ===
+                                  "perplexity" &&
+                                  (selectedModel.slug ===
+                                    "sonar-deep-research" ||
+                                    selectedModel.name
+                                      .toLowerCase()
+                                      .includes("deep research")));
+
                               const iconPath = isDeepResearch
                                 ? "/assets/images/onechat.png"
-                                : PROVIDER_ICONS[selectedProvider] || "/assets/images/deepseek1.png";
+                                : PROVIDER_ICONS[selectedProvider] ||
+                                  "/assets/images/deepseek1.png";
 
                               const headerLabel = isDeepResearch
                                 ? "Deep Research"
@@ -1633,66 +2099,79 @@ ${aiLastAnswer.substring(0, 500)}`;
                               );
                             })()}
                           </div>
-                          <FormattedAiResponse 
-                            content={msg.content} 
-                            isStreaming={isStreaming && idx === messages.length - 1}
-                            searchResults={msg.searchResults} 
+                          <FormattedAiResponse
+                            content={msg.content}
+                            isStreaming={
+                              isStreaming && idx === messages.length - 1
+                            }
+                            searchResults={msg.searchResults}
                           />
-                          
+
                           {/* Message Action Bar matching Flutter: Copy + Workspace Save + Sources Pill (for Perplexity / searchResults) */}
                           {msg.content && !isStreaming && (
                             <div className="flex items-center gap-2 mt-3 pt-1">
                               <CopyButton text={msg.content} />
 
                               {/* Perplexity Sources Pill Button (matching Flutter's _buildSourcesPillButton & Image 2) */}
-                              {selectedProvider.toLowerCase() === "perplexity" && msg.searchResults && msg.searchResults.length > 0 && (
-                                <SourcesPillButton
-                                  sources={msg.searchResults}
-                                  onClick={() => setActiveSourcesDrawer(msg.searchResults || null)}
-                                />
-                              )}
+                              {selectedProvider.toLowerCase() ===
+                                "perplexity" &&
+                                msg.searchResults &&
+                                msg.searchResults.length > 0 && (
+                                  <SourcesPillButton
+                                    sources={msg.searchResults}
+                                    onClick={() =>
+                                      setActiveSourcesDrawer(
+                                        msg.searchResults || null,
+                                      )
+                                    }
+                                  />
+                                )}
                             </div>
                           )}
 
                           {/* Follow-ups rendering exactly like Flutter's _buildFollowUpsList & _buildFollowUpItem */}
-                          {msg.followUps && msg.followUps.length > 0 && !isStreaming && (
-                            <div className="mt-6 mb-2 border border-[#1B1F30] bg-[#121522] rounded-xl overflow-hidden shadow-md">
-                              {/* Header matching Flutter _buildFollowUpsList: question icon + 'Follow-ups' */}
-                              <div className="flex items-center px-4 py-3 border-b border-[#1B1F30] bg-[#121522]">
-                                <span className="text-[#8B5CF6] text-base mr-2 select-none">❓</span>
-                                <span className="text-[14px] font-semibold text-white tracking-wide">
-                                  Follow-ups
-                                </span>
-                              </div>
+                          {msg.followUps &&
+                            msg.followUps.length > 0 &&
+                            !isStreaming && (
+                              <div className="mt-6 mb-2 border border-[#1B1F30] bg-[#121522] rounded-xl overflow-hidden shadow-md">
+                                {/* Header matching Flutter _buildFollowUpsList: question icon + 'Follow-ups' */}
+                                <div className="flex items-center px-4 py-3 border-b border-[#1B1F30] bg-[#121522]">
+                                  <span className="text-[#8B5CF6] text-base mr-2 select-none">
+                                    ❓
+                                  </span>
+                                  <span className="text-[14px] font-semibold text-white tracking-wide">
+                                    Follow-ups
+                                  </span>
+                                </div>
 
-                              {/* Follow-up Items matching Flutter's exact hover, arrow_forward_rounded, north_east_rounded on hover */}
-                              <div className="divide-y divide-[#1B1F30]">
-                                {msg.followUps.map((q, i) => (
-                                  <button
-                                    key={i}
-                                    type="button"
-                                    onClick={() => {
-                                      setPrompt(q);
-                                      handleSendMessage(q);
-                                    }}
-                                    className="w-full text-left flex items-center justify-between px-4 py-3 bg-transparent hover:bg-[#22273D] transition-colors duration-150 cursor-pointer group"
-                                  >
-                                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                      {/* Left Arrow: Icons.arrow_forward_rounded (textSecondary -> primaryPurpleLight on hover) */}
-                                      <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#8B5CF6] shrink-0 transition-colors duration-150" />
-                                      {/* Question Text: 14px font-medium (textSecondary -> textPrimary on hover) */}
-                                      <span className="text-[14px] font-medium text-[#94A3B8] group-hover:text-white transition-colors duration-150 leading-snug line-clamp-2">
-                                        {q}
-                                      </span>
-                                    </div>
+                                {/* Follow-up Items matching Flutter's exact hover, arrow_forward_rounded, north_east_rounded on hover */}
+                                <div className="divide-y divide-[#1B1F30]">
+                                  {msg.followUps.map((q, i) => (
+                                    <button
+                                      key={i}
+                                      type="button"
+                                      onClick={() => {
+                                        setPrompt(q);
+                                        handleSendMessage(q);
+                                      }}
+                                      className="w-full text-left flex items-center justify-between px-4 py-3 bg-transparent hover:bg-[#22273D] transition-colors duration-150 cursor-pointer group"
+                                    >
+                                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                        {/* Left Arrow: Icons.arrow_forward_rounded (textSecondary -> primaryPurpleLight on hover) */}
+                                        <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#8B5CF6] shrink-0 transition-colors duration-150" />
+                                        {/* Question Text: 14px font-medium (textSecondary -> textPrimary on hover) */}
+                                        <span className="text-[14px] font-medium text-[#94A3B8] group-hover:text-white transition-colors duration-150 leading-snug line-clamp-2">
+                                          {q}
+                                        </span>
+                                      </div>
 
-                                    {/* Right Arrow: Icons.north_east_rounded (fades in on hover) */}
-                                    <ArrowUpRight className="w-3.5 h-3.5 text-[#8B5CF6] opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0 ml-2" />
-                                  </button>
-                                ))}
+                                      {/* Right Arrow: Icons.north_east_rounded (fades in on hover) */}
+                                      <ArrowUpRight className="w-3.5 h-3.5 text-[#8B5CF6] opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0 ml-2" />
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
                         </div>
                       </div>
                     )}
@@ -1708,7 +2187,9 @@ ${aiLastAnswer.substring(0, 500)}`;
         <div className="px-4 pb-6 pt-2 bg-[#08090E] flex flex-col items-center">
           <input {...getInputProps()} />
           <ModelSpecificSearchInput
-            selectedProvider={isDeepResearchMode ? "deep_research" : selectedProvider}
+            selectedProvider={
+              isDeepResearchMode ? "deep_research" : selectedProvider
+            }
             selectedModel={selectedModel}
             onModelSelect={(m) => setSelectedModel(m)}
             prompt={prompt}
@@ -1717,9 +2198,13 @@ ${aiLastAnswer.substring(0, 500)}`;
             onRemoveFile={(idx) =>
               setSelectedFiles((prev) => prev.filter((_, i) => i !== idx))
             }
-            onAddFiles={(files) => setSelectedFiles((prev) => [...prev, ...files])}
+            onAddFiles={(files) =>
+              setSelectedFiles((prev) => [...prev, ...files])
+            }
             isStreaming={isStreaming}
-            onSendMessage={(overridePrompt) => handleSendMessage(overridePrompt)}
+            onSendMessage={(overridePrompt) =>
+              handleSendMessage(overridePrompt)
+            }
             isDeepThinkActive={isDeepThinkActive}
             setIsDeepThinkActive={setIsDeepThinkActive}
             isListening={isListening}
@@ -1768,7 +2253,10 @@ ${aiLastAnswer.substring(0, 500)}`;
                     source.domain?.replace(/^www\./, "") ||
                     (() => {
                       try {
-                        return new URL(source.url).hostname.replace(/^www\./, "");
+                        return new URL(source.url).hostname.replace(
+                          /^www\./,
+                          "",
+                        );
                       } catch {
                         return source.url || "";
                       }
@@ -1805,8 +2293,10 @@ ${aiLastAnswer.substring(0, 500)}`;
                                     alt={domain}
                                     className="w-full h-full object-contain"
                                     onError={(e) => {
-                                      (e.target as HTMLElement).style.display = "none";
-                                      const parent = (e.target as HTMLElement).parentElement;
+                                      (e.target as HTMLElement).style.display =
+                                        "none";
+                                      const parent = (e.target as HTMLElement)
+                                        .parentElement;
                                       if (parent) {
                                         parent.innerHTML = `<span style="font-size:10px;font-weight:700;color:#9386FF">${(domain.charAt(0) || "S").toUpperCase()}</span>`;
                                       }

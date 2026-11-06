@@ -52,7 +52,7 @@ export default function LandingPageClient() {
       setAuthOpen(true);
     } else {
       // Direct CTA Flow: Seamless client-side navigation without page reload
-      router.push("/multi-chat");
+      router.push("/generate-ai-videos");
     }
   };
 
@@ -70,7 +70,7 @@ export default function LandingPageClient() {
           setAuthOpen(true);
         } else {
           // Direct CTA Flow: Seamless client-side navigation without page reload
-          router.push("/multi-chat");
+          router.push("/generate-ai-videos");
         }
       },
       mode,

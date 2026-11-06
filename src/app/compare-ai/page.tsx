@@ -791,9 +791,11 @@ function CompareAiContent() {
         }
       }
     }
-    const lines: string[] = [];
-    lines.push(currentPrompt.trim());
-    lines.push("\n{{historyData}} Please answer casually with emojis, and don't mention anything about markdown or formatting.");
+   const lines: string[] = [];
+    if (currentPrompt.trim()) {
+      lines.push(currentPrompt.trim());
+    }
+    lines.push("Please answer casually with emojis, and don't mention anything about markdown or formatting.");
     if (fileContent && fileContent.trim()) {
       lines.push(`\n---\nFile Content:\n${fileContent.trim()}`);
     }
